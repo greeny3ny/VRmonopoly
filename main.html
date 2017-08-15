@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+<!--<script src="https://cdn.rawgit.com/AltspaceVR/AltspaceSDK/v2.0.2/dist/altspace.min.js"></script>-->
+<script src="../../dist/altspace.js"></script>
+<script src="https://sdk.altvr.com/libs/altspace.js/2.4.0/altspace.min.js"></script>
+<script src="js/three.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAPChB8eI_3xS0Sm8UW1IWcyR-_aE5YJyo",
+    authDomain: "greeny-masterdatabase-altspace.firebaseapp.com",
+    databaseURL: "https://greeny-masterdatabase-altspace.firebaseio.com",
+    projectId: "greeny-masterdatabase-altspace",
+    storageBucket: "greeny-masterdatabase-altspace.appspot.com",
+    messagingSenderId: "667469072790"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCvKQCyURJiH13dXDl_f6kB_deZ67QmbgQ",
+    authDomain: "vrmonopoly.firebaseapp.com",
+    databaseURL: "https://vrmonopoly.firebaseio.com",
+    projectId: "vrmonopoly",
+    storageBucket: "vrmonopoly.appspot.com",
+    messagingSenderId: "831868478183"
+  };
+  firebase.initializeApp(config);
+</script>
+</head>
+
+<body>
+
+<!-- set up the scene -->
+<a-scene altspace="fullspace: true" sync-system="author: greeny3ny; app: monopoly">
+ 
+    <!-- add a view camera (2d only) -->
+    <!--<a-text value="Hello, World!"></a-text>-->
+
+    <a-assets>
+  
+  	</a-assets>
+
+	<a-entity position='4 8 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
+
+    <!--<a-entity geometry="primitive: box" material="shader: flat; src: #m1" position = '0 10 0'></a-entity>-->
+	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>
+--> 
+</a-scene>
+ 
+</body>
+
+<script>
+console.log("Version 0.0.1");
+
+var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
+var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
+
+var username;
+var userID;
+var moderator;
+var displayname;
+
+var loaded = false;
+
+//update info in master database
+altspace.getUser().then(function(userInfo) {
+	var dataRequest = (THREE.FileLoader ? new THREE.FileLoader() : new THREE.XHRLoader());
+	dataRequest.setWithCredentials(true);
+	dataRequest.load('https://account.altvr.com/api/v1/users/' + userInfo.userId, onLoaded, undefined, undefined);
+	function onLoaded(obj) {
+		console.log('JSON thing:');
+		console.log(JSON.parse(obj));
+		username = JSON.parse(obj).users[0].username;
+		userID = JSON.parse(obj).users[0].user_id;
+		moderator = JSON.parse(obj).users[0].admin;
+		displayname = JSON.parse(obj).users[0].display_name;
+
+		console.log(username + " " + userID + " " + moderator + " " + displayname);
+
+		
+		
+		fbMasterRef.child("users").once('value', function (snapshot) {
+			console.log('Snapshot function worked!');
+			console.log(snapshot.child(username).child('Username').val());
+
+			var usernameSnapshot = snapshot.child(username).child('Username').val();
+
+			if (snapshot.exists() && usernameSnapshot == username) {
+				console.log('Snapshot exists!');
+
+			} else if (snapshot.exists() && usernameSnapshot != username && usernameSnapshot != null) {
+				console.log('Snapshot exists, but user has changed their username.');
+				fbMasterRef.child("users").child(username).child('Username').update(username);
+
+			} else {
+				console.log('Snapshot does not exist; creating one...');
+				console.log('Snapshot will be: ' + username + ', ' + userID + ', ' + moderator + '.');
+				fbMasterRef.child("users").child(username).set({'Moderator': moderator, 'User ID': userID, 'Username': username, 'Display Name': displayname}, function () {
+					console.log('Snapshot created!');
+				});
+			}
+
+		});
+
+		
+		
+		altspace.getDocument().then(function (document) { document.position.set(100, 100, 100); document.rotation.set(0, 90, 0);});
+		console.log("loaded");
+		
+		//main();
+		
+		
+	}
+}); 
+
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+
+//--- synchronisation
+setTimeout(load, 2000);
+
+//add user to database
+//add heartbeat to database
+//check other heartbeats
+//do database stuff re heatbeats
+
+var local_player;
+var local_ref; //player reference in array
+var heartbeat;
+var inSession;
+
+function load(){
+
+	initVars(); //initialise variables
+
+	fbGameRef.child("inSession").on("value", function(snapshot) {
+	
+		//console.log(snapshot.val());
+		inSession = snapshot.val(); //set up insession array
+		
+	});
+	
+	setTimeout(main,2000);
+	
+}
+
+function main(){
+
+	local_ref = inSession.length;
+	//add player to array
+	inSession.push(local_player + " " + heartbeat);
+	//inSession = ["---"]; 
+		
+	console.log("main");
+	
+	setTimeout(updateFirebase, 2000); //waits so that above code can load
+	setInterval(tick, 1000);
+	setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
+
+
+}
+
+//initialise variables
+function initVars(){
+	local_player = displayname;
+	heartbeat = 0;
+	inSession = ["---"];
+}
+
+//update database
+function updateFirebase(){
+	fbGameRef.update({
+		inSession: inSession
+	});
+	//console.log("database updated!");
+}
+
+function readFirebaseUsers(){
+
+	fbGameRef.child("inSession").on("value", function(snapshot) {
+		inSession = snapshot.val();
+	});
+
+}
+
+function tick(){
+
+	heartbeat ++;
+	inSession[local_ref] = local_player + " " + heartbeat;
+	updateFirebase();
+
+}
+
+function checkHeartbeats(){
+
+ var temp1 = inSession;
+ 
+ setTimeout(function temp(){
+ 
+	var temp2 = inSession;
+	var activeCount = 0;
+	var activePos = [];
+	
+	console.log(temp1 + " | " + temp2);
+	
+	for (var i = 0; i<temp1.length; i++){
+	
+		if (temp1[i] != temp2[i]){
+		
+			activePos[activeCount] = i;
+			activeCount ++;
+			
+		
+		}
+	
+	}
+	console.log(activeCount + " players active at : " + activePos);
+	var newPos = 0;
+	for (var i = 0; i < activePos.length; i++){
+		inSession[newPos] = inSession[activePos[i]];
+		local_ref = newPos; //might break stuff
+		newPos ++;
+	}
+	//remove rest of array
+	for (var j = inSession.length; j > activeCount; j--){
+		inSession.pop();
+	}
+	
+ 
+ }, 4000);
+ 
+
+
+}
+
+ 
+ 
+
+</script>
+</html>
