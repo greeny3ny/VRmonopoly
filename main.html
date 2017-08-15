@@ -180,7 +180,7 @@ function main(){
 	
 	setTimeout(updateFirebase, 2000); //waits so that above code can load
 	setInterval(tick, 1000);
-	setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
+	//setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
 	
 
 }
@@ -330,6 +330,15 @@ sim.scene.add(joinBox);
 sim.scene.add(startBox);
 
 joinBox.addEventListener('cursordown', function(){
+
+	//first person to click join button becomes host
+	//host is the only one that removes from database, hopefully works by avoiding conflicts
+	if (counter == 0){
+		host = true;
+		setInterval(checkHeartbeats, 5000);
+		console.log("you are the host");
+	}
+
 	console.log("player joined game");
 	players[counter] = local_player + " " + 0
 	counter ++;
