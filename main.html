@@ -161,9 +161,9 @@ function load(){
 		
 	});
 	
-	fbGameRef.child("host").on("value", function(snapshot){
-		host = snapshot.val();
-	});
+	//fbGameRef.child("host").on("value", function(snapshot){
+	//	host = snapshot.val();
+	//});
 	
 	setTimeout(main,2000);
 	
@@ -213,14 +213,24 @@ function readFirebaseUsers(){
 
 }
 
+function readFirebasePlayers(){
+
+	fbGameRef.child("players").on("value", function(snapshot){
+		players = snapshot.val();
+	});
+
+}
+
 function tick(){
 
 	heartbeat ++;
-	inSession[local_ref] = local_player + " " + heartbeat + " "+joined;
+	inSession[local_ref] = local_player + " " + heartbeat + " " + joined;
 	
 	//if (host == true){
-		updateFirebase();
+	updateFirebase();
 	//}
+	readFirebasePlayers();
+	readFirebaseUsers();
 	
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + inSession);
 
