@@ -182,7 +182,7 @@ function initVars(){
 	local_player = displayname;
 	heartbeat = 0;
 	inSession = ["---"];
-	host = true; //player is host till changed
+	host = false;
 }
 
 //update database
@@ -205,15 +205,16 @@ function tick(){
 
 	heartbeat ++;
 	inSession[local_ref] = local_player + " " + heartbeat;
-	updateFirebase();
+	
+	if (host == true){
+		updateFirebase();
+	}
 	
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + inSession);
 
 }
 
 function checkHeartbeats(){
-
-//if (host == true){
 
  var temp1 = inSession;
  
@@ -258,8 +259,6 @@ function checkHeartbeats(){
  
  }, 4000);
  
-//}
-
 }
 
 
