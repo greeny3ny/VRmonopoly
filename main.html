@@ -48,6 +48,7 @@
   	</a-assets>
 
 	<a-entity position='4 8 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
+	<a-entity id="players" position='4 6 -6' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
 
     <!--<a-entity geometry="primitive: box" material="shader: flat; src: #m1" position = '0 10 0'></a-entity>-->
 	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>
@@ -199,6 +200,8 @@ function tick(){
 	heartbeat ++;
 	inSession[local_ref] = local_player + " " + heartbeat;
 	updateFirebase();
+	
+	document.querySelector('#players').setAttribute('n-text','text: Players : ' + inSession);
 
 }
 
@@ -229,7 +232,7 @@ function checkHeartbeats(){
 	for (var i = 0; i < activePos.length; i++){
 		inSession[newPos] = inSession[activePos[i]];
 		if (activePos[i] == local_ref){
-			console.log("this is you");
+			//console.log("this is you");
 			local_ref = newPos;
 		}
 		//local_ref = newPos; //might break stuff
