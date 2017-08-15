@@ -221,7 +221,6 @@ function checkHeartbeats(){
 			activePos[activeCount] = i;
 			activeCount ++;
 			
-		
 		}
 	
 	}
@@ -229,7 +228,11 @@ function checkHeartbeats(){
 	var newPos = 0;
 	for (var i = 0; i < activePos.length; i++){
 		inSession[newPos] = inSession[activePos[i]];
-		local_ref = newPos; //might break stuff
+		if (activePos[i] == local_ref){
+			console.log("this is you");
+			local_ref = newPos;
+		}
+		//local_ref = newPos; //might break stuff
 		newPos ++;
 	}
 	//remove rest of array
