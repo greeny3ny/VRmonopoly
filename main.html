@@ -206,9 +206,9 @@ function tick(){
 	heartbeat ++;
 	inSession[local_ref] = local_player + " " + heartbeat;
 	
-	if (host == true){
+	//if (host == true){
 		updateFirebase();
-	}
+	//}
 	
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + inSession);
 
