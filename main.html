@@ -50,7 +50,9 @@
 	<a-entity position='4 8 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
 	<a-entity id="players" position='4 6 -6' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
 
-    <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 10 0'></a-entity>
+    <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
+	
+	<a-box id="tile0" collision="box_id:0;"n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
 	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>
 --> 
 </a-scene>
@@ -69,6 +71,8 @@ var moderator;
 var displayname;
 
 var loaded = false;
+
+var players;
 
 //update info in master database
 altspace.getUser().then(function(userInfo) {
@@ -136,11 +140,15 @@ setTimeout(load, 2000);
 //check other heartbeats
 //do database stuff re heatbeats
 
+var sim = new altspace.utilities.Simulation(); //simulation
+
 var local_player;
 var local_ref; //player reference in array
 var heartbeat;
 var inSession;
 var host;
+
+var joined; //local 
 
 function load(){
 
@@ -165,7 +173,7 @@ function main(){
 
 	local_ref = inSession.length;
 	//add player to array
-	inSession.push(local_player + " " + heartbeat);
+	inSession.push(local_player + " " + heartbeat + " " + joined);
 	//inSession = ["---"]; 
 		
 	console.log("main");
@@ -183,12 +191,16 @@ function initVars(){
 	heartbeat = 0;
 	inSession = ["---"];
 	host = false;
+	joined = false;
+	
+	players = ["---"];
 }
 
 //update database
 function updateFirebase(){
 	fbGameRef.update({
-		inSession: inSession
+		inSession: inSession,
+		players: players
 	});
 	//console.log("database updated!");
 }
@@ -204,7 +216,7 @@ function readFirebaseUsers(){
 function tick(){
 
 	heartbeat ++;
-	inSession[local_ref] = local_player + " " + heartbeat;
+	inSession[local_ref] = local_player + " " + heartbeat + " "+joined;
 	
 	//if (host == true){
 		updateFirebase();
@@ -262,7 +274,83 @@ function checkHeartbeats(){
 }
 
 
+//base collision aframe component code
+AFRAME.registerComponent('collision',
+                         {
+  schema:  //does stuff
+  { 
+    jointCubeSize: {
+      type: 'float',
+      default: 0.275
+    },
+	box_id:
+	{
+		type: 'int'
+	}
+  },
+  init: function ()
+  {
+    var self = this;
+    var object = self.el.object3D;
+	
+    object.addBehavior(new altspace.utilities.behaviors.JointCollisionEvents
+                       ({
+      joints: [['Head', 'Center', 0]], jointCubeSize: self.data.jointCubeSize
+    }));
+	
+	//joints enter
+    object.addEventListener('jointcollisionenter', handleJoin);		
+    function handleJoin(event)
+    {
+		console.log(self.data.box_id);
+    }// end function handle join
+	
+	//joint collision leave
+    object.addEventListener('jointcollisionleave', handleLeave);
+    function handleLeave(event)
+    {
+		
+    }//end function handle leave
+  }
+}); //end base collision
  
+var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+var boxGeo = new THREE.BoxGeometry(1, 1, 1);
+var joinBox = new THREE.Mesh(boxGeo, redMat); 
+var startBox = new THREE.Mesh(boxGeo, pinkMat); 
+
+var playerIcons = [];
+
+var counter = 0;
+
+joinBox.position.set(0, 2, 0);
+startBox.position.set(0,2,1);
+sim.scene.add(joinBox);
+sim.scene.add(startBox);
+
+joinBox.addEventListener('cursordown', function(){
+	console.log("player joined game");
+	players[counter] = local_player + " " + 0
+	counter ++;
+	joined = true;
+
+});
+
+startBox.addEventListener('cursordown', function(){
+
+	console.log("game start");
+	
+	for (var i = 0; i < players.length; i++){
+		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
+		playerIcons[i].position.set(0, 0, 2*i);
+		sim.scene.add(playerIcons[i]);
+	}
+	
+	//spawn player icons
+	//tell player one to roll
+
+});
 
 </script>
 </html>
