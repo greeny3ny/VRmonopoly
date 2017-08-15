@@ -140,6 +140,7 @@ var local_player;
 var local_ref; //player reference in array
 var heartbeat;
 var inSession;
+var host;
 
 function load(){
 
@@ -150,6 +151,10 @@ function load(){
 		//console.log(snapshot.val());
 		inSession = snapshot.val(); //set up insession array
 		
+	});
+	
+	fbGameRef.child("host").on("value", function(snapshot){
+		host = snapshot.val();
 	});
 	
 	setTimeout(main,2000);
@@ -168,7 +173,7 @@ function main(){
 	setTimeout(updateFirebase, 2000); //waits so that above code can load
 	setInterval(tick, 1000);
 	setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
-
+	
 
 }
 
@@ -177,6 +182,7 @@ function initVars(){
 	local_player = displayname;
 	heartbeat = 0;
 	inSession = ["---"];
+	host = true; //player is host till changed
 }
 
 //update database
@@ -207,6 +213,8 @@ function tick(){
 
 function checkHeartbeats(){
 
+if (host == true){
+
  var temp1 = inSession;
  
  setTimeout(function temp(){
@@ -235,6 +243,10 @@ function checkHeartbeats(){
 			//console.log("this is you");
 			local_ref = newPos;
 		}
+		
+		if (local_ref == 0){
+			host = true;
+		} else { host = false; }
 		//local_ref = newPos; //might break stuff
 		newPos ++;
 	}
@@ -246,11 +258,11 @@ function checkHeartbeats(){
  
  }, 4000);
  
-
+}
 
 }
 
- 
+
  
 
 </script>
