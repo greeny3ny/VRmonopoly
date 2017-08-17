@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+<!--<script src="https://cdn.rawgit.com/AltspaceVR/AltspaceSDK/v2.0.2/dist/altspace.min.js"></script>-->
+<script src="../../dist/altspace.js"></script>
+<script src="https://sdk.altvr.com/libs/altspace.js/2.4.0/altspace.min.js"></script>
+<script src="js/three.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAPChB8eI_3xS0Sm8UW1IWcyR-_aE5YJyo",
+    authDomain: "greeny-masterdatabase-altspace.firebaseapp.com",
+    databaseURL: "https://greeny-masterdatabase-altspace.firebaseio.com",
+    projectId: "greeny-masterdatabase-altspace",
+    storageBucket: "greeny-masterdatabase-altspace.appspot.com",
+    messagingSenderId: "667469072790"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCvKQCyURJiH13dXDl_f6kB_deZ67QmbgQ",
+    authDomain: "vrmonopoly.firebaseapp.com",
+    databaseURL: "https://vrmonopoly.firebaseio.com",
+    projectId: "vrmonopoly",
+    storageBucket: "vrmonopoly.appspot.com",
+    messagingSenderId: "831868478183"
+  };
+  firebase.initializeApp(config);
+</script>
+</head>
+
+<body>
+
+<!-- set up the scene -->
+<a-scene altspace="fullspace: true" sync-system="author: greeny3ny; app: monopoly">
+ 
+    <!-- add a view camera (2d only) -->
+    <!--<a-text value="Hello, World!"></a-text>-->
+
+    <a-assets>
+		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/77c933e2/ALTOPOLY.png"/>
+  	</a-assets>
+
+	<a-entity position='4 8 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
+	<a-entity id="players" position='4 6 -6' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
+
+    <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
+	
+	<a-box id="tile0" collision="box_id:0;"n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
+	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>
+--> 
+</a-scene>
+ 
+</body>
+
+<script>
+console.log("Version 0.0.1");
+
+var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
+var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
+
+var username;
+var userID;
+var moderator;
+var displayname;
+
+//update info in master database
+altspace.getUser().then(function(userInfo) {
+	var dataRequest = (THREE.FileLoader ? new THREE.FileLoader() : new THREE.XHRLoader());
+	dataRequest.setWithCredentials(true);
+	dataRequest.load('https://account.altvr.com/api/v1/users/' + userInfo.userId, onLoaded, undefined, undefined);
+	function onLoaded(obj) {
+		console.log('JSON thing:');
+		console.log(JSON.parse(obj));
+		username = JSON.parse(obj).users[0].username;
+		userID = JSON.parse(obj).users[0].user_id;
+		moderator = JSON.parse(obj).users[0].admin;
+		displayname = JSON.parse(obj).users[0].display_name;
+
+		console.log(username + " " + userID + " " + moderator + " " + displayname);
+
+		
+		
+		fbMasterRef.child("users").once('value', function (snapshot) {
+			console.log('Snapshot function worked!');
+			console.log(snapshot.child(username).child('Username').val());
+
+			var usernameSnapshot = snapshot.child(username).child('Username').val();
+
+			if (snapshot.exists() && usernameSnapshot == username) {
+				console.log('Snapshot exists!');
+
+			} else if (snapshot.exists() && usernameSnapshot != username && usernameSnapshot != null) {
+				console.log('Snapshot exists, but user has changed their username.');
+				fbMasterRef.child("users").child(username).child('Username').update(username);
+
+			} else {
+				console.log('Snapshot does not exist; creating one...');
+				console.log('Snapshot will be: ' + username + ', ' + userID + ', ' + moderator + '.');
+				fbMasterRef.child("users").child(username).set({'Moderator': moderator, 'User ID': userID, 'Username': username, 'Display Name': displayname}, function () {
+					console.log('Snapshot created!');
+				});
+			}
+
+		});
+
+		
+		
+		altspace.getDocument().then(function (document) { document.position.set(100, 100, 100); document.rotation.set(0, 90, 0);});
+		console.log("loaded");
+		
+		//main();
+		
+		
+	}
+}); 
+
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+
+//--- synchronisation
+setTimeout(main, 2000); //waits for user data before starting
+
+//add user to database
+//add heartbeat to database
+//check other heartbeats
+//do database stuff re heatbeats
+
+var sim = new altspace.utilities.Simulation(); //simulation
+
+var gameStart; //boolean declaring if game is started or not
+
+var joined; //local 
+
+var loaded = false;
+
+var players;
+var playerTurn; //what players turn is it
+
+var playerPos; //0 = go, array storing all players locations
+
+function main(){
+
+	console.log("main");
+	
+	initVars();
+	
+	setInterval(tick, 1000); //start ticker
+	//setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
+	
+
+}
+
+//initialise variables
+function initVars(){
+	gameStart = false;
+	
+	joined = false;
+	
+	players = [];
+	
+	playerTurn = 0;
+	playerPos = 0;	
+}
+
+//update database
+function updateFirebase(){
+	fbGameRef.update({
+		players: players,
+		turn: playerTurn,
+		position: playerPos,
+		gameStart: gameStart
+	});
+	//console.log("database updated!");
+}
+
+//reads users in session
+function readFirebaseUsers(){
+
+	fbGameRef.child("inSession").on("value", function(snapshot) {
+		inSession = snapshot.val();
+	});
+
+}
+
+//reads users who are playing
+function readFirebasePlayers(){
+
+	fbGameRef.child("players").on("value", function(snapshot){
+		players = snapshot.val();
+	});
+
+}
+
+function readFirebaseTurn(){
+	fbGameRef.child("turn").on("value", function(snapshot){
+		playerTurn = snapshot.val();
+	});
+}
+
+function readFirebasePos(){
+
+	fbGameRef.child("position").on("value", function(snapshot){
+		playerPos = snapshot.val();
+	});
+
+}
+
+var temp = false;;
+//tick function
+function tick(){
+
+	readFirebasePlayers(); //check if players is being updated
+	
+if (gameStart == true){
+	if (players[playerTurn] == displayname){
+		if (temp == false){
+			console.log("its your turn!");
+			sim.scene.add(rollDiceBox);
+			temp = true;
+		}
+	}
+}
+	//change n-text
+	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
+
+}
+
+//base collision aframe component code
+AFRAME.registerComponent('collision',
+                         {
+  schema:  //does stuff
+  { 
+    jointCubeSize: {
+      type: 'float',
+      default: 0.275
+    },
+	box_id:
+	{
+		type: 'int'
+	}
+  },
+  init: function ()
+  {
+    var self = this;
+    var object = self.el.object3D;
+	
+    object.addBehavior(new altspace.utilities.behaviors.JointCollisionEvents
+                       ({
+      joints: [['Head', 'Center', 0]], jointCubeSize: self.data.jointCubeSize
+    }));
+	
+	//joints enter
+    object.addEventListener('jointcollisionenter', handleJoin);		
+    function handleJoin(event)
+    {
+		console.log(self.data.box_id);
+    }// end function handle join
+	
+	//joint collision leave
+    object.addEventListener('jointcollisionleave', handleLeave);
+    function handleLeave(event)
+    {
+		
+    }//end function handle leave
+  }
+}); //end base collision
+ 
+var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+var greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+
+var boxGeo = new THREE.BoxGeometry(1, 1, 1);
+
+var joinBox = new THREE.Mesh(boxGeo, redMat); 
+var startBox = new THREE.Mesh(boxGeo, pinkMat);
+var resetBox = new THREE.Mesh(boxGeo, greenMat);
+var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
+
+var playerIcons = [];
+var voteKickBox = [];
+
+var counter = 0;
+
+joinBox.position.set(0, 2, 0);
+startBox.position.set(0,2,1);
+resetBox.position.set(10, 0, 10);
+rollDiceBox.position.set(0,2,-1);
+
+sim.scene.add(joinBox);
+sim.scene.add(resetBox);
+//sim.scene.add(rollDiceBox);
+
+joinBox.addEventListener('cursordown', function(){
+	console.log("join click | " + joined);
+	if (joined == false){
+		
+		//players already being read every second
+		//add to database
+		console.log(players);
+		
+		//issue here
+		if (players == null){
+			players = []; //sets up array again
+			players[0] = displayname;
+		} else {
+			players[players.length] = displayname;
+		}
+		
+		sim.scene.add(startBox); //startbox only appears for person who joins game
+		
+		joined = true;
+		console.log(displayname + " joined!");
+		updateFirebase(); //updates firebase with new info
+	}
+	
+});
+
+resetBox.addEventListener('cursordown', function(){
+	
+	
+	sim.scene.remove(startBox); //remove startbox
+	
+	for (var i = 0; i<players.length; i++){
+		sim.scene.remove(playerIcons[i]);
+		sim.scene.remove(voteKickBox[i]);
+	}
+	
+	sim.scene.remove(rollDiceBox);
+	
+	console.log("game reset");
+	players = []; //reset players
+	gameStart = false;
+	joined = false;
+	updateFirebase(); //update firebase
+	
+});
+
+rollDiceBox.addEventListener('cursordown', function(){
+	
+	var test = Math.floor((Math.random() * 12) + 1);
+	console.log(test);
+	
+	
+	
+});
+
+
+startBox.addEventListener('cursordown', function(){
+
+	console.log("game start");
+	
+	for (var i = 0; i < players.length; i++){
+		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
+		voteKickBox[i] = new THREE.Mesh(boxGeo, pinkMat);
+		
+		playerIcons[i].position.set(-9, i, 9); //testing
+		voteKickBox[i].position.set(1, 2*i, 1); //testing 2
+		
+		sim.scene.add(playerIcons[i]);
+		sim.scene.add(voteKickBox[i]);
+	}
+	
+	playerTurn = 0;
+	console.log(playerTurn);
+	
+	gameStart = true;
+	updateFirebase();
+	
+	//spawn player icons
+	//tell player one to roll
+
+});
+
+</script>
+</html>
