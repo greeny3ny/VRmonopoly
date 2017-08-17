@@ -60,7 +60,7 @@
 </body>
 
 <script>
-console.log("Version 0.0.3");
+console.log("Version 0.0.3.1");
 
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -216,6 +216,12 @@ function readFirebasePos(){
 
 }
 
+function readFirebaseStart(){
+	fbGameRef.child("gameStart").on("value", function(snapshot){
+		gameStart = snapshot.val();
+	});
+}
+
 var temp = false;
 var temp_reset = false;
 var temp_start = false;
@@ -224,7 +230,7 @@ var rolled = false; //is dice been rolled?
 function tick(){
 
 	readFirebasePlayers(); //check if players is being updated
-	
+	readFirebaseStart();
 	
 if (gameStart == true){
 	temp_reset = false;
