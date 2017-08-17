@@ -222,13 +222,17 @@ function tick(){
 
 	readFirebasePlayers(); //check if players is being updated
 	
+	
 if (gameStart == true){
+	console.log(playerTurn + " | " + players[playerTurn]);
 	if (players[playerTurn] == displayname){
 		if (temp == false){
 			console.log("its your turn!");
 			sim.scene.add(rollDiceBox);
 			temp = true;
 		}
+	} else {
+		sim.scene.remove(rollDiceBox);
 	}
 }
 	//change n-text
@@ -340,8 +344,11 @@ resetBox.addEventListener('cursordown', function(){
 	
 	console.log("game reset");
 	players = []; //reset players
+	playerTurn = 0;
+	playerPos = 0;
 	gameStart = false;
 	joined = false;
+	temp = false;
 	updateFirebase(); //update firebase
 	
 });
@@ -351,10 +358,13 @@ rollDiceBox.addEventListener('cursordown', function(){
 	var test = Math.floor((Math.random() * 12) + 1);
 	console.log(test);
 	
+	temp = false; //refactor
 	
+	playerPos[playerTurn] += test;
+	
+	updateFirebase();
 	
 });
-
 
 startBox.addEventListener('cursordown', function(){
 
@@ -371,6 +381,8 @@ startBox.addEventListener('cursordown', function(){
 		sim.scene.add(voteKickBox[i]);
 	}
 	
+
+	
 	playerTurn = 0;
 	console.log(playerTurn);
 	
@@ -379,8 +391,12 @@ startBox.addEventListener('cursordown', function(){
 	
 	//spawn player icons
 	//tell player one to roll
-
+	
+	sim.scene.remove(startBox); //throws error, but works
+	
 });
+
+
 
 </script>
 </html>
