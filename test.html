@@ -44,7 +44,7 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/77c933e2/ALTOPOLY.png"/>
+		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/e768e8da/ALTOPOLY.png"/>
   	</a-assets>
 
 	<a-entity position='4 10 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -277,7 +277,7 @@ if (gameStart == true){
 	if (temp_reset == false){
 	sim.scene.remove(startBox); //remove startbox
 	
-	for (var i = 0; i<players.length; i++){
+	for (var i = 0; i < players.length; i++){
 		sim.scene.remove(playerIcons[i]);
 		sim.scene.remove(voteKickBox[i]);
 	}
