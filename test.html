@@ -61,7 +61,7 @@
 </body>
 
 <script>
-var version = "0.0.3.7"
+var version = "0.0.3.8"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -236,7 +236,6 @@ function tick(){
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
 	readFirebaseTurn();
-	readFirebaseTempStart();
 	//readFirebasePos();
 	
 if (gameStart == true){
