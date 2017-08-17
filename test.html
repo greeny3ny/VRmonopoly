@@ -60,7 +60,7 @@
 </body>
 
 <script>
-console.log("Version 0.0.2");
+console.log("Version 0.0.3");
 
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -218,6 +218,7 @@ function readFirebasePos(){
 
 var temp = false;
 var temp_reset = false;
+var temp_start = false;
 var rolled = false; //is dice been rolled?
 //tick function
 function tick(){
@@ -228,6 +229,28 @@ function tick(){
 if (gameStart == true){
 	temp_reset = false;
 	//console.log(playerTurn + " | " + players[playerTurn]);
+	
+	//set up start
+	if (temp_start == false) {
+		for (var i = 0; i < players.length; i++){
+			playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
+			voteKickBox[i] = new THREE.Mesh(boxGeo, pinkMat);
+			
+			playerIcons[i].position.set(-9, i, 9); //testing
+			voteKickBox[i].position.set(1, 2*i, 1); //testing 2
+		
+			playerPos[i] = 0;
+		
+			sim.scene.add(playerIcons[i]);
+			sim.scene.add(voteKickBox[i]);
+		}
+
+		playerTurn = 0;
+		console.log(playerTurn);
+		sim.scene.remove(startBox); //throws error, but works
+		temp_start = true;
+	}
+	
 	if (players[playerTurn] == displayname){
 		if (temp == false){
 			console.log("its your turn!");
@@ -258,13 +281,17 @@ if (gameStart == true){
 	temp = false;
 	rolled = false;
 	
-	
+	updateFirebase();
+	temp_start = false;
 	temp_reset = true; //used so only happens once
 	
 	}
 
 
-}
+} //end gamestart if
+
+
+
 	//change n-text
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
 
@@ -392,23 +419,7 @@ startBox.addEventListener('cursordown', function(){
 	console.log("game start");
 	
 	//loop through all players in game
-	for (var i = 0; i < players.length; i++){
-		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
-		voteKickBox[i] = new THREE.Mesh(boxGeo, pinkMat);
-		
-		playerIcons[i].position.set(-9, i, 9); //testing
-		voteKickBox[i].position.set(1, 2*i, 1); //testing 2
-		
-		playerPos[i] = 0;
-		
-		sim.scene.add(playerIcons[i]);
-		sim.scene.add(voteKickBox[i]);
-	}
 	
-
-	
-	playerTurn = 0;
-	console.log(playerTurn);
 	
 	gameStart = true;
 	updateFirebase();
@@ -416,7 +427,7 @@ startBox.addEventListener('cursordown', function(){
 	//spawn player icons
 	//tell player one to roll
 	
-	sim.scene.remove(startBox); //throws error, but works
+	
 	
 });
 
