@@ -61,7 +61,7 @@
 </body>
 
 <script>
-var version = "0.0.3.4"
+var version = "0.0.3.5"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -412,6 +412,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 	
 	rolled = true; //refactor
 	
+	readFirebasePos();
 	playerPos[playerTurn] += test;
 	console.log(playerPos);
 	
