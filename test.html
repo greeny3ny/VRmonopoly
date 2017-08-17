@@ -61,7 +61,7 @@
 </body>
 
 <script>
-var version = "0.0.3.6"
+var version = "0.0.3.7"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -225,6 +225,7 @@ function readFirebaseStart(){
 	});
 }
 
+
 var temp = false;
 var temp_reset = false;
 var temp_start = false;
@@ -235,6 +236,7 @@ function tick(){
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
 	readFirebaseTurn();
+	readFirebaseTempStart();
 	//readFirebasePos();
 	
 if (gameStart == true){
@@ -250,15 +252,11 @@ if (gameStart == true){
 			
 			playerIcons[i].position.set(-9, i, 9); //testing
 			voteKickBox[i].position.set(1, 2*i, 1); //testing 2
-		
-			playerPos[i] = 0;
-		
+
 			sim.scene.add(playerIcons[i]);
 			sim.scene.add(voteKickBox[i]);
 		}
 
-		playerTurn = 0;
-		console.log(playerTurn);
 		sim.scene.remove(startBox); //throws error, but works
 		temp_start = true;
 	}
@@ -376,7 +374,7 @@ sim.scene.add(resetBox);
 
 joinBox.addEventListener('cursordown', function(){
 	console.log("join click | " + joined);
-	if (joined == false){
+	if (joined == false && gameStart == false){
 		
 		//players already being read every second
 		//add to database
@@ -433,7 +431,8 @@ startBox.addEventListener('cursordown', function(){
 	
 	//loop through all players in game
 	
-	
+	playerPos[i] = 0;
+	playerTurn = 0;
 	gameStart = true;
 	updateFirebase();
 	
