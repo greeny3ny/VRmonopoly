@@ -61,7 +61,7 @@
 </body>
 
 <script>
-var version = "0.0.3.5"
+var version = "0.0.3.6"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -243,6 +243,7 @@ if (gameStart == true){
 	
 	//set up start
 	if (temp_start == false) {
+		playerPos = []; //initialise array
 		for (var i = 0; i < players.length; i++){
 			playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
 			voteKickBox[i] = new THREE.Mesh(boxGeo, pinkMat);
