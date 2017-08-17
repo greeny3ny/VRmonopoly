@@ -49,6 +49,7 @@
 
 	<a-entity position='4 8 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
 	<a-entity id="players" position='4 6 -6' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
+	<a-entity id="version" position='4 8 -6' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
 
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
@@ -60,7 +61,9 @@
 </body>
 
 <script>
-console.log("Version 0.0.3.1");
+var version = "0.0.3.1"
+console.log("Version :" + version);
+document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -231,6 +234,8 @@ function tick(){
 
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
+	readFirebaseTurn();
+	readFirebasePos();
 	
 if (gameStart == true){
 	temp_reset = false;
