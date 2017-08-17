@@ -170,7 +170,7 @@ function initVars(){
 	players = [];
 	
 	playerTurn = 0;
-	playerPos = 0;	
+	playerPos = [];	
 }
 
 //update database
@@ -216,7 +216,8 @@ function readFirebasePos(){
 
 }
 
-var temp = false;;
+var temp = false;
+var rolled = false; //is dice been rolled?
 //tick function
 function tick(){
 
@@ -224,16 +225,14 @@ function tick(){
 	
 	
 if (gameStart == true){
-	console.log(playerTurn + " | " + players[playerTurn]);
+	//console.log(playerTurn + " | " + players[playerTurn]);
 	if (players[playerTurn] == displayname){
 		if (temp == false){
 			console.log("its your turn!");
 			sim.scene.add(rollDiceBox);
 			temp = true;
-		}
-	} else {
-		sim.scene.remove(rollDiceBox);
-	}
+		} 
+	} 
 }
 	//change n-text
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
@@ -345,10 +344,11 @@ resetBox.addEventListener('cursordown', function(){
 	console.log("game reset");
 	players = []; //reset players
 	playerTurn = 0;
-	playerPos = 0;
+	playerPos = [];
 	gameStart = false;
 	joined = false;
 	temp = false;
+	rolled = false;
 	updateFirebase(); //update firebase
 	
 });
@@ -358,10 +358,17 @@ rollDiceBox.addEventListener('cursordown', function(){
 	var test = Math.floor((Math.random() * 12) + 1);
 	console.log(test);
 	
-	temp = false; //refactor
+	rolled = true; //refactor
 	
 	playerPos[playerTurn] += test;
+	console.log(playerPos);
 	
+	playerTurn ++; //next players turn once rolled (will be changed)
+	if (playerTurn >= players.length){
+		playerTurn = 0;
+	}
+	temp = false;
+	sim.scene.remove(rollDiceBox);
 	updateFirebase();
 	
 });
@@ -370,12 +377,15 @@ startBox.addEventListener('cursordown', function(){
 
 	console.log("game start");
 	
+	//loop through all players in game
 	for (var i = 0; i < players.length; i++){
 		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
 		voteKickBox[i] = new THREE.Mesh(boxGeo, pinkMat);
 		
 		playerIcons[i].position.set(-9, i, 9); //testing
 		voteKickBox[i].position.set(1, 2*i, 1); //testing 2
+		
+		playerPos[i] = 0;
 		
 		sim.scene.add(playerIcons[i]);
 		sim.scene.add(voteKickBox[i]);
