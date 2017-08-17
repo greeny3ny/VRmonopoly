@@ -44,7 +44,7 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/e768e8da/ALTOPOLY.png"/>
+		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/77c933e2/ALTOPOLY.png"/>
   	</a-assets>
 
 	<a-entity position='4 8 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -60,7 +60,7 @@
 </body>
 
 <script>
-console.log("Version 0.0.1");
+console.log("Version 0.0.2");
 
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -217,6 +217,7 @@ function readFirebasePos(){
 }
 
 var temp = false;
+var temp_reset = false;
 var rolled = false; //is dice been rolled?
 //tick function
 function tick(){
@@ -225,6 +226,7 @@ function tick(){
 	
 	
 if (gameStart == true){
+	temp_reset = false;
 	//console.log(playerTurn + " | " + players[playerTurn]);
 	if (players[playerTurn] == displayname){
 		if (temp == false){
@@ -233,6 +235,35 @@ if (gameStart == true){
 			temp = true;
 		} 
 	} 
+} else {
+
+ //basically reset stuff
+	
+	if (temp_reset == false){
+	sim.scene.remove(startBox); //remove startbox
+	
+	for (var i = 0; i<players.length; i++){
+		sim.scene.remove(playerIcons[i]);
+		sim.scene.remove(voteKickBox[i]);
+	}
+	
+	sim.scene.remove(rollDiceBox);
+	
+	console.log("game reset");
+	players = []; //reset players
+	playerTurn = 0;
+	playerPos = [];
+	
+	joined = false;
+	temp = false;
+	rolled = false;
+	
+	
+	temp_reset = true; //used so only happens once
+	
+	}
+
+
 }
 	//change n-text
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
@@ -331,24 +362,7 @@ joinBox.addEventListener('cursordown', function(){
 
 resetBox.addEventListener('cursordown', function(){
 	
-	
-	sim.scene.remove(startBox); //remove startbox
-	
-	for (var i = 0; i<players.length; i++){
-		sim.scene.remove(playerIcons[i]);
-		sim.scene.remove(voteKickBox[i]);
-	}
-	
-	sim.scene.remove(rollDiceBox);
-	
-	console.log("game reset");
-	players = []; //reset players
-	playerTurn = 0;
-	playerPos = [];
 	gameStart = false;
-	joined = false;
-	temp = false;
-	rolled = false;
 	updateFirebase(); //update firebase
 	
 });
