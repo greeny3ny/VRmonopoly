@@ -65,7 +65,7 @@
 </body>
 
 <script>
-var version = "0.4.2"
+var version = "0.4.2.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -266,7 +266,8 @@ if (gameStart == true){
 	
 
 	for (var i = 0; i < players.length; i++){
-	setPositions(i);
+		setPositions(i);
+		//console.log("test1");
 	}
 
 	
@@ -324,6 +325,8 @@ function initialiseBoxes(){
 //move boxes to position and carries out specific task based on place
 //brunt of the code goes here
 function setPositions(playerNo){
+	
+	console.log("positions set");
 	
 	if (playerPos[playerNo] >= 40){
 		playerPos[playerNo] -= 40; //back at go (0)
