@@ -44,7 +44,7 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/e768e8da/ALTOPOLY.png"/>
+		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/1c51641e/ALTOPOLY.png"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -75,8 +75,9 @@
 	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
 	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
 
-	
-	<!--<a-box color="black" position="-6.4, 0, 9" scale="0.5, 0.5, 0.5"></a-box>w
+	<a-box color="red" position="-10, 0, 6.9" scale="0.5, 0.5, 0.5"></a-box>
+	<!--<a-box color="blue" position="-10, 0, 6.4" scale="0.5, 0.5, 0.5"></a-box> -->
+	<!--<a-box color="green" position="-10, 0, 5.9" scale="0.5, 0.5, 0.5"></a-box>
 	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>A
 	
 	
@@ -86,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.4.5.1"
+var version = "0.5.1.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -179,6 +180,38 @@ var playerPos; //0 = go, array storing all players locations
 var player_element; //element local player in array is
 var playerMoney; //array holding all money for players
 
+var propertyOwned = []; //array of 40, stores what properties are owned by who
+var housesOwned = []; //array of 40, stores how many houses are on tile, 5 houses = hotel
+//--- box stuff ---
+
+var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+var greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var blueMat = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+
+var boxGeo = new THREE.BoxGeometry(1, 1, 1);
+
+var joinBox = new THREE.Mesh(boxGeo, redMat); 
+var startBox = new THREE.Mesh(boxGeo, pinkMat);
+var resetBox = new THREE.Mesh(boxGeo, greenMat);
+var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
+//--- 
+var buyBox = new THREE.Mesh(boxGeo, greenMat);
+var skipBox = new THREE.Mesh(boxGeo, redMat);
+
+var buyHouseBox = new THREE.Mesh(boxGeo, greenMat);
+var sellHouseBox = new THREE.Mesh(boxGeo, redMat);
+
+var playerIcons = [];
+var voteKickBox = [];
+var propertyCards = [];
+
+
+var counter = 0;
+
+///--------------------
+
+
 function main(){
 
 	console.log("main");
@@ -212,7 +245,9 @@ function updateFirebase(){
 		turn: playerTurn,
 		position: playerPos,
 		gameStart: gameStart,
-		money: playerMoney
+		money: playerMoney,
+		properties: propertyOwned,
+		houses: housesOwned
 	});
 	//console.log("database updated!");
 }
@@ -263,6 +298,23 @@ function readFirebaseMoney(){
 
 }
 
+function readFirebaseOwned(){
+	
+	fbGameRef.child("properties").on("value", function(snapshot){
+		propertyOwned = snapshot.val();
+		//console.log(propertyOwned);
+	});
+
+}
+
+function readFirebaseHouses(){
+
+	fbGameRef.child("houses").on("value", function(snapshot){
+		housesOwned = snapshot.val();
+		//console.log(propertyOwned);
+	});
+
+}
 
 var temp = false;
 var temp_start = false;
@@ -274,12 +326,15 @@ function tick(){
 	readFirebaseStart();
 	readFirebaseTurn();
 	readFirebasePos();
+	//readPropertyOwned();
 	//readFirebaseMoney();
 	
 if (gameStart == true){
 	//console.log(playerTurn + " | " + players[playerTurn]);
 	
 	readFirebaseMoney();
+	readFirebaseOwned();
+	readFirebaseHouses();
 	
 	//set up start
 	if (temp_start == false) {
@@ -333,9 +388,13 @@ if (gameStart == true){
 	rolled = false;
 	
 	temp_start = false;
-	
-	
 
+	//reset box positions
+	for (var i = 0; i < 8; i++){
+		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
+	}//end for8
+	
+	
 
 } //end gamestart if
 
@@ -404,27 +463,58 @@ function drawText(){
 
 function initialiseBoxes(){
 
+	//console.log("test");
+
 	//max 8 players in a game
 	for (var i = 0; i < 8; i++){
 		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);			
 		voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
-			
-		playerIcons[i].position.set(-11, i, 11); //testing
-		voteKickBox[i].position.set(12, 2*i, -6); //testing 2
 		
-		playerIcons[i].scale.set(0.5, 1, 0.5);
-
+		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
+		voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
+		
+		playerIcons[i].scale.set(0.5, 0.5, 0.5);
+		
 		sim.scene.add(playerIcons[i]);
 		sim.scene.add(voteKickBox[i]);
-	}
+		
+	}//end for8
 	
+	for (var i = 0; i<40; i++){
+		propertyCards[i] = new THREE.Mesh(boxGeo, blueMat);
+		propertyCards[i].position.set(0, -1, 0);
+		propertyCards[i].scale.set(0.5, 0.5, 0.5);
+		
+		setPropertyCardPos(i);
+		
+		sim.scene.add(propertyCards[i]);
+	}//end for40
 	
+	buyHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -1, 0);
 	
+	buyHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -1, 0);
+	
+	buyHouseBox.scale.set(0.5, 0.5, 0.5);
+	sellHouseBox.scale.set(0.5, 0.5, 0.5);
+	
+	buyHouseBox.scale.set(0.5, 0.5, 0.5);
+	sellHouseBox.scale.set(0.5, 0.5, 0.5);
+	
+	sim.scene.add(buyHouseBox);
+	sim.scene.add(sellHouseBox);
 
+	sim.scene.add(buyHouseBox);
+	sim.scene.add(sellHouseBox);
+	
 }
 
 //move boxes to position and carries out specific task based on place
 //brunt of the code goes here
+var temp_money;
+var bought = false; //variable saying if player bought tile or not
+var cost = 0; //stores how much player recieves/pays
 function setPositions(playerNo){
 	
 	//console.log("positions set");
@@ -435,14 +525,100 @@ function setPositions(playerNo){
 	}
 
 	switch (playerPos[playerNo]){
+	
 	case 0:
 	//CAMPFIRE (GO)
 	playerIcons[playerNo].position.set(-9, 0, 8.5); 
-	
+
 	break;
+	
 	case 1:
 	//VR MEDITATION (BROWN-1)
+	
+	//move players token to position
 	playerIcons[playerNo].position.set(-9, 0, 6.5); 
+	
+	//check if YOU have landed on property
+	if (playerNo == player_element){
+		//check if owned
+		if (propertyOwned[1] != 10){
+			//console.log("property owned by " + players[propertyOwned[1]]);
+			
+			//check if player owns property already
+			if (propertyOwned[1] == player_element){
+			
+				//buy/sell house option
+				//buyHouseBox.position.set();
+			
+			} else {
+			//player does NOT own property
+			
+			//sets money of player who owns property 
+			//makes sure money only updated once
+			if (temp_money == false){
+			
+			//house check
+				switch (housesOwned[1]){
+				case 0:
+				
+					//if a player owns ALL the lots of any colour group, 
+					//the rent is doubled for unimproved lots in that group
+				
+					//checking if player also owns the other brown tile (which is at element 3)
+					if (propertyOwned[3] == player_element){
+						cost = 4;
+					} else {
+						cost = 2;
+					}
+				break;
+				case 1:
+					cost = 10;
+				break;
+				case 2:
+					cost = 30;
+				break;
+				case 3:
+					cost = 90;
+				break;
+				case 4:
+					cost = 160;
+				break;
+				case 5:
+					cost = 250;
+				break;
+				}//end switch
+				
+				playerMoney[propertyOwned[1]] += cost;
+				playerMoney[playerNo] -= cost;
+				
+				//bankruptcy check
+				
+				temp_money = true;
+			}
+			}
+			//do for houses/hotels too
+		
+		} else {
+			//console.log("property unowned");
+			//display buy / sell boxes
+			//console.log("you have landed here");
+			buyBox.position.set(-10, 0, 5.9);
+			
+			if (bought == true){
+				propertyOwned[1] = player_element;
+				playerMoney[player_element] -= 60;
+				buyBox.position.set(0, -1, 0);
+			}//end if bought  = true
+			
+			
+			
+		}//end if
+		
+		
+	}//end if playerNo ==  player_element
+
+	updateFirebase();
+	
 	break;
 	case 2:
 	//CHEST
@@ -609,6 +785,32 @@ function setPositions(playerNo){
 
 }
 
+
+function setPropertyCardPos(tileNo){
+
+	//console.log("card pos set");
+
+	switch (tileNo){
+	
+	case 1:
+		propertyCards[tileNo].position.set(-10, 0, 6.4); 
+		
+		propertyCards[tileNo].addEventListener('cursordown', function(){
+			console.log("test " + tileNo);
+		});
+
+	break;
+	case 3:
+		propertyCards[tileNo].position.set(-10, 0, 3.4); 
+		
+		propertyCards[tileNo].addEventListener('cursordown', function(){
+			console.log("test " + tileNo);
+		});
+	break;
+	}//end switch
+
+}//end function
+
 //base collision aframe component code
 AFRAME.registerComponent('collision',
                          {
@@ -649,22 +851,8 @@ AFRAME.registerComponent('collision',
   }
 }); //end base collision
  
-var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
-var greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-
-var boxGeo = new THREE.BoxGeometry(1, 1, 1);
-
-var joinBox = new THREE.Mesh(boxGeo, redMat); 
-var startBox = new THREE.Mesh(boxGeo, pinkMat);
-var resetBox = new THREE.Mesh(boxGeo, greenMat);
-var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
-
-var playerIcons = [];
-var voteKickBox = [];
-
-var counter = 0;
-
+//------- box stuff -----------------
+ 
 joinBox.position.set(0, 2, 0);
 startBox.position.set(0,2,1);
 resetBox.position.set(10, 0, 10);
@@ -711,10 +899,19 @@ resetBox.addEventListener('cursordown', function(){
 	playerPos = [];
 	gameStart = false;
 	playerMoney = [];
+	propertyOwned = [];
+	housesOwned = [];
 	updateFirebase(); //update firebase
 	
 	console.log("game reset");
 	
+});
+
+buyBox.addEventListener('cursordown', function(){
+
+	console.log("tile bought!");
+	bought = true;
+
 });
 
 rollDiceBox.addEventListener('cursordown', function(){
@@ -725,6 +922,9 @@ rollDiceBox.addEventListener('cursordown', function(){
 	var diceRoll = dice1 + dice2
 	
 	rolled = true;
+	
+	//used for testing
+	diceRoll = 1;
 	
 	readFirebasePos();
 	playerPos[playerTurn] += diceRoll;
@@ -739,6 +939,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 		playerTurn = 0;
 	}
 	temp = false;
+	temp_money = false;
 	
 	sim.scene.remove(rollDiceBox);
 
@@ -753,9 +954,18 @@ startBox.addEventListener('cursordown', function(){
 	//loop through all players in game
 	playerPos=[];
 	playerMoney=[];
+	propertyOwned = [];
+	housesOwned = [];
 	for (var i = 0; i < players.length; i++){
 		playerPos[i] = 0;
 		playerMoney[i] = 1500;
+		
+	}
+	
+	for (var i=0; i<40; i++){
+		propertyOwned[i] = 10; //10 being who owns property (there is no player 10, variable used as a placeholder for noone)
+		housesOwned[i] = 0; //every tile starts with 0 houses
+		//console.log(housesOwned);
 	}
 	
 	
