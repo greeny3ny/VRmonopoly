@@ -47,15 +47,36 @@
 		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/e768e8da/ALTOPOLY.png"/>
   	</a-assets>
 
-	<a-entity position='4 10 -6' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
-	<a-entity id="players" position='4 6 -6' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
-	<a-entity id="version" position='4 8 -6' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
+	<a-entity id="players" position='8 16 -15' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
+	<a-entity id="version" position='-8 15 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
 
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
 	<a-box id="tile0" collision="box_id:0;"n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
 	
-	<!--<a-box color="black" position="-6.4, 0, 9" scale="0.5, 0.5, 0.5"></a-box>
+	<a-sky color="black" radius="200"></a-sky>
+	
+	<a-entity id="board1" position='-9 12 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board2" position='-9 11 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board3" position='-9 10 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board4" position='-9 9 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board5" position='-9 8 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board6" position='-9 7 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board7" position='-9 6 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="board8" position='-9 5 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	
+	<a-entity id="money1" position='0 12 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money2" position='0 11 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money3" position='0 10 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money4" position='0 9 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money5" position='0 8 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money6" position='0 7 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+
+	
+	<!--<a-box color="black" position="-6.4, 0, 9" scale="0.5, 0.5, 0.5"></a-box>w
 	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>A
 	
 	
@@ -65,7 +86,7 @@
 </body>
 
 <script>
-var version = "0.4.2.1"
+var version = "0.4.3.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -156,6 +177,7 @@ var playerTurn; //what players turn is it
 
 var playerPos; //0 = go, array storing all players locations
 var player_element; //element local player in array is
+var playerMoney; //array holding all money for players
 
 function main(){
 
@@ -180,6 +202,7 @@ function initVars(){
 	
 	playerTurn = 0;
 	playerPos = [];	
+	playerMoney = [];
 }
 
 //update database
@@ -188,7 +211,8 @@ function updateFirebase(){
 		players: players,
 		turn: playerTurn,
 		position: playerPos,
-		gameStart: gameStart
+		gameStart: gameStart,
+		money: playerMoney
 	});
 	//console.log("database updated!");
 }
@@ -231,6 +255,14 @@ function readFirebaseStart(){
 	});
 }
 
+function readFirebaseMoney(){
+
+	fbGameRef.child("money").on("value", function(snapshot){
+		playerMoney = snapshot.val();
+	});
+
+}
+
 
 var temp = false;
 var temp_start = false;
@@ -241,15 +273,17 @@ function tick(){
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
 	readFirebaseTurn();
-	//readFirebasePos();
+	//readFirebaseMoney();
 	
 if (gameStart == true){
 	//console.log(playerTurn + " | " + players[playerTurn]);
 	
+	readFirebaseMoney();
+	
 	//set up start
 	if (temp_start == false) {
 		playerPos = []; //initialise array
-	
+		//playerMoney = []; //init array
 		//--------------
 		
 		sim.scene.remove(startBox); //throws error, but works
@@ -301,8 +335,64 @@ if (gameStart == true){
 
 	//change n-text
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
+	
 
+	//keeps leaderboards updated
+	drawText();
+	
+
+}//end tick function
+
+
+//keep code clean
+function drawText(){
+
+	//only draw money if gamestarted else error
+	if (gameStart == true){
+	
+		document.querySelector('#board1').setAttribute('n-text','text:' + players[0]);
+		document.querySelector('#board2').setAttribute('n-text','text:' + players[1]);
+		document.querySelector('#board3').setAttribute('n-text','text:' + players[2]);
+		document.querySelector('#board4').setAttribute('n-text','text:' + players[3]);
+		document.querySelector('#board5').setAttribute('n-text','text:' + players[4]);
+		document.querySelector('#board6').setAttribute('n-text','text:' + players[5]);
+		document.querySelector('#board7').setAttribute('n-text','text:' + players[6]);
+		document.querySelector('#board8').setAttribute('n-text','text:' + players[7]);
+	
+		document.querySelector('#money1').setAttribute('n-text','text:' + playerMoney[0]);
+		document.querySelector('#money2').setAttribute('n-text','text:' + playerMoney[1]);
+		document.querySelector('#money3').setAttribute('n-text','text:' + playerMoney[2]);
+		document.querySelector('#money4').setAttribute('n-text','text:' + playerMoney[3]);
+		document.querySelector('#money5').setAttribute('n-text','text:' + playerMoney[4]);
+		document.querySelector('#money6').setAttribute('n-text','text:' + playerMoney[5]);
+		document.querySelector('#money7').setAttribute('n-text','text:' + playerMoney[6]);
+		document.querySelector('#money8').setAttribute('n-text','text:' + playerMoney[7]);
+	
+	}else{
+	
+		document.querySelector('#board1').setAttribute('n-text','text:---');
+		document.querySelector('#board2').setAttribute('n-text','text:---');
+		document.querySelector('#board3').setAttribute('n-text','text:---');
+		document.querySelector('#board4').setAttribute('n-text','text:---');
+		document.querySelector('#board5').setAttribute('n-text','text:---');
+		document.querySelector('#board6').setAttribute('n-text','text:---');
+		document.querySelector('#board7').setAttribute('n-text','text:---');
+		document.querySelector('#board8').setAttribute('n-text','text:---');
+	
+		document.querySelector('#money1').setAttribute('n-text','text:---');
+		document.querySelector('#money2').setAttribute('n-text','text:---');
+		document.querySelector('#money3').setAttribute('n-text','text:---');
+		document.querySelector('#money4').setAttribute('n-text','text:---');
+		document.querySelector('#money5').setAttribute('n-text','text:---');
+		document.querySelector('#money6').setAttribute('n-text','text:---');
+		document.querySelector('#money7').setAttribute('n-text','text:---');
+		document.querySelector('#money8').setAttribute('n-text','text:---');
+	
+	}
+	
 }
+
+
 
 function initialiseBoxes(){
 
@@ -319,6 +409,9 @@ function initialiseBoxes(){
 		sim.scene.add(playerIcons[i]);
 		sim.scene.add(voteKickBox[i]);
 	}
+	
+	
+	
 
 }
 
@@ -326,16 +419,18 @@ function initialiseBoxes(){
 //brunt of the code goes here
 function setPositions(playerNo){
 	
-	console.log("positions set");
+	//console.log("positions set");
 	
 	if (playerPos[playerNo] >= 40){
 		playerPos[playerNo] -= 40; //back at go (0)
+		playerMoney[playerNo] += 200; //collect 200
 	}
 
 	switch (playerPos[playerNo]){
 	case 0:
 	//CAMPFIRE (GO)
 	playerIcons[playerNo].position.set(-9, 0, 8.5); 
+	
 	break;
 	case 1:
 	//VR MEDITATION (BROWN-1)
@@ -352,6 +447,7 @@ function setPositions(playerNo){
 	case 4:
 	//LISA TAX -NAME TBC- (TAX-200)
 	playerIcons[playerNo].position.set(-9, 0, 1.7); 
+	playerMoney[playerNo] -= 200; //income tax
 	break;
 	case 5:
 	//CAMPFIRE PORTAL (RAIL-1)
@@ -459,7 +555,7 @@ function setPositions(playerNo){
 	break;
 	case 30:
 	//GO TO SUSPENSION (GO TO JAIL)
-	playerIcons[playerNo].position.set(-9.5, 0, -9.5); 
+	playerIcons[playerNo].position.set(-8.25, 0, -8.25); 
 	
 	//change this to jail and add popup?
 	break;
@@ -606,11 +702,10 @@ resetBox.addEventListener('cursordown', function(){
 	playerTurn = 0;
 	playerPos = [];
 	gameStart = false;
+	playerMoney = [];
 	updateFirebase(); //update firebase
 	
 });
-
-var setPos = false;
 
 rollDiceBox.addEventListener('cursordown', function(){
 	
@@ -623,9 +718,9 @@ rollDiceBox.addEventListener('cursordown', function(){
 	playerPos[playerTurn] += test;
 	console.log("Player moves to pos:" + playerPos);
 	
-	setPositions(playerTurn); //not synced
+	setPositions(playerTurn); //works kinda?
 	
-	setPos = true;
+	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
 	
 	playerTurn ++; //next players turn once rolled (will be changed)
 	if (playerTurn >= players.length){
@@ -645,6 +740,7 @@ startBox.addEventListener('cursordown', function(){
 	
 	for (var i = 0; i < players.length; i++){
 		playerPos[i] = 0;
+		playerMoney[i] = 1500;
 	}
 	
 	
