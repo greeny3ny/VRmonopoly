@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.2.2"
+var version = "0.5.2.3"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -888,6 +888,7 @@ joinBox.addEventListener('cursordown', function(){
 			players[0] = displayname;
 			player_element = 0;
 		} else {
+			console.log(players.length);
 			players[players.length] = displayname;
 			player_element = players.length;
 		}
