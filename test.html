@@ -65,7 +65,7 @@
 </body>
 
 <script>
-var version = "0.0.4.1"
+var version = "0.4.2"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -264,10 +264,11 @@ if (gameStart == true){
 		} 
 	} 
 	
-	if (setPos == true){
-		setPositions(playerTurn);
-		setPos = false;
+
+	for (var i = 0; i < players.length; i++){
+	setPositions(i);
 	}
+
 	
 	
 	
