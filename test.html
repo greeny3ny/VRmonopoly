@@ -44,7 +44,7 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/1c51641e/ALTOPOLY.png"/>
+		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/34903d3c/ALTOPOLY.png"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.1.3"
+var version = "0.5.2.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -195,6 +195,7 @@ var joinBox = new THREE.Mesh(boxGeo, redMat);
 var startBox = new THREE.Mesh(boxGeo, pinkMat);
 var resetBox = new THREE.Mesh(boxGeo, greenMat);
 var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
+var endTurnBox = new THREE.Mesh(boxGeo, blueMat);
 //--- 
 var buyBox = new THREE.Mesh(boxGeo, greenMat);
 var skipBox = new THREE.Mesh(boxGeo, redMat);
@@ -338,7 +339,7 @@ if (gameStart == true){
 	
 	//set up start
 	if (temp_start == false) {
-		playerPos = []; //initialise array
+		//playerPos = []; //initialise array
 		//playerMoney = []; //init array
 		//--------------
 		
@@ -358,14 +359,6 @@ if (gameStart == true){
 	for (var i = 0; i < players.length; i++){
 		setPositions(i);
 	}
-
-	
-	
-	
-	
-	
-	
-	
 	
 } else {
 
@@ -373,8 +366,10 @@ if (gameStart == true){
 	
 	if (joined == false){
 		sim.scene.remove(startBox); //remove startbox
+		sim.scene.add(joinBox); //add join box
 	}
 	sim.scene.remove(rollDiceBox);
+	sim.scene.remove(endTurnBox);
 	
 	
 	if (players == null){
@@ -393,6 +388,8 @@ if (gameStart == true){
 	for (var i = 0; i < 8; i++){
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
 	}//end for8
+	buyBox.position.set(0, -1, 0);
+	
 	
 	
 
@@ -494,12 +491,20 @@ function initialiseBoxes(){
 	//sellHouseBox.position.set(0, -1, 0);
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
+	joinBox.position.set(0, 2, 0);
+	startBox.position.set(0,2,1);
+	resetBox.position.set(10, 0, 10);
+	rollDiceBox.position.set(0,2,-1);
+	endTurnBox.position.set(0,2,-2);
 	
 	buyBox.scale.set(0.5, 0.5, 0.5);
 	//sellHouseBox.scale.set(0.5, 0.5, 0.5);
 	buyHouseBox.scale.set(0.5, 0.5, 0.5);
 	sellHouseBox.scale.set(0.5, 0.5, 0.5);
-	
+
+	//sim.scene.add(endTurnBox);
+	sim.scene.add(joinBox);
+	sim.scene.add(resetBox);
 	sim.scene.add(buyBox);
 	//sim.scene.add(sellHouseBox);
 	sim.scene.add(buyHouseBox);
@@ -537,18 +542,19 @@ function setPositions(playerNo){
 	
 	//check if YOU have landed on property
 	if (playerNo == player_element){
+		//console.log("you have landed here");
 		//check if owned
 		if (propertyOwned[1] != 10){
 			//console.log("property owned by " + players[propertyOwned[1]]);
 			
-			//check if player owns property already
+			//check if client owns property already
 			if (propertyOwned[1] == player_element){
 			
 				//buy/sell house option
 				//buyHouseBox.position.set();
 			
 			} else {
-			//player does NOT own property
+			//other player owns property
 			
 			//sets money of player who owns property 
 			//makes sure money only updated once
@@ -562,7 +568,7 @@ function setPositions(playerNo){
 					//the rent is doubled for unimproved lots in that group
 				
 					//checking if player also owns the other brown tile (which is at element 3)
-					if (propertyOwned[3] == player_element){
+					if (propertyOwned[3] == propertyOwned[1]){
 						cost = 4;
 					} else {
 						cost = 2;
@@ -781,6 +787,8 @@ function setPositions(playerNo){
 	
 	}//end switch
 
+	updateFirebase();
+		
 }
 
 
@@ -808,6 +816,19 @@ function setPropertyCardPos(tileNo){
 	}//end switch
 
 }//end function
+
+function nextTurn(){
+
+	playerTurn ++; //next players turn once rolled (will be changed)
+	if (playerTurn >= players.length){
+		playerTurn = 0;
+	}
+	temp = false;
+	//sim.scene.remove(rollDiceBox);
+	
+	updateFirebase();
+
+}
 
 //base collision aframe component code
 AFRAME.registerComponent('collision',
@@ -851,13 +872,6 @@ AFRAME.registerComponent('collision',
  
 //------- box stuff -----------------
  
-joinBox.position.set(0, 2, 0);
-startBox.position.set(0,2,1);
-resetBox.position.set(10, 0, 10);
-rollDiceBox.position.set(0,2,-1);
-
-sim.scene.add(joinBox);
-sim.scene.add(resetBox);
 //sim.scene.add(rollDiceBox);
 
 joinBox.addEventListener('cursordown', function(){
@@ -882,6 +896,7 @@ joinBox.addEventListener('cursordown', function(){
 		
 		playerIcons[player_element].position.set(-9, 0, 8.5); 
 		
+		sim.scene.remove(joinBox);
 		
 		joined = true;
 		console.log(displayname + " joined!");
@@ -899,10 +914,23 @@ resetBox.addEventListener('cursordown', function(){
 	playerMoney = [];
 	propertyOwned = [];
 	housesOwned = [];
+	
+	//only synced data can go here
+	
 	updateFirebase(); //update firebase
 	
 	console.log("game reset");
 	
+});
+
+endTurnBox.addEventListener('cursordown', function(){
+
+	console.log("end turn");
+	
+	nextTurn();
+	
+	sim.scene.remove(endTurnBox);
+
 });
 
 buyBox.addEventListener('cursordown', function(){
@@ -913,13 +941,24 @@ buyBox.addEventListener('cursordown', function(){
 });
 
 rollDiceBox.addEventListener('cursordown', function(){
-	
+		
+	var double = false;
 	var dice1 = Math.floor((Math.random()*6)+1); //redo
 	var dice2 = Math.floor( (Math.random()*6)+1);
 	console.log("Player rolled : " + dice1 + " | " + dice2);
 	var diceRoll = dice1 + dice2
 	
+	if (dice1 == dice2){
+		double = true;
+		//roll again
+	} else {
+		sim.scene.remove(rollDiceBox);
+	}
+	
 	rolled = true;
+	
+	//player needs to roll to end turn
+	sim.scene.add(endTurnBox);
 	
 	//used for testing
 	diceRoll = 1;
@@ -928,20 +967,14 @@ rollDiceBox.addEventListener('cursordown', function(){
 	playerPos[playerTurn] += diceRoll;
 	console.log("Player moves to pos:" + playerPos);
 	
+	//bug here
 	setPositions(playerTurn); //works kinda?
 	
 	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
-	
-	playerTurn ++; //next players turn once rolled (will be changed)
-	if (playerTurn >= players.length){
-		playerTurn = 0;
-	}
-	temp = false;
-	temp_money = false;
-	
-	sim.scene.remove(rollDiceBox);
-
 	updateFirebase();
+	temp_money = false; //resets, so money can be dropped if a roll again is needed
+
+	
 	
 });
 
@@ -955,6 +988,7 @@ startBox.addEventListener('cursordown', function(){
 	propertyOwned = [];
 	housesOwned = [];
 	for (var i = 0; i < players.length; i++){
+		console.log("test");
 		playerPos[i] = 0;
 		playerMoney[i] = 1500;
 		
