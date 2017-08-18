@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.1.1"
+var version = "0.5.1.2"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -490,21 +490,18 @@ function initialiseBoxes(){
 		sim.scene.add(propertyCards[i]);
 	}//end for40
 	
+	buyBox.position.set(0, -1, 0);
+	//sellHouseBox.position.set(0, -1, 0);
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
 	
-	buyHouseBox.position.set(0, -1, 0);
-	sellHouseBox.position.set(0, -1, 0);
-	
+	buyBox.scale.set(0.5, 0.5, 0.5);
+	//sellHouseBox.scale.set(0.5, 0.5, 0.5);
 	buyHouseBox.scale.set(0.5, 0.5, 0.5);
 	sellHouseBox.scale.set(0.5, 0.5, 0.5);
 	
-	buyHouseBox.scale.set(0.5, 0.5, 0.5);
-	sellHouseBox.scale.set(0.5, 0.5, 0.5);
-	
-	sim.scene.add(buyHouseBox);
-	sim.scene.add(sellHouseBox);
-
+	sim.scene.add(buyBox);
+	//sim.scene.add(sellHouseBox);
 	sim.scene.add(buyHouseBox);
 	sim.scene.add(sellHouseBox);
 	
