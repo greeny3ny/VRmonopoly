@@ -86,7 +86,7 @@
 </body>
 
 <script>
-var version = "0.4.4.1"
+var version = "0.4.5.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -273,6 +273,7 @@ function tick(){
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
 	readFirebaseTurn();
+	readFirebasePos();
 	//readFirebaseMoney();
 	
 if (gameStart == true){
@@ -301,7 +302,6 @@ if (gameStart == true){
 
 	for (var i = 0; i < players.length; i++){
 		setPositions(i);
-		//console.log("test1");
 	}
 
 	
@@ -713,17 +713,21 @@ resetBox.addEventListener('cursordown', function(){
 	playerMoney = [];
 	updateFirebase(); //update firebase
 	
+	console.log("game reset");
+	
 });
 
 rollDiceBox.addEventListener('cursordown', function(){
 	
-	var test = Math.floor((Math.random() * 12) + 1);
-	console.log(test);
+	var dice1 = Math.floor((Math.random()*6)+1); //redo
+	var dice2 = Math.floor( (Math.random()*6)+1);
+	console.log("Player rolled : " + dice1 + " | " + dice2);
+	var diceRoll = dice1 + dice2
 	
 	rolled = true;
 	
 	readFirebasePos();
-	playerPos[playerTurn] += test;
+	playerPos[playerTurn] += diceRoll;
 	console.log("Player moves to pos:" + playerPos);
 	
 	setPositions(playerTurn); //works kinda?
@@ -735,7 +739,9 @@ rollDiceBox.addEventListener('cursordown', function(){
 		playerTurn = 0;
 	}
 	temp = false;
+	
 	sim.scene.remove(rollDiceBox);
+
 	updateFirebase();
 	
 });
@@ -745,7 +751,8 @@ startBox.addEventListener('cursordown', function(){
 	console.log("game start");
 	
 	//loop through all players in game
-	
+	playerPos=[];
+	playerMoney=[];
 	for (var i = 0; i < players.length; i++){
 		playerPos[i] = 0;
 		playerMoney[i] = 1500;
