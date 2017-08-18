@@ -54,14 +54,18 @@
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
 	<a-box id="tile0" collision="box_id:0;"n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
-	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>
+	
+	<!--<a-box color="black" position="-6.4, 0, 9" scale="0.5, 0.5, 0.5"></a-box>
+	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>A
+	
+	
 --> 
 </a-scene>
  
 </body>
 
 <script>
-var version = "0.0.3.10"
+var version = "0.0.4.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -151,12 +155,14 @@ var players;
 var playerTurn; //what players turn is it
 
 var playerPos; //0 = go, array storing all players locations
+var player_element; //element local player in array is
 
 function main(){
 
 	console.log("main");
 	
 	initVars();
+	initialiseBoxes();
 	
 	setInterval(tick, 1000); //start ticker
 	//setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
@@ -227,7 +233,6 @@ function readFirebaseStart(){
 
 
 var temp = false;
-var temp_reset = false;
 var temp_start = false;
 var rolled = false; //is dice been rolled?
 //tick function
@@ -239,23 +244,14 @@ function tick(){
 	//readFirebasePos();
 	
 if (gameStart == true){
-	temp_reset = false;
 	//console.log(playerTurn + " | " + players[playerTurn]);
 	
 	//set up start
 	if (temp_start == false) {
 		playerPos = []; //initialise array
-		for (var i = 0; i < players.length; i++){
-			playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);
-			voteKickBox[i] = new THREE.Mesh(boxGeo, pinkMat);
-			
-			playerIcons[i].position.set(-9, i, 9); //testing
-			voteKickBox[i].position.set(1, 2*i, 1); //testing 2
-
-			sim.scene.add(playerIcons[i]);
-			sim.scene.add(voteKickBox[i]);
-		}
-
+	
+		//--------------
+		
 		sim.scene.remove(startBox); //throws error, but works
 		temp_start = true;
 	}
@@ -267,34 +263,34 @@ if (gameStart == true){
 			temp = true;
 		} 
 	} 
+	
+	if (setPos == true){
+		setPositions(playerTurn);
+		setPos = false;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 } else {
 
  //basically reset stuff
 	
-	if (temp_reset == false){
+	if (joined == false){
 	sim.scene.remove(startBox); //remove startbox
-	
-	for (var i = 0; i < players.length; i++){
-		sim.scene.remove(playerIcons[i]);
-		sim.scene.remove(voteKickBox[i]);
 	}
-	
 	sim.scene.remove(rollDiceBox);
 	
-	console.log("game reset");
-	players = []; //reset players
-	playerTurn = 0;
-	playerPos = [];
-	
-	joined = false;
+	//console.log("game reset");
+
 	temp = false;
 	rolled = false;
 	
-	updateFirebase();
 	temp_start = false;
-	temp_reset = true; //used so only happens once
-	
-	}
 
 
 } //end gamestart if
@@ -303,6 +299,205 @@ if (gameStart == true){
 
 	//change n-text
 	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
+
+}
+
+function initialiseBoxes(){
+
+	//max 8 players in a game
+	for (var i = 0; i < 8; i++){
+		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);			
+		voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
+			
+		playerIcons[i].position.set(-11, i, 11); //testing
+		voteKickBox[i].position.set(12, 2*i, -6); //testing 2
+		
+		playerIcons[i].scale.set(0.5, 1, 0.5);
+
+		sim.scene.add(playerIcons[i]);
+		sim.scene.add(voteKickBox[i]);
+	}
+
+}
+
+//move boxes to position and carries out specific task based on place
+//brunt of the code goes here
+function setPositions(playerNo){
+	
+	if (playerPos[playerNo] >= 40){
+		playerPos[playerNo] -= 40; //back at go (0)
+	}
+
+	switch (playerPos[playerNo]){
+	case 0:
+	//CAMPFIRE (GO)
+	playerIcons[playerNo].position.set(-9, 0, 8.5); 
+	break;
+	case 1:
+	//VR MEDITATION (BROWN-1)
+	playerIcons[playerNo].position.set(-9, 0, 6.5); 
+	break;
+	case 2:
+	//CHEST
+	playerIcons[playerNo].position.set(-9, 0, 4.85); 
+	break;
+	case 3:
+	//VR YOGA (BROWN-2)
+	playerIcons[playerNo].position.set(-9, 0, 3.35); 
+	break;
+	case 4:
+	//LISA TAX -NAME TBC- (TAX-200)
+	playerIcons[playerNo].position.set(-9, 0, 1.7); 
+	break;
+	case 5:
+	//CAMPFIRE PORTAL (RAIL-1)
+	playerIcons[playerNo].position.set(-9, 0, 0.1); 
+	break;
+	case 6:
+	//DISC GOLF (LBLUE-1)
+	playerIcons[playerNo].position.set(-9, 0, -1.55); 
+	break;
+	case 7:
+	//CHANCE
+	playerIcons[playerNo].position.set(-9, 0, -3.2); 
+	break;
+	case 8:
+	//JUNGLE MAZE (LBLUE-2)
+	playerIcons[playerNo].position.set(-9, 0, -4.8); 
+	break;
+	case 9:
+	//MEDIEVAL TAVERN (LBLUE-3)
+	playerIcons[playerNo].position.set(-9, 0, -6.4); 
+	break;
+	case 10:
+	//SUSPENSION (JAIL)
+	//JAILED
+	//playerIcons[playerNo].position.set(-8.25, 0, -8.25); 
+	//JUST VISITING
+	playerIcons[playerNo].position.set(-9.5, 0, -9.5); 
+	break;
+	case 11:
+	//360 THEATER (PINK-1)
+	playerIcons[playerNo].position.set(-6.5, 0, -9); 
+	break;
+	case 12:
+	//-UNNAMED- (UTIL-1)
+	playerIcons[playerNo].position.set(-4.85, 0, -9); 
+	break;
+	case 13:
+	//RAINBOW ROOM (PINK-2)
+	playerIcons[playerNo].position.set(-3.35, 0, -9); 
+	break;
+	case 14:
+	//WINTER WONDERLAND (PINK-3)
+	playerIcons[playerNo].position.set(-1.7, 0, -9); 
+	break;
+	case 15:
+	//JUNGLE MAZE TELEPORT (RAIL-2)
+	playerIcons[playerNo].position.set(-0.1, 0, -9); 
+	break;
+	case 16:
+	//BOSS MONSTER (ORANGE-1)
+	playerIcons[playerNo].position.set(1.55, 0, -9); 
+	break;
+	case 17:
+	//CHEST
+	playerIcons[playerNo].position.set(3.2, 0, -9); 
+	break;
+	case 18:
+	//HOLOGRAMGS(ORANGE-2)
+	playerIcons[playerNo].position.set(4.8, 0, -9); 
+	break;
+	case 19:
+	//LOVE LETTER (ORANGE-3)
+	playerIcons[playerNo].position.set(6.4, 0, -9); 
+	break;
+	case 20:
+	//COMMUNITY CORNER(FREE PARKING)
+	playerIcons[playerNo].position.set(9.5, 0, -9.5); 
+	break;
+	
+	case 21:
+	//SCULPT TOGETHER (RED-1)
+	playerIcons[playerNo].position.set(9, 0, -6.5); 
+	break;
+	case 22:
+	//CHANCE
+	playerIcons[playerNo].position.set(9, 0, -4.85); 
+	break;
+	case 23:
+	//PAINT STUDIO (RED-2)
+	playerIcons[playerNo].position.set(9, 0, -3.35); 
+	break;
+	case 24:
+	//SDK (RED-3)
+	playerIcons[playerNo].position.set(9, 0, -1.7); 
+	break;
+	case 25:
+	//DISC GOLD TELEPORT (RAIL-3)
+	playerIcons[playerNo].position.set(9, 0, -0.1); 
+	break;
+	case 26:
+	//VIDEO JUKEBOX (YELLOW-1)
+	playerIcons[playerNo].position.set(9, 0, 1.55); 
+	break;
+	case 27:
+	//NIGHT HOUSE PARTY (YELLOW-2)
+	playerIcons[playerNo].position.set(9, 0, 3.2); 
+	break;
+	case 28:
+	//-UNNAMED- (UTIL-2)
+	playerIcons[playerNo].position.set(9, 0, 4.8); 
+	break;
+	case 29:
+	//HOUSE PARTY (YELLOW-3)
+	playerIcons[playerNo].position.set(9, 0, 6.4); 
+	break;
+	case 30:
+	//GO TO SUSPENSION (GO TO JAIL)
+	playerIcons[playerNo].position.set(-9.5, 0, -9.5); 
+	
+	//change this to jail and add popup?
+	break;
+	case 31:
+	//360 THEATER (PINK-1)
+	playerIcons[playerNo].position.set(6.5, 0, 9); 
+	break;
+	
+	case 32:
+	//-UNNAMED- (UTIL-1)
+	playerIcons[playerNo].position.set(4.85, 0, 9); 
+	break;
+	case 33:
+	//RAINBOW ROOM (PINK-2)
+	playerIcons[playerNo].position.set(3.35, 0, 9); 
+	break;
+	case 34:
+	//WINTER WONDERLAND (PINK-3)
+	playerIcons[playerNo].position.set(1.7, 0, 9); 
+	break;
+	case 35:
+	//JUNGLE MAZE TELEPORT (RAIL-2)
+	playerIcons[playerNo].position.set(0.1, 0, 9); 
+	break;
+	case 36:
+	//BOSS MONSTER (ORANGE-1)
+	playerIcons[playerNo].position.set(-1.55, 0, 9); 
+	break;
+	case 37:
+	//CHEST
+	playerIcons[playerNo].position.set(-3.2, 0, 9); 
+	break;
+	case 38:
+	//HOLOGRAMGS(ORANGE-2)
+	playerIcons[playerNo].position.set(-4.8, 0, 9); 
+	break;
+	case 39:
+	//LOVE LETTER (ORANGE-3)
+	playerIcons[playerNo].position.set(-6.4, 0, 9); 
+	break;	
+	
+	}//end switch
 
 }
 
@@ -383,11 +578,16 @@ joinBox.addEventListener('cursordown', function(){
 		if (players == null){
 			players = []; //sets up array again
 			players[0] = displayname;
+			player_element = 0;
 		} else {
 			players[players.length] = displayname;
+			player_element = players.length;
 		}
 		
 		sim.scene.add(startBox); //startbox only appears for person who joins game
+		
+		playerIcons[player_element].position.set(-9, 0, 8.5); 
+		
 		
 		joined = true;
 		console.log(displayname + " joined!");
@@ -398,21 +598,30 @@ joinBox.addEventListener('cursordown', function(){
 
 resetBox.addEventListener('cursordown', function(){
 	
+	players = []; //reset players
+	playerTurn = 0;
+	playerPos = [];
 	gameStart = false;
 	updateFirebase(); //update firebase
 	
 });
+
+var setPos = false;
 
 rollDiceBox.addEventListener('cursordown', function(){
 	
 	var test = Math.floor((Math.random() * 12) + 1);
 	console.log(test);
 	
-	rolled = true; //refactor
+	rolled = true;
 	
 	readFirebasePos();
 	playerPos[playerTurn] += test;
-	console.log(playerPos);
+	console.log("Player moves to pos:" + playerPos);
+	
+	setPositions(playerTurn); //not synced
+	
+	setPos = true;
 	
 	playerTurn ++; //next players turn once rolled (will be changed)
 	if (playerTurn >= players.length){
