@@ -86,7 +86,7 @@
 </body>
 
 <script>
-var version = "0.4.3.1"
+var version = "0.4.4.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -317,9 +317,15 @@ if (gameStart == true){
  //basically reset stuff
 	
 	if (joined == false){
-	sim.scene.remove(startBox); //remove startbox
+		sim.scene.remove(startBox); //remove startbox
 	}
 	sim.scene.remove(rollDiceBox);
+	
+	
+	if (players == null){
+		//console.log("test");
+		joined = false;
+	}
 	
 	//console.log("game reset");
 
@@ -327,6 +333,8 @@ if (gameStart == true){
 	rolled = false;
 	
 	temp_start = false;
+	
+	
 
 
 } //end gamestart if
