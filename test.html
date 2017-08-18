@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.1.2"
+var version = "0.5.1.3"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -587,7 +587,7 @@ function setPositions(playerNo){
 				
 				playerMoney[propertyOwned[1]] += cost;
 				playerMoney[playerNo] -= cost;
-				
+				updateFirebase();
 				//bankruptcy check
 				
 				temp_money = true;
@@ -605,6 +605,7 @@ function setPositions(playerNo){
 				propertyOwned[1] = player_element;
 				playerMoney[player_element] -= 60;
 				buyBox.position.set(0, -1, 0);
+				updateFirebase();
 			}//end if bought  = true
 			
 			
@@ -614,7 +615,7 @@ function setPositions(playerNo){
 		
 	}//end if playerNo ==  player_element
 
-	updateFirebase();
+	
 	
 	break;
 	case 2:
