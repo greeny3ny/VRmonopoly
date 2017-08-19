@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.2.3"
+var version = "0.5.3.1"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -219,6 +219,7 @@ function main(){
 	
 	initVars();
 	initialiseBoxes();
+	readFirebase();
 	
 	setInterval(tick, 1000); //start ticker
 	//setInterval(checkHeartbeats, 5000); //checks heartbeats every 5 seconds
@@ -317,25 +318,55 @@ function readFirebaseHouses(){
 
 }
 
+//checks element if game has started
+function checkPlayerElement(){
+
+	//assume firebase players already been read
+	for (var i = 0; i < players.length; i++){
+	
+		//will only work if no 2 players share the same name
+		if (players[i] == displayname){
+			player_element = 0;
+		} else {
+			console.log("player not in current game");
+		}
+	
+	}
+
+}//end checkplayerelement
+
 var temp = false;
 var temp_start = false;
 var rolled = false; //is dice been rolled?
 //tick function
-function tick(){
+
+function readFirebase(){
 
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
 	readFirebaseTurn();
 	readFirebasePos();
-	//readPropertyOwned();
-	//readFirebaseMoney();
-	
-if (gameStart == true){
-	//console.log(playerTurn + " | " + players[playerTurn]);
-	
 	readFirebaseMoney();
 	readFirebaseOwned();
 	readFirebaseHouses();
+
+	if (gameStart == true){
+	checkPlayerElement();
+	}
+}
+
+function tick(){
+
+	//read database
+	readFirebase();
+		
+if (gameStart == true){
+	//console.log(playerTurn + " | " + players[playerTurn]);
+	
+	//readFirebaseMoney();
+	//readFirebaseOwned();
+	//readFirebaseHouses();
+	
 	
 	//set up start
 	if (temp_start == false) {
@@ -361,7 +392,7 @@ if (gameStart == true){
 	}
 	
 } else {
-
+//-----------------------------------------------
  //basically reset stuff
 	
 	if (joined == false){
@@ -389,10 +420,11 @@ if (gameStart == true){
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
 	}//end for8
 	buyBox.position.set(0, -1, 0);
+	buyHouseBox.position.set(0, -1, 0);
 	
+	bought = false;
 	
-	
-
+//---------------------------
 } //end gamestart if
 
 
@@ -457,7 +489,6 @@ function drawText(){
 }
 
 
-
 function initialiseBoxes(){
 
 	//console.log("test");
@@ -503,7 +534,7 @@ function initialiseBoxes(){
 	sellHouseBox.scale.set(0.5, 0.5, 0.5);
 
 	//sim.scene.add(endTurnBox);
-	sim.scene.add(joinBox);
+	//sim.scene.add(joinBox);
 	sim.scene.add(resetBox);
 	sim.scene.add(buyBox);
 	//sim.scene.add(sellHouseBox);
@@ -517,6 +548,8 @@ function initialiseBoxes(){
 var temp_money;
 var bought = false; //variable saying if player bought tile or not
 var cost = 0; //stores how much player recieves/pays
+var housePrice = 0; //local, stores house price of tile
+
 function setPositions(playerNo){
 	
 	//console.log("positions set");
@@ -539,20 +572,25 @@ function setPositions(playerNo){
 	
 	//move players token to position
 	playerIcons[playerNo].position.set(-9, 0, 6.5); 
-	
+
 	//check if YOU have landed on property
 	if (playerNo == player_element){
 		//console.log("you have landed here");
 		//check if owned
 		if (propertyOwned[1] != 10){
 			//console.log("property owned by " + players[propertyOwned[1]]);
-			
 			//check if client owns property already
 			if (propertyOwned[1] == player_element){
-			
 				//buy/sell house option
-				//buyHouseBox.position.set();
-			
+				//only places button if more houses can be bought 
+				if (housesOwned[1] < 5){
+					buyHouseBox.position.set(-10.5, 0, 5.9);
+					housePrice = 50;
+				} else {
+					buyHouseBox.position.set(0, -1, 0);
+				}//end if
+				
+				
 			} else {
 			//other player owns property
 			
@@ -888,7 +926,6 @@ joinBox.addEventListener('cursordown', function(){
 			players[0] = displayname;
 			player_element = 0;
 		} else {
-			console.log(players.length);
 			players[players.length] = displayname;
 			player_element = players.length;
 		}
@@ -915,7 +952,7 @@ resetBox.addEventListener('cursordown', function(){
 	playerMoney = [];
 	propertyOwned = [];
 	housesOwned = [];
-	
+
 	//only synced data can go here
 	
 	updateFirebase(); //update firebase
@@ -939,6 +976,21 @@ buyBox.addEventListener('cursordown', function(){
 	console.log("tile bought!");
 	bought = true;
 
+});
+
+//box can only be clicked if player is on tile
+buyHouseBox.addEventListener('cursordown', function(){
+
+	console.log("house bought!");
+	housesOwned[playerPos[player_element]] ++;
+	playerMoney[player_element] -= housePrice;
+	
+	//check bankruptcy
+	
+	updateFirebase();
+	//box can only be clicked 4 times, will disappear after fifth,
+	//so no check needs to be done here
+	
 });
 
 rollDiceBox.addEventListener('cursordown', function(){
