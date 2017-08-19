@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.3.1"
+var version = "0.5.3.2"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -326,9 +326,9 @@ function checkPlayerElement(){
 	
 		//will only work if no 2 players share the same name
 		if (players[i] == displayname){
-			player_element = 0;
+			player_element = i;
 		} else {
-			console.log("player not in current game");
+			//console.log("player not in current game");
 		}
 	
 	}
@@ -575,7 +575,8 @@ function setPositions(playerNo){
 
 	//check if YOU have landed on property
 	if (playerNo == player_element){
-		//console.log("you have landed here");
+		console.log(playerNo + " | " + player_element);
+		console.log("you have landed here");
 		//check if owned
 		if (propertyOwned[1] != 10){
 			//console.log("property owned by " + players[propertyOwned[1]]);
@@ -640,7 +641,8 @@ function setPositions(playerNo){
 			//do for houses/hotels too
 		
 		} else {
-			//console.log("property unowned");
+
+			console.log("property unowned");
 			//display buy / sell boxes
 			//console.log("you have landed here");
 			buyBox.position.set(-10, 0, 5.9);
@@ -996,7 +998,7 @@ buyHouseBox.addEventListener('cursordown', function(){
 rollDiceBox.addEventListener('cursordown', function(){
 		
 	var double = false;
-	var dice1 = Math.floor((Math.random()*6)+1); //redo
+	var dice1 = Math.floor((Math.random()*6)+1);
 	var dice2 = Math.floor( (Math.random()*6)+1);
 	console.log("Player rolled : " + dice1 + " | " + dice2);
 	var diceRoll = dice1 + dice2
@@ -1006,12 +1008,13 @@ rollDiceBox.addEventListener('cursordown', function(){
 		//roll again
 	} else {
 		sim.scene.remove(rollDiceBox);
+		//player needs to roll to end turn
+		sim.scene.add(endTurnBox);
 	}
 	
 	rolled = true;
 	
-	//player needs to roll to end turn
-	sim.scene.add(endTurnBox);
+	
 	
 	//used for testing
 	diceRoll = 1;
