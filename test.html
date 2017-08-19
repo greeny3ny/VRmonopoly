@@ -87,7 +87,7 @@
 </body>
 
 <script>
-var version = "0.5.3.2"
+var version = "0.5.3.3"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 
@@ -575,8 +575,8 @@ function setPositions(playerNo){
 
 	//check if YOU have landed on property
 	if (playerNo == player_element){
-		console.log(playerNo + " | " + player_element);
-		console.log("you have landed here");
+		//console.log(playerNo + " | " + player_element);
+		//console.log("you have landed here");
 		//check if owned
 		if (propertyOwned[1] != 10){
 			//console.log("property owned by " + players[propertyOwned[1]]);
@@ -1005,6 +1005,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 	
 	if (dice1 == dice2){
 		double = true;
+		console.log("double");
 		//roll again
 	} else {
 		sim.scene.remove(rollDiceBox);
