@@ -76,7 +76,7 @@
 </body>
 
 <script>
-var version = "0.0.1"
+var version = "0.0.2"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -100,6 +100,7 @@ var endTurnBox = new THREE.Mesh(boxGeo, blueMat);
 //---- LOCAL VARIABLES ----
 var joined = false; //have I joined the game?
 var postId;
+var firstJoin = false; //am i first to click the join button?
 
 //----                 ----
 
@@ -114,9 +115,14 @@ getUser();
 function main(){
 	console.log("main");
 	
+	fbRead();
+	
 	resetVars();
 	
+	resetBox.position.set(0, 1, 0);
+	
 	sim.scene.add(joinBox);
+	sim.scene.add(resetBox);
 
 }
 
@@ -151,7 +157,7 @@ function updateFirebase(){
 }
 //reads users in session
 
-function readFirebase(){
+function joinClickReadFB(){
 	//child_changed, child_added
 	console.log("reading firebase...");
 
@@ -168,40 +174,52 @@ function readFirebase(){
 		
 		console.log(players[2]);
 		updateFirebase();
+		drawText();
 	});
+
+	console.log("catch");
 	
-	
-	fbGameRef.child("players").on("child_added", function(snapshot){
-		//console.log(snapshot.val().players.length);
-		//playerCount = snapshot.val().players.length;
-	}); 
+}
+
+
+
+function fbRead(){
+
+	fbGameRef.once("value", function(snapshot){
+		console.log("apples");
+		console.log(snapshot.val());
+		
+		firstJoin = (snapshot.val()==null);
+		
+	});
+
 }
 
 //keep code clean
 function drawText(){
 	//only draw money if gamestarted else error
-	if (gameStart == true){
+
 		/*
-		document.querySelector('#board1').setAttribute('n-text','text:' + players[0]);
-		document.querySelector('#board2').setAttribute('n-text','text:' + players[1]);
-		document.querySelector('#board3').setAttribute('n-text','text:' + players[2]);
-		document.querySelector('#board4').setAttribute('n-text','text:' + players[3]);
-		document.querySelector('#board5').setAttribute('n-text','text:' + players[4]);
-		document.querySelector('#board6').setAttribute('n-text','text:' + players[5]);
-		document.querySelector('#board7').setAttribute('n-text','text:' + players[6]);
-		document.querySelector('#board8').setAttribute('n-text','text:' + players[7]);
+		document.querySelector('#board1').setAttribute('n-text','text:' + players[0][0]);
+		document.querySelector('#board2').setAttribute('n-text','text:' + players[1][0]);
+		document.querySelector('#board3').setAttribute('n-text','text:' + players[2][0]);
+		document.querySelector('#board4').setAttribute('n-text','text:' + players[3][0]);
+		document.querySelector('#board5').setAttribute('n-text','text:' + players[4][0]);
+		document.querySelector('#board6').setAttribute('n-text','text:' + players[5][0]);
+		document.querySelector('#board7').setAttribute('n-text','text:' + players[6][0]);
+		document.querySelector('#board8').setAttribute('n-text','text:' + players[7][0]);
+		
+		document.querySelector('#money1').setAttribute('n-text','text:' + players[0][1]);
+		document.querySelector('#money2').setAttribute('n-text','text:' + players[1][1]);
+		document.querySelector('#money3').setAttribute('n-text','text:' + players[2][1]);
+		document.querySelector('#money4').setAttribute('n-text','text:' + players[3][1]);
+		document.querySelector('#money5').setAttribute('n-text','text:' + players[4][1]);
+		document.querySelector('#money6').setAttribute('n-text','text:' + players[5][1]);
+		document.querySelector('#money7').setAttribute('n-text','text:' + players[6][1]);
+		document.querySelector('#money8').setAttribute('n-text','text:' + players[7][1]);
+		
 	
-		document.querySelector('#money1').setAttribute('n-text','text:' + playerMoney[0]);
-		document.querySelector('#money2').setAttribute('n-text','text:' + playerMoney[1]);
-		document.querySelector('#money3').setAttribute('n-text','text:' + playerMoney[2]);
-		document.querySelector('#money4').setAttribute('n-text','text:' + playerMoney[3]);
-		document.querySelector('#money5').setAttribute('n-text','text:' + playerMoney[4]);
-		document.querySelector('#money6').setAttribute('n-text','text:' + playerMoney[5]);
-		document.querySelector('#money7').setAttribute('n-text','text:' + playerMoney[6]);
-		document.querySelector('#money8').setAttribute('n-text','text:' + playerMoney[7]);
-		*/
-	}else{
-	
+		/*
 		document.querySelector('#board1').setAttribute('n-text','text:---');
 		document.querySelector('#board2').setAttribute('n-text','text:---');
 		document.querySelector('#board3').setAttribute('n-text','text:---');
@@ -219,8 +237,8 @@ function drawText(){
 		document.querySelector('#money6').setAttribute('n-text','text:---');
 		document.querySelector('#money7').setAttribute('n-text','text:---');
 		document.querySelector('#money8').setAttribute('n-text','text:---');
+		*/
 	
-	}
 	
 }
 
@@ -235,17 +253,26 @@ joinBox.addEventListener('cursordown', function(){
 	data[3] = []; //places owned
 	data[4] = []; //houses owned (only if places owned)
 	
-	readFirebase();
-	//updateFirebase();
+	if (firstJoin){
+		updateFirebase();
+	} else {
+		joinClickReadFB();
+	}
 	
 	
 });
 
 resetBox.addEventListener('cursordown', function(){
 	
-	resetVars();
+	//resetVars();
 	
-	updateFirebase(); //update firebase
+	players = [];
+	fbGameRef.child("players").update({players:players});
+	
+	firstJoin = false;
+	joined = false;
+	
+	fbRead();
 	
 	console.log("game reset");
 	
