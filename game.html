@@ -104,6 +104,7 @@ var postId;
 //----                 ----
 
 //---- SYNCED VARIABLES ----
+var playerCount = 0;
 var players = [];
 var data=[]; //what players are in the game / their data
 //----                  ----
@@ -112,7 +113,7 @@ getUser();
 
 function main(){
 	console.log("main");
-
+	
 	resetVars();
 	
 	sim.scene.add(joinBox);
@@ -136,39 +137,43 @@ function resetVars(){
 	
 }
 
-//update database
-var counter=0;
+
 
 function updateFirebase(){
 	
-	/*
-	if (postId == null){
-		postId = fbGameRef.child("players").push().key(); //get the post id
-		console.log(postId);
-	}
+	console.log("this should come last");
 	
-	fbGameRef.child("players/"+postId).update({data:data});
-	*/
-	
-	players[counter] = data;
-	counter ++;
+	console.log("count" + playerCount);
+	players[playerCount] = data;
 	
 	fbGameRef.child("players").update({players:players});
-	
+
 }
 //reads users in session
 
 function readFirebase(){
 	//child_changed, child_added
-	//console.log("read");
+	console.log("reading firebase...");
 
-	fbGameRef.child("players").on("value", function(snapshot){
-		console.log(snapshot.val());
+	fbGameRef.child("players").once("value", function(snapshot){
+		console.log("test"  + snapshot.val().players.length);
+		playerCount = snapshot.val().players.length;
+		
+		for (var i=0; i<playerCount; i++){
+			console.log(i);
+			
+			players[i] = snapshot.val().players[i];
+			
+		}
+		
+		console.log(players[2]);
+		updateFirebase();
 	});
 	
 	
-	fbGameRef.child("players").on("child_changed", function(snapshot){
-		console.log("read" + snapshot);
+	fbGameRef.child("players").on("child_added", function(snapshot){
+		//console.log(snapshot.val().players.length);
+		//playerCount = snapshot.val().players.length;
 	}); 
 }
 
@@ -230,8 +235,9 @@ joinBox.addEventListener('cursordown', function(){
 	data[3] = []; //places owned
 	data[4] = []; //houses owned (only if places owned)
 	
-	updateFirebase();
 	readFirebase();
+	//updateFirebase();
+	
 	
 });
 
