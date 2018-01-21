@@ -76,7 +76,7 @@
 </body>
 
 <script>
-var version = "0.0.4"
+var version = "0.0.5"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -90,9 +90,9 @@ var blueMat = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
 //-
 var boxGeo = new THREE.BoxGeometry(1, 1, 1);
 //-
-var joinBox = new THREE.Mesh(boxGeo, redMat); 
+var joinBox = new THREE.Mesh(boxGeo, redMat); //using 
 var startBox = new THREE.Mesh(boxGeo, pinkMat);
-var resetBox = new THREE.Mesh(boxGeo, greenMat);
+var resetBox = new THREE.Mesh(boxGeo, greenMat); //using
 var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
 var endTurnBox = new THREE.Mesh(boxGeo, blueMat);
 //--- 
@@ -109,6 +109,8 @@ var playerCount = 0;
 var players = [];
 var data=[]; //what players are in the game / their data
 var reset = false; //used to trigger global reset
+var gameStarted = false; //is the game started?
+var playerTurn = 0;
 //----                  ----
 
 getUser();
@@ -116,17 +118,23 @@ getUser();
 function main(){
 	console.log("main");
 	
-	fbFirstRead();
+	
 	
 	resetVars();
 	
+	
+	
 	//drawText();
 	
-	resetBox.position.set(0, 1, 0);
+	resetBox.position.set(10, 0.5, 10);
+	startBox.position.set(0, 2, 0);
 	
-	sim.scene.add(joinBox);
+	if (!gameStarted){
+		sim.scene.add(joinBox);
+	}
 	sim.scene.add(resetBox);
-
+	//sim.scene.add(startBox);
+	
 }
 
 function getUser(){
@@ -137,7 +145,19 @@ function getUser(){
 		console.log(user);
 		//sets timeout to deal with latency issues - kinda works
 		//setTimeout(addToSession, 2000); 
-	}).then(main());
+		console.log("first");
+	})
+	.then(function(){
+		fbFirstRead();
+		console.log("second");
+		//readStart();
+	})
+	.then(function(){
+		console.log("start:"+gameStarted);
+		console.log("third");
+	})
+	.then(main());
+	
 	
 }
 
@@ -153,7 +173,7 @@ function resetVars(){
 
 function updateFirebase(){
 	
-	console.log("this should come last");
+	console.log("Updating Firebase");
 	
 	console.log("count" + playerCount);
 	players[playerCount] = data; //sets players new data
@@ -217,12 +237,17 @@ function fbReadChildAdded(){
 
 }
 
+//redundant?
 function fbFirstRead(){
 	//console.log("test");
 	fbGameRef.child("players").once("value", function(snapshot){
 		firstJoin = (snapshot.val()==null); //works out wether person is first to join button
 	});
-
+	fbGameRef.child("gameStarted").on("value", function(snapshot){
+		gameStarted = snapshot.val().gameStart;
+		console.log("Game started : " + gameStarted);
+	});
+	return;
 }
 
 //keep code clean
@@ -246,6 +271,10 @@ function cleanText(){
 joinBox.addEventListener('cursordown', function(){
 	
 	joined = true;
+	
+	sim.scene.remove(joinBox); //remove this box
+	sim.scene.add(startBox); //add the start box
+	
 	console.log("join click " + joined);
 	console.log("Player " + user + " joined");
 	data[0] = user; //name
@@ -271,13 +300,50 @@ joinBox.addEventListener('cursordown', function(){
 	
 });
 
+//Updates game vars, paramater determines what is to be updated
+function updateGameVars(i){
+
+	switch (i){
+		case 0:
+		fbGameRef.child("gameStarted").update({
+			gameStart:gameStarted
+		});
+		break;
+	
+		case 1:
+		fbGameRef.child("playerTurn").update({
+			playerTurn:playerTurn
+		});
+		break;
+		
+		case 2:
+		fbGameRef.child("reset").update({
+			reset:reset
+		});
+		break;
+	
+	}
+
+}
+
+function readStart(){
+
+	fbGameRef.child("gameStarted").on("value", function(snapshot){
+		gameStarted = snapshot.val().gameStart;
+		console.log(gameStarted);
+	});
+
+}
+
 resetBox.addEventListener('cursordown', function(){
 	reset = !reset; //switch the value of reset 
-	fbGameRef.child("reset").update({reset:reset});
+	updateGameVars(2);
 });
 
 startBox.addEventListener('cursordown', function(){
-	console.log("game start");
+	//console.log("game start");
+	gameStarted = true;
+	updateGameVars(0);
 	
 });
 
@@ -286,15 +352,34 @@ fbGameRef.child("reset").on("child_changed", function(snapshot){
 		resetGame();	
 });
 
+fbGameRef.child("gameStarted").on("child_changed", function(snapshot){
+	gameStarted = snapshot.val();
+	console.log("Game Start : " + snapshot.val());
+});
+
+fbGameRef.child("playerTurn").on("child_changed", function(snapshot){
+	playerTurn = players[snapshot.val()][0];
+	console.log("Player " + playerTurn);
+});
+
 function resetGame(){
 
-	cleanText();
+	cleanText(); //clear text first...
 	
 	players = [];
 	fbGameRef.child("players").update({players:players});
 	
+	sim.scene.remove(joinBox);
+	sim.scene.remove(startBox);
+	
 	firstJoin = false;
 	joined = false;
+	gameStarted = false;
+	playerTurn = 0;
+	
+	updateGameVars(0);
+	updateGameVars(1);
+	updateGameVars(2);
 	
 	playerCount = 0;
 	data=[]; //what players are in the game / their data
