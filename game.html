@@ -108,6 +108,7 @@ var firstJoin = false; //am i first to click the join button?
 var playerCount = 0;
 var players = [];
 var data=[]; //what players are in the game / their data
+var reset = false; //used to trigger global reset
 //----                  ----
 
 getUser();
@@ -219,7 +220,8 @@ function fbReadChildAdded(){
 function fbFirstRead(){
 
 	console.log("test");
-	fbGameRef.once("value", function(snapshot){
+	fbGameRef.child("players").once("value", function(snapshot){
+		
 		firstJoin = (snapshot.val()==null); //works out wether person is first to join button
 	});
 
@@ -233,28 +235,6 @@ function drawText(){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:'+players[i][0]);
 			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+players[i][1]);
 		}
-		
-	
-		/*
-		document.querySelector('#board1').setAttribute('n-text','text:---');
-		document.querySelector('#board2').setAttribute('n-text','text:---');
-		document.querySelector('#board3').setAttribute('n-text','text:---');
-		document.querySelector('#board4').setAttribute('n-text','text:---');
-		document.querySelector('#board5').setAttribute('n-text','text:---');
-		document.querySelector('#board6').setAttribute('n-text','text:---');
-		document.querySelector('#board7').setAttribute('n-text','text:---');
-		document.querySelector('#board8').setAttribute('n-text','text:---');
-	
-		document.querySelector('#money1').setAttribute('n-text','text:---');
-		document.querySelector('#money2').setAttribute('n-text','text:---');
-		document.querySelector('#money3').setAttribute('n-text','text:---');
-		document.querySelector('#money4').setAttribute('n-text','text:---');
-		document.querySelector('#money5').setAttribute('n-text','text:---');
-		document.querySelector('#money6').setAttribute('n-text','text:---');
-		document.querySelector('#money7').setAttribute('n-text','text:---');
-		document.querySelector('#money8').setAttribute('n-text','text:---');
-		*/
-	
 	
 }
 
@@ -294,8 +274,22 @@ joinBox.addEventListener('cursordown', function(){
 });
 
 resetBox.addEventListener('cursordown', function(){
+	reset = !reset; //switch the value of reset 
+	fbGameRef.child("reset").update({reset:reset});
+});
+
+startBox.addEventListener('cursordown', function(){
+	console.log("game start");
 	
-	//resetVars();
+});
+
+fbGameRef.child("reset").on("child_changed", function(snapshot){
+		console.log("global reset");
+		resetGame();	
+});
+
+function resetGame(){
+
 	cleanText();
 	
 	players = [];
@@ -306,22 +300,16 @@ resetBox.addEventListener('cursordown', function(){
 	
 	playerCount = 0;
 	data=[]; //what players are in the game / their data
-	
-	
-	
-	
-	
-	//fbFirstRead();
+
 	main();
-	//drawText();
 	
 	console.log("game reset");
-	
-});
 
-startBox.addEventListener('cursordown', function(){
-	console.log("game start");
-	
-});
+}
+
+
+
+
+
 </script>
 </html>
