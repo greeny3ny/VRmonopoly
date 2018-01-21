@@ -76,7 +76,7 @@
 </body>
 
 <script>
-var version = "0.0.2"
+var version = "0.0.3"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -115,9 +115,11 @@ getUser();
 function main(){
 	console.log("main");
 	
-	fbRead();
+	fbFirstRead();
 	
 	resetVars();
+	
+	//drawText();
 	
 	resetBox.position.set(0, 1, 0);
 	
@@ -141,6 +143,9 @@ function getUser(){
 //initialise variables
 function resetVars(){
 	
+	players = [];
+	console.log(players);
+	
 }
 
 
@@ -150,47 +155,66 @@ function updateFirebase(){
 	console.log("this should come last");
 	
 	console.log("count" + playerCount);
-	players[playerCount] = data;
+	players[playerCount] = data; //sets players new data
 	
-	fbGameRef.child("players").update({players:players});
+	fbGameRef.child("players").update({players:players}); //update database
 
+	
+	drawText();
 }
-//reads users in session
 
+//class called when join button clicked
 function joinClickReadFB(){
 	//child_changed, child_added
 	console.log("reading firebase...");
 
+	//reads the database
 	fbGameRef.child("players").once("value", function(snapshot){
-		console.log("test"  + snapshot.val().players.length);
-		playerCount = snapshot.val().players.length;
-		
+		console.log("test"  + snapshot.val().players.length); 
+		playerCount = snapshot.val().players.length; //finds the amount of players in game
+	
+		//loops through players and adds them to database
 		for (var i=0; i<playerCount; i++){
 			console.log(i);
-			
 			players[i] = snapshot.val().players[i];
-			
 		}
 		
-		console.log(players[2]);
-		updateFirebase();
-		drawText();
+		updateFirebase(); //updatesFirebase 
+		drawText(); //draws the text
 	});
 
 	console.log("catch");
 	
 }
 
-
-
-function fbRead(){
-
-	fbGameRef.once("value", function(snapshot){
-		console.log("apples");
+//function used to read database on child_changed
+//does NOT update database
+function fbRead2(){
+	console.log("this is last");
+	//reads database
+	fbGameRef.child("players").on("child_changed", function(snapshot){
+		
 		console.log(snapshot.val());
+		//console.log("test"  + snapshot.val().players.length);
+		playerCount = snapshot.val().length; //gets length of players
 		
-		firstJoin = (snapshot.val()==null);
+		for (var i=0; i<playerCount; i++){
+			console.log(i);
+			
+			players[i] = snapshot.val()[i]; //updates local variables
+			
+		}
 		
+		drawText(); //draws the text
+	});
+
+}
+
+function fbFirstRead(){
+
+	console.log("test");
+	fbGameRef.once("value", function(snapshot){
+		firstJoin = (snapshot.val()==null); //works out wether person is first to join button
 	});
 
 }
@@ -199,24 +223,10 @@ function fbRead(){
 function drawText(){
 	//only draw money if gamestarted else error
 
-		/*
-		document.querySelector('#board1').setAttribute('n-text','text:' + players[0][0]);
-		document.querySelector('#board2').setAttribute('n-text','text:' + players[1][0]);
-		document.querySelector('#board3').setAttribute('n-text','text:' + players[2][0]);
-		document.querySelector('#board4').setAttribute('n-text','text:' + players[3][0]);
-		document.querySelector('#board5').setAttribute('n-text','text:' + players[4][0]);
-		document.querySelector('#board6').setAttribute('n-text','text:' + players[5][0]);
-		document.querySelector('#board7').setAttribute('n-text','text:' + players[6][0]);
-		document.querySelector('#board8').setAttribute('n-text','text:' + players[7][0]);
-		
-		document.querySelector('#money1').setAttribute('n-text','text:' + players[0][1]);
-		document.querySelector('#money2').setAttribute('n-text','text:' + players[1][1]);
-		document.querySelector('#money3').setAttribute('n-text','text:' + players[2][1]);
-		document.querySelector('#money4').setAttribute('n-text','text:' + players[3][1]);
-		document.querySelector('#money5').setAttribute('n-text','text:' + players[4][1]);
-		document.querySelector('#money6').setAttribute('n-text','text:' + players[5][1]);
-		document.querySelector('#money7').setAttribute('n-text','text:' + players[6][1]);
-		document.querySelector('#money8').setAttribute('n-text','text:' + players[7][1]);
+		for (var i=0; i<playerCount; i++){
+			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:'+players[i][0]);
+			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+players[i][1]);
+		}
 		
 	
 		/*
@@ -242,6 +252,13 @@ function drawText(){
 	
 }
 
+function cleanText(){
+	for (var i=0; i<playerCount; i++){
+		document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
+		document.querySelector('#money'+(i+1)).setAttribute('n-text','text:---');
+	}
+}
+
 joinBox.addEventListener('cursordown', function(){
 	
 	joined = true;
@@ -253,18 +270,26 @@ joinBox.addEventListener('cursordown', function(){
 	data[3] = []; //places owned
 	data[4] = []; //houses owned (only if places owned)
 	
+	//checks wether the player is the first person to join the game or not
+	
+
+	
 	if (firstJoin){
+		console.log("first join");
+		firstJoin = false;
 		updateFirebase();
 	} else {
+		console.log("not first join");
 		joinClickReadFB();
 	}
-	
+	fbRead2();
 	
 });
 
 resetBox.addEventListener('cursordown', function(){
 	
 	//resetVars();
+	cleanText();
 	
 	players = [];
 	fbGameRef.child("players").update({players:players});
@@ -272,7 +297,16 @@ resetBox.addEventListener('cursordown', function(){
 	firstJoin = false;
 	joined = false;
 	
-	fbRead();
+	playerCount = 0;
+	data=[]; //what players are in the game / their data
+	
+	
+	
+	
+	
+	//fbFirstRead();
+	main();
+	//drawText();
 	
 	console.log("game reset");
 	
