@@ -76,7 +76,7 @@
 </body>
 
 <script>
-var version = "0.0.5"
+var version = "0.0.6"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -243,10 +243,10 @@ function fbFirstRead(){
 	fbGameRef.child("players").once("value", function(snapshot){
 		firstJoin = (snapshot.val()==null); //works out wether person is first to join button
 	});
-	fbGameRef.child("gameStarted").on("value", function(snapshot){
-		gameStarted = snapshot.val().gameStart;
-		console.log("Game started : " + gameStarted);
-	});
+	//fbGameRef.child("gameStarted").on("value", function(snapshot){
+	//	gameStarted = snapshot.val().gameStart;
+	//	console.log("Game started : " + gameStarted);
+	//});
 	//return;
 }
 
@@ -266,6 +266,13 @@ function cleanText(){
 		document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
 		document.querySelector('#money'+(i+1)).setAttribute('n-text','text:---');
 	}
+}
+
+function test(){
+	fbGameRef.child("gameStarted").on("value", function(snapshot){
+		gameStarted = snapshot.val().gameStart;
+		console.log("Game started : " + gameStarted);
+	});
 }
 
 joinBox.addEventListener('cursordown', function(){
