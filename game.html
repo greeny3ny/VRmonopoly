@@ -160,7 +160,6 @@ function updateFirebase(){
 	fbGameRef.child("players").update({players:players}); //update database
 
 	
-	drawText();
 }
 
 //class called when join button clicked
@@ -190,21 +189,28 @@ function joinClickReadFB(){
 //function used to read database on child_changed
 //does NOT update database
 function fbRead2(){
-	console.log("this is last");
+	
 	//reads database
 	fbGameRef.child("players").on("child_changed", function(snapshot){
-		
-		console.log(snapshot.val());
-		//console.log("test"  + snapshot.val().players.length);
 		playerCount = snapshot.val().length; //gets length of players
-		
 		for (var i=0; i<playerCount; i++){
-			console.log(i);
-			
-			players[i] = snapshot.val()[i]; //updates local variables
-			
+			//console.log(i);
+			players[i] = snapshot.val()[i]; //updates local variables	
 		}
-		
+		console.log("Child Changed");
+		drawText(); //draws the text
+	});
+
+}
+
+function fbReadChildAdded(){
+	fbGameRef.child("players").on("child_added", function(snapshot){
+		playerCount = snapshot.val().length; //gets length of players
+		for (var i=0; i<playerCount; i++){
+			//console.log(i);
+			players[i] = snapshot.val()[i]; //updates local variables
+		}
+		console.log("Child Added");
 		drawText(); //draws the text
 	});
 
@@ -278,6 +284,7 @@ joinBox.addEventListener('cursordown', function(){
 		console.log("first join");
 		firstJoin = false;
 		updateFirebase();
+		fbReadChildAdded();
 	} else {
 		console.log("not first join");
 		joinClickReadFB();
