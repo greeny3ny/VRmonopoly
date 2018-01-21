@@ -218,10 +218,8 @@ function fbReadChildAdded(){
 }
 
 function fbFirstRead(){
-
-	console.log("test");
+	//console.log("test");
 	fbGameRef.child("players").once("value", function(snapshot){
-		
 		firstJoin = (snapshot.val()==null); //works out wether person is first to join button
 	});
 
@@ -258,7 +256,7 @@ joinBox.addEventListener('cursordown', function(){
 	
 	//checks wether the player is the first person to join the game or not
 	
-
+	fbFirstRead();
 	
 	if (firstJoin){
 		console.log("first join");
