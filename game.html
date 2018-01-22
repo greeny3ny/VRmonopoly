@@ -88,7 +88,7 @@
 </body>
 
 <script>
-var version = "0.5.5.1"
+var version = "0.5.5.2"
 console.log("Version :" + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -1008,12 +1008,17 @@ resetBox.addEventListener('cursordown', function(){
 endTurnBox.addEventListener('cursordown', function(){
 	console.log("end turn");
 	
+	buyHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -1, 0);
+	buyBox.position.set(0, -1, 0);
+	
 	nextTurn();
 	
 	sim.scene.remove(endTurnBox);
 });
 buyBox.addEventListener('cursordown', function(){
 	console.log("tile bought!");
+	
 	bought = true;
 });
 buyHouseBox.addEventListener('cursordown', function(){
@@ -1091,7 +1096,6 @@ rollDiceBox.addEventListener('cursordown', function(){
 	console.log(playerPos[playerTurn]);
 	console.log("Player moves to pos:" + playerPos);
 	
-	//bug here
 	setPositions(playerTurn); //works kinda?
 	
 	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
