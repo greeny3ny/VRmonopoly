@@ -44,8 +44,8 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://greeny3ny.github.io/VRmonopoly/images/ALTOPOLY.png"/>
-		<img id="cardTemplate" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCard.jpg"/>
+		<img id="board" src="ALTOPOLY.png"/>
+		<img id="cardTemplate" src="propertyCard.jpg"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -79,6 +79,8 @@
 	<a-box id="card" src="#cardTemplate" position='0 10 0' rotation='0 0 0' color='white' scale='0.1 5 5'>
 		<a-animation attribute="rotation" dur="50000" to="0 360 0" repeat="indefinite" easing="linear"></a-animation>
 	</a-box>
+	
+	<a-entity id="dice" position='0 3 0' n-text='text: blah has rolled blah'></a-entity>
 	<!--
 	<a-box color="black" position="-10, 0, -4.8" scale="0.5, 0.5, 0.5"></a-box>
 	<a-box color="red" position="-10, 0, -4.3" scale="0.5, 0.5, 0.5"></a-box>
@@ -92,7 +94,7 @@
 </body>
 
 <script>
-var version = "0.0.1"
+var version = "0.0.5"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -195,6 +197,44 @@ function updateFirebase(){
 	});
 	//console.log("database updated!");
 }
+
+function updatePlayers(){
+	fbGameRef.update({
+		players:players
+	});
+}
+function updateTurn(){
+	fbGameRef.update({
+		turn:playerTurn
+	});
+}
+function updatePosition(){
+	fbGameRef.update({
+		position:playerPos
+	});
+}
+function updateGameStart(){
+	fbGameRef.update({
+		gameStart: gameStart
+	});
+}
+function updateMoney(){
+	fbGameRef.update({
+		money: playerMoney
+	});
+}
+function updateProperties(){
+	fbGameRef.update({
+		properties: propertyOwned
+	});
+}
+function updateHouses(){
+	fbGameRef.update({
+		houses: housesOwned
+	});
+}
+
+
 //reads users in session
 function readFirebaseUsers(){
 	fbGameRef.child("inSession").on("value", function(snapshot) {
@@ -231,15 +271,48 @@ function readFirebaseOwned(){
 	
 	fbGameRef.child("properties").on("value", function(snapshot){
 		propertyOwned = snapshot.val();
-		//console.log(propertyOwned);
 	});
 }
 function readFirebaseHouses(){
 	fbGameRef.child("houses").on("value", function(snapshot){
 		housesOwned = snapshot.val();
-		//console.log(propertyOwned);
 	});
 }
+
+/*
+	WILL ALLOW A READ WHEN A CHILD_CHANGE IS DETECTED
+*/
+function readOnChildChanged(){
+	console.log("read on child changed");
+	fbGameRef.child("inSession").on("child_changed", function(snapshot) {
+		inSession = snapshot.val();
+	});
+	fbGameRef.child("players").on("child_changed", function(snapshot){
+		players = snapshot.val();
+	});
+	fbGameRef.child("turn").on("child_changed", function(snapshot){
+		playerTurn = snapshot.val();
+	});
+	fbGameRef.child("position").on("child_changed", function(snapshot){
+		playerPos = snapshot.val();
+	});
+	fbGameRef.child("gameStart").on("child_changed", function(snapshot){
+		gameStart = snapshot.val();
+	});
+	fbGameRef.child("money").on("child_changed", function(snapshot){
+		playerMoney = snapshot.val();
+	});
+	fbGameRef.child("properties").on("child_changed", function(snapshot){
+		propertyOwned = snapshot.val();
+		//console.log(propertyOwned);
+	});
+	fbGameRef.child("houses").on("child_changed", function(snapshot){
+		housesOwned = snapshot.val();
+	});
+	
+}
+
+
 //checks element if game has started
 function checkPlayerElement(){
 	//assume firebase players already been read
@@ -257,8 +330,10 @@ function checkPlayerElement(){
 var temp = false;
 var temp_start = false;
 var rolled = false; //is dice been rolled?
-//tick function
+
+
 function readFirebase(){
+	console.log("testing");
 	readFirebasePlayers(); //check if players is being updated
 	readFirebaseStart();
 	readFirebaseTurn();
@@ -266,9 +341,11 @@ function readFirebase(){
 	readFirebaseMoney();
 	readFirebaseOwned();
 	readFirebaseHouses();
-	if (gameStart == true){
-	checkPlayerElement();
+	if (gameStart){
+		console.log("This message should only appear once");
+		checkPlayerElement();
 	}
+	readOnChildChanged();
 }
 function tick(){
 	//read database
@@ -338,7 +415,7 @@ if (gameStart){
 function drawText(){
 	//only draw money if gamestarted else error
 	if (gameStart){
-		for (var i=0; i<8; i++){
+		for (var i=0; i<players.length; i++){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:'+players[i]);
 			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+playerMoney[i]);
 		}	
@@ -426,7 +503,8 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 
 				playerMoney[propertyOwned[tileNo]] += cost;
 				playerMoney[playerNo] -= cost;
-				updateFirebase();
+				
+				updateMoney();
 				//bankruptcy check
 				
 				temp_money = true;
@@ -444,7 +522,10 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 				propertyOwned[tileNo] = player_element;
 				playerMoney[player_element] -= tilePrice;  //------------------------
 				buyBox.position.set(0, -1, 0);
-				updateFirebase();
+				
+				updateMoney();
+				updateProperties();
+
 			}//end if bought  = true
 			
 			
@@ -479,7 +560,6 @@ function setPositions(playerNo){
 	//move players token to position
 	playerIcons[playerNo].position.set(-9, 0, 6.4); 
 	//check if player owns other lots
-	
 	allLotsOwned = (propertyOwned[1] === propertyOwned[3]);
 	
 	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
@@ -702,7 +782,9 @@ function setPositions(playerNo){
 	break;	
 	
 	}//end switch
-	updateFirebase();
+	//updateFirebase();
+	updatePosition();
+	updateMoney();
 		
 }
 function chanceCard(){
@@ -871,8 +953,7 @@ function nextTurn(){
 	}
 	temp = false;
 	//sim.scene.remove(rollDiceBox);
-	
-	updateFirebase();
+	updateTurn();
 }
  
 //------- box stuff -----------------
@@ -886,7 +967,7 @@ joinBox.addEventListener('cursordown', function(){
 		//add to database
 		console.log(players);
 		
-		//issue here
+		//issue here ??? idk what issue???
 		if (players == null){
 			players = []; //sets up array again
 			players[0] = displayname;
@@ -898,13 +979,11 @@ joinBox.addEventListener('cursordown', function(){
 		
 		sim.scene.add(startBox); //startbox only appears for person who joins game
 		
-		playerIcons[player_element].position.set(-9, 0, 8.5); 
-		
 		sim.scene.remove(joinBox);
 		
 		joined = true;
 		console.log(displayname + " joined!");
-		updateFirebase(); //updates firebase with new info
+		updatePlayers();
 	}
 	
 });
@@ -937,7 +1016,6 @@ endTurnBox.addEventListener('cursordown', function(){
 });
 buyBox.addEventListener('cursordown', function(){
 	console.log("tile bought!");
-	
 	bought = true;
 });
 buyHouseBox.addEventListener('cursordown', function(){
@@ -959,7 +1037,9 @@ buyHouseBox.addEventListener('cursordown', function(){
 	
 	//check bankruptcy
 	
-	updateFirebase();
+	updateHouses();
+	updateMoney();
+
 	//box can only be clicked 4 times, will disappear after fifth,
 	//so no check needs to be done here
 	}
@@ -980,27 +1060,32 @@ sellHouseBox.addEventListener('cursordown', function(){
 	
 	//check bankruptcy
 	
-	updateFirebase();
+	updateHouses();
+	updateMoney();
+	
 });
 rollDiceBox.addEventListener('cursordown', function(){
 		
-	var double = false;
+	var is_double = false;
 	var dice1 = Math.floor((Math.random()*6)+1);
 	var dice2 = Math.floor( (Math.random()*6)+1);
 	console.log("Player rolled : " + dice1 + " | " + dice2);
 	var diceRoll = dice1 + dice2
 	
-	if (dice1 == dice2){
-		double = true;
-		console.log("double");
-		//roll again
-	} else {
+	is_double = (dice1==dice2);
+	
+	if (is_double){
+		console.log("Double rolled!");
+	}
+	else
+	{
 		sim.scene.remove(rollDiceBox);
-		//player needs to roll to end turn
 		sim.scene.add(endTurnBox);
+		rolled = true;
 	}
 	
-	rolled = true;
+	
+	
 	
 	bought = false; //makes sure player can buy again
 	buyBox.position.set(0, -1, 0); //hides buy box
@@ -1014,11 +1099,12 @@ rollDiceBox.addEventListener('cursordown', function(){
 	playerPos[playerTurn] += diceRoll;
 	console.log(playerPos[playerTurn]);
 	console.log("Player moves to pos:" + playerPos);
+	document.querySelector('#dice').setAttribute('n-text','text: You have moved to ' + playerPos);
 	
 	setPositions(playerTurn); //works kinda?
 	
 	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
-	updateFirebase();
+	updatePosition();
 	
 	temp_money = false; //resets, so money can be dropped if a roll again is needed
 	
