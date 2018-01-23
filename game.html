@@ -44,8 +44,8 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://greeny3ny.github.io/VRmonopoly/images/ALTOPOLY.png"/>
-		<img id="cardTemplate" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCard.jpg"/>
+		<img id="board" src="ALTOPOLY.png"/>
+		<img id="cardTemplate" src="propertyCard.jpg"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -54,7 +54,9 @@
 
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
+	<!--
 	<a-box id="tile0" n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
+	
 	
 	<a-sky color="black" radius="200"></a-sky>
 	
@@ -94,7 +96,7 @@
 </body>
 
 <script>
-var version = "0.1.0"
+var version = "0.0.5"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -858,28 +860,31 @@ function setPropertyCardPos(tileNo){
 	//console.log("card pos set");
 	switch (tileNo){
 	case 1:
-		propertyCards[tileNo].position.set(-10, 0, 6.4); 
+		//propertyCards[tileNo].position.set(-10.25, 0.5, 6.4);
+		propertyCards[tileNo].position.set(-8.7, 0, 6.5);
+		propertyCards[tileNo].scale.set(2.75, 0.1, 1.65);
+		//propertyCards[tileNo].opacity(0.25);
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("vrmeditation");
+			console.log("discgolf");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, 5.9, 6.9, 50);
 		});
 	break;
 	case 3:
-		propertyCards[tileNo].position.set(-10, 0, 3.275); 
+		propertyCards[tileNo].position.set(-10.25, -0.125, 3.275); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("vryoga");
+			console.log("maze");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, 2.775, 3.775, 50);
 		});
 	break;
 	case 6:
-		propertyCards[tileNo].position.set(-10, 0, -1.55); 
+		propertyCards[tileNo].position.set(-7, 0, -1.55); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("discgolf");
+			console.log("beatlab");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, -2.05, -1.05, 50);
 		});
@@ -888,7 +893,7 @@ function setPropertyCardPos(tileNo){
 		propertyCards[tileNo].position.set(-10, 0, -4.8); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("junglemaze");
+			console.log("tavern");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, -5.3, -4.3, 50);
 		});
@@ -897,7 +902,7 @@ function setPropertyCardPos(tileNo){
 		propertyCards[tileNo].position.set(-10, 0, -6.4); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("tavern");
+			console.log("winterwonderland");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
 		});
