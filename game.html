@@ -44,7 +44,7 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://cdn.rawgit.com/greeny3ny/VRmonopoly/c3c8b093/ALTOPOLY.png"/>
+		<img id="board" src="https://greeny3ny.github.io/VRMonopoly/ALTOPOLY.png"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -97,56 +97,16 @@ var username;
 var userID;
 var moderator;
 var displayname;
-//update info in master database
-altspace.getUser().then(function(userInfo) {
-	var dataRequest = (THREE.FileLoader ? new THREE.FileLoader() : new THREE.XHRLoader());
-	dataRequest.setWithCredentials(true);
-	dataRequest.load('https://account.altvr.com/api/v1/users/' + userInfo.userId, onLoaded, undefined, undefined);
-	function onLoaded(obj) {
-		console.log('JSON thing:');
-		console.log(JSON.parse(obj));
-		username = JSON.parse(obj).users[0].username;
-		userID = JSON.parse(obj).users[0].user_id;
-		moderator = JSON.parse(obj).users[0].admin;
-		displayname = JSON.parse(obj).users[0].display_name;
-		console.log(username + " " + userID + " " + moderator + " " + displayname);
-		
-		
-		fbMasterRef.child("users").once('value', function (snapshot) {
-			console.log('Snapshot function worked!');
-			console.log(snapshot.child(username).child('Username').val());
-			var usernameSnapshot = snapshot.child(username).child('Username').val();
-			if (snapshot.exists() && usernameSnapshot == username) {
-				console.log('Snapshot exists!');
-			} else if (snapshot.exists() && usernameSnapshot != username && usernameSnapshot != null) {
-				console.log('Snapshot exists, but user has changed their username.');
-				fbMasterRef.child("users").child(username).child('Username').update(username);
-			} else {
-				console.log('Snapshot does not exist; creating one...');
-				console.log('Snapshot will be: ' + username + ', ' + userID + ', ' + moderator + '.');
-				fbMasterRef.child("users").child(username).set({'Moderator': moderator, 'User ID': userID, 'Username': username, 'Display Name': displayname}, function () {
-					console.log('Snapshot created!');
-				});
-			}
-		});
-		
-		
-		altspace.getDocument().then(function (document) { document.position.set(100, 100, 100); document.rotation.set(0, 90, 0);});
-		console.log("loaded");
-		
-		//main();
-		
-		
-	}
-}); 
+
 //---------------------------------------------------------------
 //---------------------------------------------------------------
-//---------------------------------------------------------------
-//---------------------------------------------------------------
-//---------------------------------------------------------------
-//---------------------------------------------------------------
-//--- synchronisation
-setTimeout(main, 2000); //waits for user data before starting
+//--------------------- synchronisation? ------------------------
+setTimeout(main, 3000); //waits for user data before starting
+
+/*
+	HEARTBEAT SYSTEM - NEEDS A MAJOR REWRITE!!!
+*/
+
 //add user to database
 //add heartbeat to database
 //check other heartbeats
@@ -299,16 +259,16 @@ function tick(){
 	//read database
 	//readFirebase();
 		
-if (gameStart == true){
+if (gameStart){
 	//console.log(playerTurn + " | " + players[playerTurn])
 	//set up start
-	if (temp_start == false) {
+	if (!temp_start) {
 		sim.scene.remove(startBox); //throws error, but works
 		temp_start = true;
 	}
 	
 	if (players[playerTurn] == displayname){
-		if (temp == false){
+		if (!temp){
 			console.log("its your turn!");
 			sim.scene.add(rollDiceBox);
 			temp = true;
@@ -323,7 +283,7 @@ if (gameStart == true){
 //-----------------------------------------------
  //basically reset stuff
 	
-	if (joined == false){
+	if (!joined){
 		sim.scene.remove(startBox); //remove startbox
 		sim.scene.add(joinBox); //add join box
 	}
@@ -362,49 +322,19 @@ if (gameStart == true){
 //keep code clean
 function drawText(){
 	//only draw money if gamestarted else error
-	if (gameStart == true){
-	
-		document.querySelector('#board1').setAttribute('n-text','text:' + players[0]);
-		document.querySelector('#board2').setAttribute('n-text','text:' + players[1]);
-		document.querySelector('#board3').setAttribute('n-text','text:' + players[2]);
-		document.querySelector('#board4').setAttribute('n-text','text:' + players[3]);
-		document.querySelector('#board5').setAttribute('n-text','text:' + players[4]);
-		document.querySelector('#board6').setAttribute('n-text','text:' + players[5]);
-		document.querySelector('#board7').setAttribute('n-text','text:' + players[6]);
-		document.querySelector('#board8').setAttribute('n-text','text:' + players[7]);
-	
-		document.querySelector('#money1').setAttribute('n-text','text:' + playerMoney[0]);
-		document.querySelector('#money2').setAttribute('n-text','text:' + playerMoney[1]);
-		document.querySelector('#money3').setAttribute('n-text','text:' + playerMoney[2]);
-		document.querySelector('#money4').setAttribute('n-text','text:' + playerMoney[3]);
-		document.querySelector('#money5').setAttribute('n-text','text:' + playerMoney[4]);
-		document.querySelector('#money6').setAttribute('n-text','text:' + playerMoney[5]);
-		document.querySelector('#money7').setAttribute('n-text','text:' + playerMoney[6]);
-		document.querySelector('#money8').setAttribute('n-text','text:' + playerMoney[7]);
-	
+	if (gameStart){
+		for (var i=0; i<8; i++){
+			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:'+players[i]);
+			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+playerMoney[i]);
+		}	
 	}else{
-	
-		document.querySelector('#board1').setAttribute('n-text','text:---');
-		document.querySelector('#board2').setAttribute('n-text','text:---');
-		document.querySelector('#board3').setAttribute('n-text','text:---');
-		document.querySelector('#board4').setAttribute('n-text','text:---');
-		document.querySelector('#board5').setAttribute('n-text','text:---');
-		document.querySelector('#board6').setAttribute('n-text','text:---');
-		document.querySelector('#board7').setAttribute('n-text','text:---');
-		document.querySelector('#board8').setAttribute('n-text','text:---');
-	
-		document.querySelector('#money1').setAttribute('n-text','text:---');
-		document.querySelector('#money2').setAttribute('n-text','text:---');
-		document.querySelector('#money3').setAttribute('n-text','text:---');
-		document.querySelector('#money4').setAttribute('n-text','text:---');
-		document.querySelector('#money5').setAttribute('n-text','text:---');
-		document.querySelector('#money6').setAttribute('n-text','text:---');
-		document.querySelector('#money7').setAttribute('n-text','text:---');
-		document.querySelector('#money8').setAttribute('n-text','text:---');
-	
+		for (var i=0; i<8; i++){
+			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
+			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:---');
+		}	
 	}
-	
-}
+}//end drawText()
+
 function initialiseBoxes(){
 	//console.log("test");
 	//max 8 players in a game
@@ -464,47 +394,21 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 			//console.log("property owned by " + players[propertyOwned[1]]);
 			//check if client owns property already
 			if (propertyOwned[tileNo] == player_element){
-				
-				//dont do anything
-				
+				//dont do anything				
 			} else {
 			//other player owns property
-			
 			//sets money of player who owns property 
 			//makes sure money only updated once
-			if (temp_money == false){
-			
-			//house check
-				switch (housesOwned[tileNo]){
-				case 0:
+			if (!temp_money){
 				
-					//if a player owns ALL the lots of any colour group, 
-					//the rent is doubled for unimproved lots in that group
-				
-					if (ALO == true){
-						cost = rent[0]*2;
-					} else{
-						cost = rent[0];
-					}
-					//}
-				break;
-				case 1:
-					cost = rent[1];   //-------------------------------
-				break;
-				case 2:
-					cost = rent[2];  //-------------------------------
-				break;
-				case 3:
-					cost = rent[3];	 //-------------------------------
-				break;
-				case 4:
-					cost = rent[4];	 //-------------------------------
-				break;
-				case 5:
-					cost = rent[5];	 //-------------------------------
-				break;
-				}//end switch
-				
+				var r = housesOwned[tileNo];
+				if (r === 0 && ALO){
+					cost = rent[0]*2
+				}
+				else {
+					cost = r;
+				}
+
 				playerMoney[propertyOwned[tileNo]] += cost;
 				playerMoney[playerNo] -= cost;
 				updateFirebase();
@@ -521,7 +425,7 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 			//console.log("you have landed here");
 			buyBox.position.set(posX, 0, posZ);  //------------------------------
 			
-			if (bought == true){
+			if (bought){
 				propertyOwned[tileNo] = player_element;
 				playerMoney[player_element] -= tilePrice;  //------------------------
 				buyBox.position.set(0, -1, 0);
@@ -542,9 +446,7 @@ var cost = 0; //stores how much player recieves/pays
 var housePrice = 0; //local, stores house price of tile
 var allLotsOwned = false; //are all the lots owned by the same person?
 function setPositions(playerNo){
-	
 	//console.log("positions set");
-	
 	if (playerPos[playerNo] >= 40){
 		playerPos[playerNo] -= 40; //back at go (0)
 		playerMoney[playerNo] += 200; //collect 200
@@ -562,11 +464,8 @@ function setPositions(playerNo){
 	//move players token to position
 	playerIcons[playerNo].position.set(-9, 0, 6.4); 
 	//check if player owns other lots
-	if ((propertyOwned[1] == propertyOwned[3])){
-		allLotsOwned = true;
-	} else {
-		allLotsOwned = false;
-	}
+	
+	allLotsOwned = (propertyOwned[1] === propertyOwned[3]);
 	
 	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
 	rent = [2, 10, 30, 90, 160, 250];
@@ -584,12 +483,7 @@ function setPositions(playerNo){
 	//set playerIcon position
 	playerIcons[playerNo].position.set(-9, 0, 3.275); 
 	
-	//check if player owns other lots
-	if ((propertyOwned[1] == propertyOwned[3])){
-		allLotsOwned = true;
-	} else {
-		allLotsOwned = false;
-	}
+	allLotsOwned = (propertyOwned[1] === propertyOwned[3]);
 	
 	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
 	rent = [4, 20, 60, 180, 320, 450];
@@ -854,7 +748,12 @@ function chanceCard(){
 	}
 	
 }//end chance
-//WORK IN PROGRESS
+/*
+
+	THIS IS POSSIBLY UNNEEDED - USE ONE PROPERTY CARD IN MIDDLE OF BOARD ??
+	WILL STILL NEED TO PLACE
+
+*/
 function setPropertyCardPos(tileNo){
 	//console.log("card pos set");
 	switch (tileNo){
@@ -906,6 +805,11 @@ function setPropertyCardPos(tileNo){
 	}//end switch
 }//end function
 function selectProperty(tileNo, posX1, posX2, posZ1, posZ2, hp){
+
+	/*
+		SHIFTING THE BUY / SELL BOXES NOT NEEDED?
+		POSSIBLY KEEP THIS...
+	*/
 	//set buy/sell house box positions
 	BHB_X = posX1;
 	BHB_Z = posZ1;
@@ -961,7 +865,7 @@ function nextTurn(){
 //sim.scene.add(rollDiceBox);
 joinBox.addEventListener('cursordown', function(){
 	console.log("join click | " + joined);
-	if (joined == false && gameStart == false){
+	if (!joined && !gameStart){
 		
 		//players already being read every second
 		//add to database
