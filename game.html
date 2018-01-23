@@ -44,8 +44,8 @@
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://greeny3ny.github.io/VRmonopoly/images/ALTOPOLY.png"/>
-		<img id="cardTemplate" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCard.jpg"/>
+		<img id="board" src="ALTOPOLY.png"/>
+		<img id="cardTemplate" src="propertyCard.jpg"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -304,7 +304,6 @@ function readOnChildChanged(){
 	});
 	fbGameRef.child("properties").on("child_changed", function(snapshot){
 		propertyOwned = snapshot.val();
-		//console.log(propertyOwned);
 	});
 	fbGameRef.child("houses").on("child_changed", function(snapshot){
 		housesOwned = snapshot.val();
@@ -478,6 +477,9 @@ function initialiseBoxes(){
 	
 }
 function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
+
+	
+
 	//check if YOU have landed on property
 	if (playerNo == player_element){
 		//console.log("you have landed here");
@@ -534,6 +536,7 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 		
 		
 	}//end if playerNo ==  player_element
+	else {return;}
 }
 //move boxes to position and carries out specific task based on place
 var temp_money;
@@ -541,6 +544,7 @@ var bought = false; //variable saying if player bought tile or not
 var cost = 0; //stores how much player recieves/pays
 var housePrice = 0; //local, stores house price of tile
 var allLotsOwned = false; //are all the lots owned by the same person?
+
 function setPositions(playerNo){
 	//console.log("positions set");
 	if (playerPos[playerNo] >= 40){
@@ -564,8 +568,8 @@ function setPositions(playerNo){
 	
 	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
 	rent = [2, 10, 30, 90, 160, 250];
+
 	landedOn(playerNo, 1, -10, 5.9, rent, 60, allLotsOwned);
-	
 	break;
 	
 	case 2:
@@ -783,8 +787,7 @@ function setPositions(playerNo){
 	
 	}//end switch
 	//updateFirebase();
-	updatePosition();
-	updateMoney();
+	
 		
 }
 function chanceCard(){
@@ -1102,9 +1105,12 @@ rollDiceBox.addEventListener('cursordown', function(){
 	document.querySelector('#dice').setAttribute('n-text','text: You have moved to ' + playerPos);
 	
 	setPositions(playerTurn); //works kinda?
+
+	
 	
 	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
 	updatePosition();
+	updateMoney();
 	
 	temp_money = false; //resets, so money can be dropped if a roll again is needed
 	
