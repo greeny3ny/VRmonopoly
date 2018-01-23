@@ -38,13 +38,14 @@
 <body>
 
 <!-- set up the scene -->
-<a-scene altspace="fullspace: true" sync-system="author: greeny3ny; app: monopoly">
+<a-scene altspace="fullspace: true" sync-system="author: greeny3ny; app: monopoly1">
  
     <!-- add a view camera (2d only) -->
     <!--<a-text value="Hello, World!"></a-text>-->
 
     <a-assets>
-		<img id="board" src="https://greeny3ny.github.io/VRMonopoly/ALTOPOLY.png"/>
+		<img id="board" src="https://greeny3ny.github.io/VRmonopoly/ALTOPOLY.png"/>
+		<img id="cardTemplate" src="propertyCard.jpg"/>
   	</a-assets>
 
 	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
@@ -75,6 +76,9 @@
 	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 
+	<a-box id="card" src="#cardTemplate" position='0 10 0' rotation='0 0 0' color='white' scale='0.1 5 5'>
+		<a-animation attribute="rotation" dur="50000" to="0 360 0" repeat="indefinite" easing="linear"></a-animation>
+	</a-box>
 	<!--
 	<a-box color="black" position="-10, 0, -4.8" scale="0.5, 0.5, 0.5"></a-box>
 	<a-box color="red" position="-10, 0, -4.3" scale="0.5, 0.5, 0.5"></a-box>
@@ -88,8 +92,8 @@
 </body>
 
 <script>
-var version = "0.5.5.2"
-console.log("Version :" + version);
+var version = "0.0.1"
+console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -98,10 +102,21 @@ var userID;
 var moderator;
 var displayname;
 
+altspace.getUser().then(function(u){
+		console.log(u);
+		displayname = u.displayName;
+		//console.log(user);
+
+}).then(function(){
+	//console.log("test");
+	setTimeout(main, 2000);
+});
+
+
 //---------------------------------------------------------------
 //---------------------------------------------------------------
 //--------------------- synchronisation? ------------------------
-setTimeout(main, 3000); //waits for user data before starting
+ //waits for user data before starting
 
 /*
 	HEARTBEAT SYSTEM - NEEDS A MAJOR REWRITE!!!
@@ -182,45 +197,45 @@ function updateFirebase(){
 }
 //reads users in session
 function readFirebaseUsers(){
-	fbGameRef.child("inSession").on("child_changed", function(snapshot) {
+	fbGameRef.child("inSession").on("value", function(snapshot) {
 		inSession = snapshot.val();
 	});
 }
 //reads users who are playing
 function readFirebasePlayers(){
-	fbGameRef.child("players").on("child_changed", function(snapshot){
+	fbGameRef.child("players").on("value", function(snapshot){
 		players = snapshot.val();
 	});
 }
 function readFirebaseTurn(){
-	fbGameRef.child("turn").on("child_changed", function(snapshot){
+	fbGameRef.child("turn").on("value", function(snapshot){
 		playerTurn = snapshot.val();
 	});
 }
 function readFirebasePos(){
-	fbGameRef.child("position").on("child_changed", function(snapshot){
+	fbGameRef.child("position").on("value", function(snapshot){
 		playerPos = snapshot.val();
 	});
 }
 function readFirebaseStart(){
-	fbGameRef.child("gameStart").on("child_changed", function(snapshot){
+	fbGameRef.child("gameStart").on("value", function(snapshot){
 		gameStart = snapshot.val();
 	});
 }
 function readFirebaseMoney(){
-	fbGameRef.child("money").on("child_changed", function(snapshot){
+	fbGameRef.child("money").on("value", function(snapshot){
 		playerMoney = snapshot.val();
 	});
 }
 function readFirebaseOwned(){
 	
-	fbGameRef.child("properties").on("child_changed", function(snapshot){
+	fbGameRef.child("properties").on("value", function(snapshot){
 		propertyOwned = snapshot.val();
 		//console.log(propertyOwned);
 	});
 }
 function readFirebaseHouses(){
-	fbGameRef.child("houses").on("child_changed", function(snapshot){
+	fbGameRef.child("houses").on("value", function(snapshot){
 		housesOwned = snapshot.val();
 		//console.log(propertyOwned);
 	});
