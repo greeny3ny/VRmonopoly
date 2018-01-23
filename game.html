@@ -46,9 +46,11 @@
     <a-assets>
 		<img id="board" src="images/ALTOPOLY.png"/>
 		<img id="cardTemplate" src="images/propertyCard.jpg"/>
+		<img id="temp" src="images/propCard2.jpg"/>
+		<img id="test" src="images/test123.png"/>
   	</a-assets>
 
-	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Craigs Monopoly! ;'></a-entity>
+	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Altopoly! ;'></a-entity>
 	<a-entity id="players" position='8 16 -15' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
 	<a-entity id="version" position='-8 15 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
 
@@ -78,7 +80,7 @@
 	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 
-	<a-box id="card" src="#cardTemplate" position='0 10 0' rotation='0 0 0' color='white' scale='0.1 5 5'>
+	<a-box id="card" src="#test" position='0 7.5 0' rotation='0 0 0' color='white' scale='0.0 5 5'>
 		<a-animation attribute="rotation" dur="50000" to="0 360 0" repeat="indefinite" easing="linear"></a-animation>
 	</a-box>
 	
@@ -96,7 +98,7 @@
 </body>
 
 <script>
-var version = "0.0.6"
+var version = "0.1.0"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -149,8 +151,13 @@ var selectedTileNo; //stores number of selected tile
 var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 var greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-var blueMat = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+var blueMat = new THREE.MeshLambertMaterial( { color: 0x0000ff, transparent:true } );
+
+blueMat.opacity=0.25;
+
 var boxGeo = new THREE.BoxGeometry(1, 1, 1);
+var tileGeo = new THREE.BoxGeometry(5.4, 0.1, 3.2);
+
 var joinBox = new THREE.Mesh(boxGeo, redMat); 
 var startBox = new THREE.Mesh(boxGeo, pinkMat);
 var resetBox = new THREE.Mesh(boxGeo, greenMat);
@@ -383,6 +390,7 @@ if (gameStart){
 	sim.scene.remove(rollDiceBox);
 	sim.scene.remove(endTurnBox);
 	
+	document.querySelector('#card').setAttribute('src','#test');
 	
 	if (players == null){
 		//console.log("test");
@@ -432,21 +440,21 @@ function initialiseBoxes(){
 	//console.log("test");
 	//max 8 players in a game
 	for (var i = 0; i < 8; i++){
-		playerIcons[i] = new THREE.Mesh(boxGeo, pinkMat);			
-		voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
+		playerIcons[i] = new THREE.Mesh(boxGeo);			
+		//voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
 		
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
-		voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
+		//voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
 		
 		playerIcons[i].scale.set(0.5, 0.5, 0.5);
 		
 		sim.scene.add(playerIcons[i]);
-		sim.scene.add(voteKickBox[i]);
+		//sim.scene.add(voteKickBox[i]);
 		
 	}//end for8
 	
 	for (var i = 0; i<40; i++){
-		propertyCards[i] = new THREE.Mesh(boxGeo, blueMat);
+		propertyCards[i] = new THREE.Mesh(tileGeo, blueMat);
 		propertyCards[i].position.set(0, -1, 0);
 		propertyCards[i].scale.set(0.5, 0.5, 0.5);
 		
@@ -607,12 +615,7 @@ function setPositions(playerNo){
 	//DISC GOLF (LBLUE-1)
 	playerIcons[playerNo].position.set(-9, 0, -1.55); 
 	
-	//check if player owns other lots
-	if ((propertyOwned[6] == propertyOwned[8] == propertyOwned[9])){
-		allLotsOwned = true;
-	} else {
-		allLotsOwned = false;
-	}
+	allLotsOwned = (propertyOwned[6] == propertyOwned[8] == propertyOwned[9]);
 	
 	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
 	rent = [6, 30, 90, 270, 400, 550];
@@ -630,11 +633,7 @@ function setPositions(playerNo){
 	playerIcons[playerNo].position.set(-9, 0, -4.8); 
 	
 	//check if player owns other lots
-	if ((propertyOwned[6] == propertyOwned[8] == propertyOwned[9])){
-		allLotsOwned = true;
-	} else {
-		allLotsOwned = false;
-	}
+	allLotsOwned = (propertyOwned[6] == propertyOwned[8] == propertyOwned[9]);
 	
 	//playerNo, tileNo, posX1, posX2, posY, posZ, rent[], tilePrice, allLotsOwned
 	rent = [6, 30, 90, 270, 400, 550];
@@ -647,11 +646,7 @@ function setPositions(playerNo){
 	playerIcons[playerNo].position.set(-9, 0, -6.4); 
 	
 	//check if player owns other lots
-	if ((propertyOwned[6] == propertyOwned[8] == propertyOwned[9])){
-		allLotsOwned = true;
-	} else {
-		allLotsOwned = false;
-	}
+	allLotsOwned = (propertyOwned[6] == propertyOwned[8] == propertyOwned[9]);
 	
 	//playerNo, tileNo, posX1, posX2, posY, posZ, rent[], tilePrice, allLotsOwned
 	rent = [8, 40, 100, 300, 450, 600];
@@ -792,6 +787,11 @@ function setPositions(playerNo){
 	
 		
 }
+
+/*
+	POSSIBLY READ THESE FROM JSON OR A DIFFERENT FILE 
+	WILL KEEP CODE NICE AND CLEAN
+*/
 function chanceCard(){
 	var rand = Math.floor((Math.random()*16)+1);
 	
@@ -807,7 +807,7 @@ function chanceCard(){
 			console.log("Go watch videos in 360 Theater – If you pass Campfire, collect $200 ");
 		break;
 		case 4:
-			console.log("Advance to the Campfire (Collect $200) ");
+			console.log("You called parentheses brackets on the AltspaceVR slack channel, lose $100");
 		break;
 		case 5:
 			console.log("Advance to the Campfire (Collect $200) ");
@@ -860,28 +860,37 @@ function setPropertyCardPos(tileNo){
 	//console.log("card pos set");
 	switch (tileNo){
 	case 1:
-		//propertyCards[tileNo].position.set(-10.25, 0.5, 6.4);
-		propertyCards[tileNo].position.set(-8.7, 0, 6.5);
-		propertyCards[tileNo].scale.set(2.75, 0.1, 1.65);
-		//propertyCards[tileNo].opacity(0.25);
+
+		propertyCards[tileNo].position.set(-8.7, 0, 6.45);
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
 			console.log("discgolf");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, 5.9, 6.9, 50);
+			document.querySelector('#card').setAttribute('src','#temp');
 		});
 	break;
 	case 3:
-		propertyCards[tileNo].position.set(-10.25, -0.125, 3.275); 
+		propertyCards[tileNo].position.set(-8.7, 0, 3.275); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
 			console.log("maze");
 			selectedTileNo = tileNo;
 			selectProperty(tileNo, -10.5, -10.5, 2.775, 3.775, 50);
+			document.querySelector('#card').setAttribute('src','#cardTemplate');
 		});
 	break;
+	case 5:
+		propertyCards[tileNo].position.set(-8.7, 0, 0);
+		
+		propertyCards[tileNo].addEventListener('cursordown', function(){
+			selectedTileNo = tileNo;
+			console.log("teleport1");
+		});
+		
+	break;
 	case 6:
-		propertyCards[tileNo].position.set(-7, 0, -1.55); 
+		propertyCards[tileNo].position.set(-8.7, 0, -1.575); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
 			console.log("beatlab");
@@ -890,7 +899,7 @@ function setPropertyCardPos(tileNo){
 		});
 	break;
 	case 8:
-		propertyCards[tileNo].position.set(-10, 0, -4.8); 
+		propertyCards[tileNo].position.set(-8.7, 0, -4.85); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
 			console.log("tavern");
@@ -899,7 +908,7 @@ function setPropertyCardPos(tileNo){
 		});
 	break;
 	case 9:
-		propertyCards[tileNo].position.set(-10, 0, -6.4); 
+		propertyCards[tileNo].position.set(-8.7, 0, -6.475); 
 		
 		propertyCards[tileNo].addEventListener('cursordown', function(){
 			console.log("winterwonderland");
@@ -907,6 +916,41 @@ function setPropertyCardPos(tileNo){
 			selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
 		});
 	break;
+	case 10:
+	
+		propertyCards[tileNo].position.set(-6.5, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+		
+		propertyCards[tileNo].addEventListener('cursordown', function(){
+			console.log("bossmonster");
+			selectedTileNo = tileNo;
+			//selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
+		});
+	break;
+	case 12:
+	
+		propertyCards[tileNo].position.set(-3.31, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+		
+		propertyCards[tileNo].addEventListener('cursordown', function(){
+			console.log("hah");
+			selectedTileNo = tileNo;
+			//selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
+		});
+	break;
+	case 13:
+	
+		propertyCards[tileNo].position.set(-1.65, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+		
+		propertyCards[tileNo].addEventListener('cursordown', function(){
+			console.log("love letter");
+			selectedTileNo = tileNo;
+			//selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
+		});
+	break;
+	
+	
 	}//end switch
 }//end function
 function selectProperty(tileNo, posX1, posX2, posZ1, posZ2, hp){
