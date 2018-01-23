@@ -1,1 +1,1 @@
-* Use this folder for images *
+# Use this folder for images
