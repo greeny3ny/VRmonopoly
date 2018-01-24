@@ -475,15 +475,15 @@ function initialiseBoxes(){
 	//console.log("test");
 	//max 8 players in a game
 	for (var i = 0; i < 8; i++){
-		//playerIcons[i] = new THREE.Mesh(boxGeo);
-		playerIcons[i] = dae;		
+		playerIcons[i] = new THREE.Mesh(boxGeo);
+		//playerIcons[i] = dae;		
 		//voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
 		
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
 		//voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
 		
-		playerIcons[i].scale.set(3, 3, 3);
-		//playerIcons[i].scale.set(0.5, 0.5, 0.5);
+		//playerIcons[i].scale.set(3, 3, 3);
+		playerIcons[i].scale.set(0.5, 0.5, 0.5);
 		
 		sim.scene.add(playerIcons[i]);
 		//sim.scene.add(voteKickBox[i]);
