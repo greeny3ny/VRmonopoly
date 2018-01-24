@@ -548,13 +548,6 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 			buyBox.position.set(-1, 0, -1);  //------------------------------
 			
 			if (bought){
-				propertyOwned[tileNo] = player_element;
-				playerMoney[player_element] -= tilePrice;  //------------------------
-				buyBox.position.set(0, -1, 0);
-				
-				updateMoney();
-				updateProperties();
-
 				//console.log("test");
 			}//end if bought  = true
 			
@@ -1116,13 +1109,21 @@ endTurnBox.addEventListener('cursordown', function(){
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
 	buyBox.position.set(0, -1, 0);
-	
+
 	nextTurn();
 	
 	sim.scene.remove(endTurnBox);
 });
 buyBox.addEventListener('cursordown', function(){
 	console.log("tile bought!");
+	
+	propertyOwned[tileNo] = player_element;
+	playerMoney[player_element] -= tilePrice; 
+	buyBox.position.set(0, -1, 0); //positioning error with buybox
+				
+	updateMoney();
+	updateProperties();
+
 	bought = true;
 });
 buyHouseBox.addEventListener('cursordown', function(){
