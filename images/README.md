@@ -14,4 +14,4 @@
 - Chance Cards
 - Community Chest Cards
 
-** PLACE CARDS IN RELEVANT FOLDERS **
+**PLACE CARDS IN RELEVANT FOLDERS**
