@@ -48,11 +48,24 @@
 		<img id="cardTemplate" src="images/propertyCard.jpg"/>
 		<img id="temp" src="images/propCard2.jpg"/>
 		<img id="test" src="images/test123.png"/>
+		
+		<img id="card1" src="images/disc_golf.png" />
+		<img id="card3" src="images/the_maze.png" />
+		<img id="card6" src="images/beat_lab.png" />
+		<img id="card8" src="images/medieval_tavern.png" />
+		<img id="card9" src="images/winter_wonderland.png" />
+		<img id="card11" src="images/boss_monster.png" />
+		<img id="card13" src="images/hah.png" />
   	</a-assets>
 
-	<a-entity position='-8 16 -15' rotation='0 0 0' n-text='text: Altopoly! ;'></a-entity>
+	<a-entity position='-20 16 -15' rotation='0 0 0' n-text='text: Altopoly! ;'></a-entity>
 	<a-entity id="players" position='8 16 -15' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
-	<a-entity id="version" position='-8 15 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="version" position='-20 15 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	<a-entity id="info" position='-20 12 -15' rotation='0 0 0' n-text='text:
+	Code   : Craig
+	Images : Winrar
+	Models : Lia
+	; width:100;' ></a-entity>
 
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
@@ -98,7 +111,7 @@
 </body>
 
 <script>
-var version = "0.1.0"
+var version = "0.1.5"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -162,7 +175,7 @@ var joinBox = new THREE.Mesh(boxGeo, redMat);
 var startBox = new THREE.Mesh(boxGeo, pinkMat);
 var resetBox = new THREE.Mesh(boxGeo, greenMat);
 var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
-var endTurnBox = new THREE.Mesh(boxGeo, blueMat);
+var endTurnBox = new THREE.Mesh(boxGeo, redMat);
 //--- 
 var buyBox = new THREE.Mesh(boxGeo, greenMat);
 var skipBox = new THREE.Mesh(boxGeo, redMat);
@@ -486,9 +499,9 @@ function initialiseBoxes(){
 	sim.scene.add(sellHouseBox);
 	
 }
-function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
+function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 
-	
+	console.log(allLotsOwned);
 
 	//check if YOU have landed on property
 	if (playerNo == player_element){
@@ -525,10 +538,10 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 			//do for houses/hotels too
 		
 		} else {
-			console.log("property unowned");
+			//console.log("property unowned");
 			//display buy / sell boxes
 			//console.log("you have landed here");
-			buyBox.position.set(posX, 0, posZ);  //------------------------------
+			buyBox.position.set(-1, 0, -1);  //------------------------------
 			
 			if (bought){
 				propertyOwned[tileNo] = player_element;
@@ -538,6 +551,7 @@ function landedOn(playerNo, tileNo, posX, posZ, rent, tilePrice, ALO){
 				updateMoney();
 				updateProperties();
 
+				//console.log("test");
 			}//end if bought  = true
 			
 			
@@ -561,98 +575,73 @@ function setPositions(playerNo){
 		playerPos[playerNo] -= 40; //back at go (0)
 		playerMoney[playerNo] += 200; //collect 200
 	}
+	
+	
+	
+	var pPos = playerPos[playerNo];
+	var tPrice = 0;
+	var rent;
+
+	
 	switch (playerPos[playerNo]){
 	
 	case 0:
-	//CAMPFIRE (GO)
+	//GO
 	playerIcons[playerNo].position.set(-9, 0, 8.5); 
 	break;
-	
 	case 1:
-	//VR MEDITATION (BROWN-1)
-	
-	//move players token to position
+	//DISC GOLF -B1
 	playerIcons[playerNo].position.set(-9, 0, 6.4); 
 	//check if player owns other lots
-	allLotsOwned = (propertyOwned[1] === propertyOwned[3]);
-	
-	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
+	allLotsOwned = (propertyOwned[1] == propertyOwned[3] && propertyOwned[1] !=10);
 	rent = [2, 10, 30, 90, 160, 250];
-
-	landedOn(playerNo, 1, -10, 5.9, rent, 60, allLotsOwned);
+	tPrice = 60;
 	break;
-	
 	case 2:
 	//CHEST
 	playerIcons[playerNo].position.set(-9, 0, 4.85); 
 	break;
-	
 	case 3:
-	//VR YOGA (BROWN-2)
-	//set playerIcon position
+	//THE MAZE -B2
 	playerIcons[playerNo].position.set(-9, 0, 3.275); 
-	
-	allLotsOwned = (propertyOwned[1] === propertyOwned[3]);
-	
-	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
+	allLotsOwned = (propertyOwned[1] === propertyOwned[3] && propertyOwned[1] != 10);
 	rent = [4, 20, 60, 180, 320, 450];
-	landedOn(playerNo, 3, -10, 2.775, rent, 60, allLotsOwned);
-	
+	tPrice = 60;
 	break;
-	
 	case 4:
-	//LISA TAX -NAME TBC- (TAX-200)
+	//HOUSE TAX
 	playerIcons[playerNo].position.set(-9, 0, 1.7); 
 	//playerMoney[playerNo] -= 200; //income tax
 	break;
-	
 	case 5:
-	//CAMPFIRE PORTAL (RAIL-1)
+	//PORTAL1
 	playerIcons[playerNo].position.set(-9, 0, 0.1); 
 	break;
-	
 	case 6:
-	//DISC GOLF (LBLUE-1)
+	//BEATLAB -LB1
 	playerIcons[playerNo].position.set(-9, 0, -1.55); 
-	
-	allLotsOwned = (propertyOwned[6] == propertyOwned[8] == propertyOwned[9]);
-	
-	//playerNo, tileNo, posX, posZ, rent[], tilePrice, allLotsOwned
+	allLotsOwned = (propertyOwned[6] == propertyOwned[8] && propertyOwned[8]==propertyOwned[9] && propertyOwned[9] != 10);
+	tPrice = 100;
 	rent = [6, 30, 90, 270, 400, 550];
-	landedOn(playerNo, 6, -10,-2.05, rent, 100, allLotsOwned);
-	
 	break;
 	case 7:
 	//CHANCE
 	playerIcons[playerNo].position.set(-9, 0, -3.2); 
 	//chanceCard(); //testing
 	break;
-	
 	case 8:
-	//JUNGLE MAZE (LBLUE-2)
+	//TAVERN -LB2
 	playerIcons[playerNo].position.set(-9, 0, -4.8); 
-	
-	//check if player owns other lots
-	allLotsOwned = (propertyOwned[6] == propertyOwned[8] == propertyOwned[9]);
-	
-	//playerNo, tileNo, posX1, posX2, posY, posZ, rent[], tilePrice, allLotsOwned
+	allLotsOwned = (propertyOwned[6] == propertyOwned[8] && propertyOwned[8]==propertyOwned[9] && propertyOwned[9] != 10);
 	rent = [6, 30, 90, 270, 400, 550];
-	//change the 1
-	landedOn(playerNo, 8, -10, -5.3, rent, 100, allLotsOwned);
-	
+	tPrice = 100;
 	break;
 	case 9:
-	//MEDIEVAL TAVERN (LBLUE-3)
+	//wonderland (LBLUE-3)
 	playerIcons[playerNo].position.set(-9, 0, -6.4); 
-	
-	//check if player owns other lots
-	allLotsOwned = (propertyOwned[6] == propertyOwned[8] == propertyOwned[9]);
-	
-	//playerNo, tileNo, posX1, posX2, posY, posZ, rent[], tilePrice, allLotsOwned
+	allLotsOwned = (propertyOwned[6] == propertyOwned[8] && propertyOwned[8]==propertyOwned[9] && propertyOwned[9] != 10);
 	rent = [8, 40, 100, 300, 450, 600];
-	landedOn(playerNo, 9, -10, -6.9, rent, 120, allLotsOwned);
-	
-	
+	tPrice = 120;
 	break;
 	case 10:
 	//SUSPENSION (JAIL)
@@ -662,8 +651,11 @@ function setPositions(playerNo){
 	playerIcons[playerNo].position.set(-9.5, 0, -9.5); 
 	break;
 	case 11:
-	//360 THEATER (PINK-1)
+	//boss monster (PINK-1)
 	playerIcons[playerNo].position.set(-6.5, 0, -9); 
+	allLotsOwned = (propertyOwned[11] == propertyOwned[13] && propertyOwned[13]==propertyOwned[14] && propertyOwned[14] != 10);
+	rent = [10, 50, 150, 450, 625, 750];
+	tPrice = 140;
 	break;
 	case 12:
 	//-UNNAMED- (UTIL-1)
@@ -672,10 +664,16 @@ function setPositions(playerNo){
 	case 13:
 	//RAINBOW ROOM (PINK-2)
 	playerIcons[playerNo].position.set(-3.35, 0, -9); 
+	allLotsOwned = (propertyOwned[11] == propertyOwned[13] && propertyOwned[13]==propertyOwned[14] && propertyOwned[14] != 10);
+	rent = [10, 50, 150, 450, 625, 750];
+	tPrice = 140;
 	break;
 	case 14:
 	//WINTER WONDERLAND (PINK-3)
 	playerIcons[playerNo].position.set(-1.7, 0, -9); 
+	allLotsOwned = (propertyOwned[11] == propertyOwned[13] && propertyOwned[13]==propertyOwned[14] && propertyOwned[14] != 10);
+	rent = [12, 60, 180, 500, 700, 900];
+	tPrice = 160;
 	break;
 	case 15:
 	//JUNGLE MAZE TELEPORT (RAIL-2)
@@ -684,6 +682,9 @@ function setPositions(playerNo){
 	case 16:
 	//BOSS MONSTER (ORANGE-1)
 	playerIcons[playerNo].position.set(1.55, 0, -9); 
+	allLotsOwned = (propertyOwned[16] == propertyOwned[18] && propertyOwned[18]==propertyOwned[19] && propertyOwned[19] != 10);
+	rent = [14, 70, 200, 550, 750, 950];
+	tPrice = 180;
 	break;
 	case 17:
 	//CHEST
@@ -691,11 +692,17 @@ function setPositions(playerNo){
 	break;
 	case 18:
 	//HOLOGRAMGS(ORANGE-2)
-	playerIcons[playerNo].position.set(4.8, 0, -9); 
+	playerIcons[playerNo].position.set(4.8, 0, -9);
+	allLotsOwned = (propertyOwned[16] == propertyOwned[18] && propertyOwned[18]==propertyOwned[19] && propertyOwned[19] != 10);
+	rent = [14, 70, 200, 550, 750, 950];
+	tPrice = 180;	
 	break;
 	case 19:
 	//LOVE LETTER (ORANGE-3)
 	playerIcons[playerNo].position.set(6.4, 0, -9); 
+	allLotsOwned = (propertyOwned[16] == propertyOwned[18] && propertyOwned[18]==propertyOwned[19] && propertyOwned[19] != 10);
+	rent = [16, 80, 220, 600, 800, 1000];
+	tPrice = 200;
 	break;
 	case 20:
 	//COMMUNITY CORNER(FREE PARKING)
@@ -705,6 +712,9 @@ function setPositions(playerNo){
 	case 21:
 	//SCULPT TOGETHER (RED-1)
 	playerIcons[playerNo].position.set(9, 0, -6.5); 
+	allLotsOwned = (propertyOwned[21] == propertyOwned[23] && propertyOwned[23]==propertyOwned[24] && propertyOwned[24] != 10);
+	rent = [18, 90, 250, 700, 875, 1050];
+	tPrice = 220;
 	break;
 	case 22:
 	//CHANCE
@@ -712,11 +722,17 @@ function setPositions(playerNo){
 	break;
 	case 23:
 	//PAINT STUDIO (RED-2)
-	playerIcons[playerNo].position.set(9, 0, -3.35); 
+	playerIcons[playerNo].position.set(9, 0, -3.35);
+	allLotsOwned = (propertyOwned[21] == propertyOwned[23] && propertyOwned[23]==propertyOwned[24] && propertyOwned[24] != 10);
+	rent = [18, 90, 250, 700, 875, 1050];
+	tPrice = 220;	
 	break;
 	case 24:
 	//SDK (RED-3)
-	playerIcons[playerNo].position.set(9, 0, -1.7); 
+	playerIcons[playerNo].position.set(9, 0, -1.7);
+	allLotsOwned = (propertyOwned[21] == propertyOwned[23] && propertyOwned[23]==propertyOwned[24] && propertyOwned[24] != 10);
+	rent = [20, 100, 300, 750, 925, 1100];
+	tPrice = 240;
 	break;
 	case 25:
 	//DISC GOLD TELEPORT (RAIL-3)
@@ -725,10 +741,16 @@ function setPositions(playerNo){
 	case 26:
 	//VIDEO JUKEBOX (YELLOW-1)
 	playerIcons[playerNo].position.set(9, 0, 1.55); 
+	allLotsOwned = (propertyOwned[26] == propertyOwned[27] && propertyOwned[27]==propertyOwned[29] && propertyOwned[29] != 10);
+	rent = [22, 110, 330, 800, 975, 1150];
+	tPrice = 260;
 	break;
 	case 27:
 	//NIGHT HOUSE PARTY (YELLOW-2)
 	playerIcons[playerNo].position.set(9, 0, 3.2); 
+	allLotsOwned = (propertyOwned[26] == propertyOwned[27] && propertyOwned[27]==propertyOwned[29] && propertyOwned[29] != 10);
+	rent = [22, 110, 330, 800, 975, 1150];
+	tPrice = 260;
 	break;
 	case 28:
 	//-UNNAMED- (UTIL-2)
@@ -737,56 +759,72 @@ function setPositions(playerNo){
 	case 29:
 	//HOUSE PARTY (YELLOW-3)
 	playerIcons[playerNo].position.set(9, 0, 6.4); 
+	allLotsOwned = (propertyOwned[26] == propertyOwned[27] && propertyOwned[27]==propertyOwned[29] && propertyOwned[29] != 10);
+	rent = [22, 120, 360, 850, 1025, 1200];
+	tPrice = 280;
 	break;
 	case 30:
 	//GO TO SUSPENSION (GO TO JAIL)
 	playerIcons[playerNo].position.set(-8.25, 0, -8.25); 
-	
 	//change this to jail and add popup?
 	break;
 	case 31:
-	//360 THEATER (PINK-1)
-	playerIcons[playerNo].position.set(6.5, 0, 9); 
+	//g1
+	playerIcons[playerNo].position.set(6.5, 0, 9);
+	allLotsOwned = (propertyOwned[31] == propertyOwned[32] && propertyOwned[32]==propertyOwned[34] && propertyOwned[34] != 10);
+	rent = [26, 130, 390, 900, 1100, 1275];
+	tPrice = 300;
 	break;
-	
 	case 32:
-	//-UNNAMED- (UTIL-1)
-	playerIcons[playerNo].position.set(4.85, 0, 9); 
+	//g2
+	playerIcons[playerNo].position.set(4.85, 0, 9);
+	allLotsOwned = (propertyOwned[31] == propertyOwned[32] && propertyOwned[32]==propertyOwned[34] && propertyOwned[34] != 10);
+	rent = [26, 130, 390, 900, 1100, 1275];
+	tPrice = 300;	
 	break;
 	case 33:
-	//RAINBOW ROOM (PINK-2)
+	//cc
 	playerIcons[playerNo].position.set(3.35, 0, 9); 
 	break;
 	case 34:
-	//WINTER WONDERLAND (PINK-3)
+	//g3
 	playerIcons[playerNo].position.set(1.7, 0, 9); 
+	allLotsOwned = (propertyOwned[31] == propertyOwned[32] && propertyOwned[32]==propertyOwned[34] && propertyOwned[34] != 10);
+	rent = [28, 150, 450, 1000, 1200, 1400];
+	tPrice = 320;
 	break;
 	case 35:
-	//JUNGLE MAZE TELEPORT (RAIL-2)
+	//tele4
 	playerIcons[playerNo].position.set(0.1, 0, 9); 
 	break;
 	case 36:
-	//BOSS MONSTER (ORANGE-1)
+	//chance
 	playerIcons[playerNo].position.set(-1.55, 0, 9); 
 	break;
 	case 37:
-	//CHEST
-	playerIcons[playerNo].position.set(-3.2, 0, 9); 
+	//db1
+	playerIcons[playerNo].position.set(-3.2, 0, 9);
+	allLotsOwned = (propertyOwned[37] === propertyOwned[39] && propertyOwned[1] != 10);
+	rent = [35, 175, 500, 1100, 1300, 1500];
+	tPrice = 350;
 	break;
 	case 38:
-	//HOLOGRAMGS(ORANGE-2)
+	//tax
 	playerIcons[playerNo].position.set(-4.8, 0, 9); 
 	break;
 	case 39:
-	//LOVE LETTER (ORANGE-3)
-	playerIcons[playerNo].position.set(-6.4, 0, 9); 
+	//db2
+	playerIcons[playerNo].position.set(-6.4, 0, 9);
+	allLotsOwned = (propertyOwned[37] === propertyOwned[39] && propertyOwned[1] != 10);
+	rent = [50, 200, 600, 1400, 1700, 2000];
+	tPrice = 400;
 	break;	
 	
 	}//end switch
-	//updateFirebase();
 	
+	landedOn(playerNo, pPos, rent, tPrice, allLotsOwned);
 		
-}
+}//end function
 
 /*
 	POSSIBLY READ THESE FROM JSON OR A DIFFERENT FILE 
@@ -857,115 +895,128 @@ function chanceCard(){
 
 */
 function setPropertyCardPos(tileNo){
-	//console.log("card pos set");
+
+	/*
+		WILL KEEP THIS AND REMOVE THE OTHER STUFF - KEEPS CODE CLEAN
+	*/
+	var hpLocal = 0;
+	
+	propertyCards[tileNo].addEventListener('cursordown', function(){
+		//set house price based on position
+		if (tileNo < 10){
+			hpLocal = 50;
+		}else if (tileNo > 10 && tileNo <20){
+			hpLocal = 100;
+		}else if (tileNo > 20 && tileNo < 30){
+			hpLocal = 150;
+		}else if (tileNo > 30){
+			hpLocal = 200;
+		}
+		
+		console.log("click " + tileNo + " housePrice : " + hpLocal);
+		selectedTileNo = tileNo;
+		
+		selectProperty(tileNo, hpLocal)
+		document.querySelector('#card').setAttribute('src','#card'+tileNo);
+	});
+
 	switch (tileNo){
 	case 1:
-
 		propertyCards[tileNo].position.set(-8.7, 0, 6.45);
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("discgolf");
-			selectedTileNo = tileNo;
-			selectProperty(tileNo, -10.5, -10.5, 5.9, 6.9, 50);
-			document.querySelector('#card').setAttribute('src','#temp');
-		});
 	break;
 	case 3:
 		propertyCards[tileNo].position.set(-8.7, 0, 3.275); 
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("maze");
-			selectedTileNo = tileNo;
-			selectProperty(tileNo, -10.5, -10.5, 2.775, 3.775, 50);
-			document.querySelector('#card').setAttribute('src','#cardTemplate');
-		});
 	break;
 	case 5:
-		propertyCards[tileNo].position.set(-8.7, 0, 0);
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			selectedTileNo = tileNo;
-			console.log("teleport1");
-		});
-		
+		propertyCards[tileNo].position.set(-8.7, 0, 0);	
 	break;
 	case 6:
 		propertyCards[tileNo].position.set(-8.7, 0, -1.575); 
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("beatlab");
-			selectedTileNo = tileNo;
-			selectProperty(tileNo, -10.5, -10.5, -2.05, -1.05, 50);
-		});
 	break;
 	case 8:
 		propertyCards[tileNo].position.set(-8.7, 0, -4.85); 
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("tavern");
-			selectedTileNo = tileNo;
-			selectProperty(tileNo, -10.5, -10.5, -5.3, -4.3, 50);
-		});
 	break;
 	case 9:
 		propertyCards[tileNo].position.set(-8.7, 0, -6.475); 
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("winterwonderland");
-			selectedTileNo = tileNo;
-			selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
-		});
 	break;
-	case 10:
-	
+	case 11:
 		propertyCards[tileNo].position.set(-6.5, 0, -8.65);
 		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("bossmonster");
-			selectedTileNo = tileNo;
-			//selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
-		});
-	break;
-	case 12:
-	
-		propertyCards[tileNo].position.set(-3.31, 0, -8.65);
-		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("hah");
-			selectedTileNo = tileNo;
-			//selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
-		});
 	break;
 	case 13:
-	
+		propertyCards[tileNo].position.set(-3.31, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 14:
 		propertyCards[tileNo].position.set(-1.65, 0, -8.65);
 		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
-		
-		propertyCards[tileNo].addEventListener('cursordown', function(){
-			console.log("love letter");
-			selectedTileNo = tileNo;
-			//selectProperty(tileNo, -10.5, -10.5, -6.9, -5.9, 50);
-		});
 	break;
-	
+	case 15:
+		propertyCards[tileNo].position.set(-0.025, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 16:
+		propertyCards[tileNo].position.set(1.6, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 18:
+		propertyCards[tileNo].position.set(4.85, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 19:
+		propertyCards[tileNo].position.set(6.5, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 21:
+		propertyCards[tileNo].position.set(8.7, 0, -6.475); 
+	break;
+	case 23:
+		propertyCards[tileNo].position.set(8.7, 0, -3.25); 
+	break;
+	case 24:
+		propertyCards[tileNo].position.set(8.7, 0, -1.625); 
+	break;
+	case 25:
+		propertyCards[tileNo].position.set(8.7, 0, 0); 
+	break;
+	case 26:
+		propertyCards[tileNo].position.set(8.7, 0, 1.635); 
+	break;
+	case 27:
+		propertyCards[tileNo].position.set(8.7, 0, 3.275); 
+	break;
+	case 29:
+		propertyCards[tileNo].position.set(8.7, 0, 6.5); 
+	break;
+	case 31:
+		propertyCards[tileNo].position.set(6.475, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 32:
+		propertyCards[tileNo].position.set(4.85, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 34:
+		propertyCards[tileNo].position.set(1.6, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 35:
+		propertyCards[tileNo].position.set(-0.05, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 37:
+		propertyCards[tileNo].position.set(-3.3, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 39:
+		propertyCards[tileNo].position.set(-6.5, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
 	
 	}//end switch
 }//end function
-function selectProperty(tileNo, posX1, posX2, posZ1, posZ2, hp){
+function selectProperty(tileNo, hp){
 
-	/*
-		SHIFTING THE BUY / SELL BOXES NOT NEEDED?
-		POSSIBLY KEEP THIS...
-	*/
-	//set buy/sell house box positions
-	BHB_X = posX1;
-	BHB_Z = posZ1;
-	
-	SHB_X =	posX2;
-	SHB_Z = posZ2;
-	
 	housePrice = hp;
 	//resets box positions (avoids bugs)
 	buyHouseBox.position.set(0,-1,0);
@@ -983,13 +1034,13 @@ function selectProperty(tileNo, posX1, posX2, posZ1, posZ2, hp){
 				
 			//set buy/sell box positions
 			if (housesOwned[tileNo] < 5){
-				buyHouseBox.position.set(posX1, 0, posZ1); 
+				buyHouseBox.position.set(0, 0, 0); 
 			} else {
 				buyHouseBox.position.set(0, -1, 0);
 			}//end if
 			
 			if (housesOwned[tileNo] > 0){
-				sellHouseBox.position.set(posX2, 0, posZ2);
+				//sellHouseBox.position.set(posX2, 0, posZ2);
 			} else {
 				sellHouseBox.position.set(0, -1, 0);
 			}
@@ -997,7 +1048,7 @@ function selectProperty(tileNo, posX1, posX2, posZ1, posZ2, hp){
 		}
 	
 	}
-}
+}//END SELECT PROPERTY
 function nextTurn(){
 	playerTurn ++; //next players turn once rolled (will be changed)
 	if (playerTurn >= players.length){
@@ -1136,10 +1187,9 @@ rollDiceBox.addEventListener('cursordown', function(){
 		rolled = true;
 	}
 	
-	
-	
-	
 	bought = false; //makes sure player can buy again
+	console.log(bought + " test");
+	
 	buyBox.position.set(0, -1, 0); //hides buy box
 	buyHouseBox.position.set(0, -1, 0); //hides buyhouse box
 	sellHouseBox.position.set(0, -1, 0);
