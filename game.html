@@ -475,8 +475,8 @@ function initialiseBoxes(){
 	//console.log("test");
 	//max 8 players in a game
 	for (var i = 0; i < 8; i++){
-		//playerIcons[i] = new THREE.Mesh(boxGeo);
-		playerIcons[i] = dae;		
+		playerIcons[i] = new THREE.Mesh(boxGeo);
+		//playerIcons[i] = dae;		
 		//voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
 		
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
