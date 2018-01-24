@@ -120,7 +120,7 @@
 </body>
 
 <script>
-var version = "0.1.5"
+var version = "0.2"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -482,7 +482,7 @@ function initialiseBoxes(){
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
 		//voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
 		
-		playerIcons[i].scale.set(3, 3, 3);
+		playerIcons[i].scale.set(0.5, 0.5, 0.5);
 		
 		sim.scene.add(playerIcons[i]);
 		//sim.scene.add(voteKickBox[i]);
