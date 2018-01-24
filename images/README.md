@@ -1,6 +1,6 @@
 # Use this folder for images
 
-###To Do List for Winrar :
+### To Do List for Winrar :
 - Title graphic
 - Finish board
 - Start button graphic
