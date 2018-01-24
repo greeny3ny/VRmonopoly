@@ -60,6 +60,8 @@
 		<img id="card16" src="images/propertyCards/video_jukebox.png" />
 		<img id="card18" src="images/propertyCards/dress_up.png" />
 		<img id="card19" src="images/propertyCards/secret_ceaser.png" />
+		
+		<a-asset-item id="piece1" src="https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae"></a-asset-item>
   	</a-assets>
 
 	<a-entity position='-20 16 -15' rotation='0 0 0' n-text='text: Altopoly! ;'></a-entity>
@@ -101,6 +103,9 @@
 		<a-animation attribute="rotation" dur="50000" to="0 360 0" repeat="indefinite" easing="linear"></a-animation>
 	</a-box>
 	
+	<!--
+	<a-entity id="test123" position="-9 0 9" scale="3 3 3" collada-model='#piece1'></a-entity> 
+	-->
 	<a-entity id="dice" position='0 3 0' n-text='text: blah has rolled blah'></a-entity>
 	<!--
 	<a-box color="black" position="-10, 0, -4.8" scale="0.5, 0.5, 0.5"></a-box>
@@ -453,17 +458,31 @@ function drawText(){
 	}
 }//end drawText()
 
+var loader = new THREE.ColladaLoader();
+loader.load( 'https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae', function ( collada ) {
+ 
+    // Grab the collada scene data:
+    dae = collada.scene;
+    // Scale-up the model so that we can see it:
+    dae.scale.x = dae.scale.y = dae.scale.z = 5;
+	dae.rotation.set(Math.PI/2, Math.PI, 0);
+	//sim.scene.add(dae);
+  });
+
+
+
 function initialiseBoxes(){
 	//console.log("test");
 	//max 8 players in a game
 	for (var i = 0; i < 8; i++){
-		playerIcons[i] = new THREE.Mesh(boxGeo);			
+		//playerIcons[i] = new THREE.Mesh(boxGeo);
+		playerIcons[i] = dae;		
 		//voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
 		
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
 		//voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
 		
-		playerIcons[i].scale.set(0.5, 0.5, 0.5);
+		playerIcons[i].scale.set(3, 3, 3);
 		
 		sim.scene.add(playerIcons[i]);
 		//sim.scene.add(voteKickBox[i]);
@@ -565,7 +584,7 @@ var bought = false; //variable saying if player bought tile or not
 var cost = 0; //stores how much player recieves/pays
 var housePrice = 0; //local, stores house price of tile
 var allLotsOwned = false; //are all the lots owned by the same person?
-
+var tPrice = 0;
 function setPositions(playerNo){
 	//console.log("positions set");
 	if (playerPos[playerNo] >= 40){
@@ -576,7 +595,7 @@ function setPositions(playerNo){
 	
 	
 	var pPos = playerPos[playerNo];
-	var tPrice = 0;
+	
 	var rent;
 
 	
@@ -1031,7 +1050,7 @@ function selectProperty(tileNo, hp){
 				
 			//set buy/sell box positions
 			if (housesOwned[tileNo] < 5){
-				buyHouseBox.position.set(0, 0, 0); 
+				//buyHouseBox.position.set(0, 0, 0); 
 			} else {
 				buyHouseBox.position.set(0, -1, 0);
 			}//end if
@@ -1116,9 +1135,10 @@ endTurnBox.addEventListener('cursordown', function(){
 });
 buyBox.addEventListener('cursordown', function(){
 	console.log("tile bought!");
-	
-	propertyOwned[tileNo] = player_element;
-	playerMoney[player_element] -= tilePrice; 
+	//console.log("a: " + playerPos[player_element]);
+	console.log("price:" + tPrice);
+	propertyOwned[playerPos[player_element]] = player_element;
+	playerMoney[player_element] -= tPrice; 
 	buyBox.position.set(0, -1, 0); //positioning error with buybox
 				
 	updateMoney();
@@ -1158,7 +1178,7 @@ sellHouseBox.addEventListener('cursordown', function(){
 	playerMoney[player_element] += housePrice;
 	
 	//set buy box position
-	buyHouseBox.position.set(BHB_X, 0, BHB_Z);
+	//buyHouseBox.position.set(BHB_X, 0, BHB_Z);
 	
 	if (housesOwned[selectedTileNo] < 1){
 	
