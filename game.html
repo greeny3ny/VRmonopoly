@@ -59,7 +59,25 @@
 		<img id="card14" src="images/propertyCards/love_letter.png" />
 		<img id="card16" src="images/propertyCards/video_jukebox.png" />
 		<img id="card18" src="images/propertyCards/dress_up.png" />
-		<img id="card19" src="images/propertyCards/secret_ceaser.png" />
+		<img id="card19" src="images/propertyCards/secret_caeser.png" />
+		<img id="card21" src="images/propertyCards/comedy_club.png" />
+		<img id="card23" src="images/propertyCards/360_theater.png" />
+		<img id="card24" src="images/propertyCards/sculpt_together.png" />
+		<img id="card26" src="images/propertyCards/highrise.png" />
+		<img id="card27" src="images/propertyCards/old_welcome_space.png" />
+		<img id="card29" src="images/propertyCards/new_user_info.png" />
+		<img id="card31" src="images/propertyCards/game_room.png" />
+		<img id="card32" src="images/propertyCards/rainbow_room.png" />
+		<img id="card34" src="images/propertyCards/dojo.png" />
+		<img id="card37" src="images/propertyCards/campfire_with_pets.png" />
+		<img id="card39" src="images/propertyCards/the_campfire.png" />
+		
+		<img id="card5" src="images/propertyCards/observation_deck_teleporter.png" />
+		<img id="card15" src="images/propertyCards/the_maze_teleporter.png" />
+		<img id="card25" src="images/propertyCards/help_center_teleporter.png" />
+		<img id="card35" src="images/propertyCards/disc_golf_teleporter.png" />
+		
+		
 		
 		<a-asset-item id="piece1" src="https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae"></a-asset-item>
   	</a-assets>
@@ -73,6 +91,8 @@
 	Models : Lia
 	; width:100;' ></a-entity>
 
+	<a-entity id="tempChance" position='8 10 -15' rotation='0 0 0' n-text='text: Card Text  ;' ></a-entity>
+	
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
 	<!--
@@ -99,6 +119,9 @@
 	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 
+	<!--
+	<a-box id="test22" position="-5 1 -15" scale="2 2 2" opacity="0.5" color="green" n-text='text:BuyBox'></a-box>
+	-->
 	<a-plane id="card" src="#test" n-billboard position='0 7.5 0' rotation='0 0 0' color='white' scale='5 5'>
 	</a-plane>
 	
@@ -421,13 +444,14 @@ if (gameStart){
 	//console.log("game reset");
 	temp = false;
 	rolled = false;
+	chanceBool = false;
 	
 	temp_start = false;
 	//reset box positions
 	for (var i = 0; i < 8; i++){
 		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
 	}//end for8
-	buyBox.position.set(0, -1, 0);
+	buyBox.position.set(0, -2, 0);
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
 	
@@ -500,7 +524,7 @@ function initialiseBoxes(){
 		sim.scene.add(propertyCards[i]);
 	}//end for40
 	
-	buyBox.position.set(0, -1, 0);
+	buyBox.position.set(0, -2, 0);
 	//sellHouseBox.position.set(0, -1, 0);
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
@@ -510,7 +534,7 @@ function initialiseBoxes(){
 	rollDiceBox.position.set(0,2,-1);
 	endTurnBox.position.set(0,2,-2);
 	
-	buyBox.scale.set(0.5, 0.5, 0.5);
+	buyBox.scale.set(2, 2, 2);
 	//sellHouseBox.scale.set(0.5, 0.5, 0.5);
 	buyHouseBox.scale.set(0.5, 0.5, 0.5);
 	sellHouseBox.scale.set(0.5, 0.5, 0.5);
@@ -532,6 +556,7 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 		//console.log("you have landed here");
 		//check if owned
 		if (propertyOwned[tileNo] != 10){
+		
 			//console.log("property owned by " + players[propertyOwned[1]]);
 			//check if client owns property already
 			if (propertyOwned[tileNo] == player_element){
@@ -565,13 +590,10 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 			//console.log("property unowned");
 			//display buy / sell boxes
 			//console.log("you have landed here");
-			buyBox.position.set(-1, 0, -1);  //------------------------------
-			
-			if (bought){
-				//console.log("test");
-			}//end if bought  = true
-			
-			
+			  //------------------------------
+			if (!bought){
+				buyBox.position.set(-5, 1, -15);
+			}
 			
 		}//end if
 		
@@ -586,6 +608,7 @@ var cost = 0; //stores how much player recieves/pays
 var housePrice = 0; //local, stores house price of tile
 var allLotsOwned = false; //are all the lots owned by the same person?
 var tPrice = 0;
+var chanceBool = false;
 function setPositions(playerNo){
 	//console.log("positions set");
 	if (playerPos[playerNo] >= 40){
@@ -644,7 +667,13 @@ function setPositions(playerNo){
 	case 7:
 	//CHANCE
 	playerIcons[playerNo].position.set(-9, 0, -3.2); 
-	//chanceCard(); //testing
+	
+	//makes chance trigger only once
+	if (!chanceBool){
+		chanceCard(); //testing
+		chanceBool = true;
+	}
+	
 	break;
 	case 8:
 	//TAVERN -LB2
@@ -848,22 +877,28 @@ function setPositions(playerNo){
 	WILL KEEP CODE NICE AND CLEAN
 */
 function chanceCard(){
-	var rand = Math.floor((Math.random()*16)+1);
+	var rand = Math.floor((Math.random()*4)+1);
+	var str = "--";
 	
 	switch (rand){
 	
 		case 1:
 			console.log("Advance to the Campfire (Collect $200) ");
+			str = "Advance to the Campfire (Collect 200)";
 		break;
 		case 2:
 			console.log("Go to the SDK Meetup. - If you pass Campfire, collect $200");
+			str = "Go to the SDK Meetup. - If you pass Campfire, collect 200 " ;
 		break;
 		case 3:
-			console.log("Go watch videos in 360 Theater – If you pass Campfire, collect $200 ");
+			console.log("Go watch videos in 360 Theater - If you pass Campfire, collect 200 ");
+			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;
 		break;
 		case 4:
 			console.log("You called parentheses brackets on the AltspaceVR slack channel, lose $100");
+			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;
 		break;
+		/*
 		case 5:
 			console.log("Advance to the Campfire (Collect $200) ");
 		break;
@@ -900,9 +935,13 @@ function chanceCard(){
 		case 16:
 			console.log("Advance to the Campfire (Collect $200) ");
 		break;
-	
-	
+		default:
+		str = "---";
+		break;
+		*/
 	}
+	
+	document.querySelector('#tempChance').setAttribute('n-text','text: ' + str);
 	
 }//end chance
 /*
@@ -1116,6 +1155,7 @@ resetBox.addEventListener('cursordown', function(){
 	playerMoney = [];
 	propertyOwned = [];
 	housesOwned = [];
+	
 	//only synced data can go here
 	
 	updateFirebase(); //update firebase
@@ -1128,7 +1168,7 @@ endTurnBox.addEventListener('cursordown', function(){
 	
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
-	buyBox.position.set(0, -1, 0);
+	buyBox.position.set(0, -2, 0);
 
 	nextTurn();
 	
@@ -1140,7 +1180,7 @@ buyBox.addEventListener('cursordown', function(){
 	console.log("price:" + tPrice);
 	propertyOwned[playerPos[player_element]] = player_element;
 	playerMoney[player_element] -= tPrice; 
-	buyBox.position.set(0, -1, 0); //positioning error with buybox
+	buyBox.position.set(0, -2, 0); //positioning error with buybox
 				
 	updateMoney();
 	updateProperties();
@@ -1216,12 +1256,12 @@ rollDiceBox.addEventListener('cursordown', function(){
 	bought = false; //makes sure player can buy again
 	console.log(bought + " test");
 	
-	buyBox.position.set(0, -1, 0); //hides buy box
+	buyBox.position.set(0, -2, 0); //hides buy box
 	buyHouseBox.position.set(0, -1, 0); //hides buyhouse box
 	sellHouseBox.position.set(0, -1, 0);
 	
 	//used for testing
-	//diceRoll = 1;
+	diceRoll = 7;
 	
 	//readFirebasePos();
 	playerPos[playerTurn] += diceRoll;
@@ -1238,7 +1278,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 	updateMoney();
 	
 	temp_money = false; //resets, so money can be dropped if a roll again is needed
-	
+	chanceBool = false;
 	
 });
 startBox.addEventListener('cursordown', function(){
