@@ -10,7 +10,7 @@
 - Sell House Graphic
 - Buy property Graphic
 ---
-- Property Cards
+- ~~Property Cards~~ (DONE)
 - Chance Cards
 - Community Chest Cards
 
