@@ -165,7 +165,7 @@ More than 8 people WILL break the app completely!
 </body>
 
 <script>
-var version = "0.3.0"
+var version = "0.3.2"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -216,11 +216,29 @@ var blueMat = new THREE.MeshLambertMaterial( { color: 0x0000ff, transparent:true
 blueMat.opacity=0.5;
 var boxGeo = new THREE.BoxGeometry(1, 1, 1);
 var tileGeo = new THREE.BoxGeometry(5.4, 0.1, 3.2);
-var joinBox = new THREE.Mesh(boxGeo, redMat); 
-var startBox = new THREE.Mesh(boxGeo, pinkMat);
-var resetBox = new THREE.Mesh(boxGeo, greenMat);
-var rollDiceBox = new THREE.Mesh(boxGeo, greenMat);
+
 var endTurnBox = new THREE.Mesh(boxGeo, redMat);
+
+//-------
+var startGameTex = new THREE.TextureLoader().load("images/buttons/startGame.png");
+var startGameMat = new THREE.MeshBasicMaterial({ map:startGameTex, side:THREE.DoubleSide }); 
+var startBox = new THREE.Mesh(boxGeo, startGameMat);
+
+var joinGameTex = new THREE.TextureLoader().load("images/buttons/joinGame.png");
+var joinGameMat = new THREE.MeshBasicMaterial({ map:joinGameTex, side:THREE.DoubleSide });
+var joinBox = new THREE.Mesh(boxGeo, joinGameMat);
+
+var resetGameTex = new THREE.TextureLoader().load("images/buttons/resetGame.png");
+var resetGameMat = new THREE.MeshBasicMaterial({ map:resetGameTex, side:THREE.DoubleSide });
+var resetBox = new THREE.Mesh(boxGeo, resetGameMat);
+
+var rollDiceTex = new THREE.TextureLoader().load("images/buttons/rollDice.png");
+var rollDiceMat = new THREE.MeshBasicMaterial({ map:rollDiceTex, side:THREE.DoubleSide });
+var rollDiceBox = new THREE.Mesh(boxGeo, rollDiceMat);
+
+var endTurnTex = new THREE.TextureLoader().load("images/buttons/endTurn.png");
+var endTurnMat = new THREE.MeshBasicMaterial({ map:endTurnTex, side:THREE.DoubleSide });
+var endTurnBox = new THREE.Mesh(boxGeo, endTurnMat);
 //--- 
 var buyBox = new THREE.Mesh(boxGeo, greenMat);
 var skipBox = new THREE.Mesh(boxGeo, redMat);
@@ -453,6 +471,13 @@ if (gameStart){
 		} 
 	} 
 	
+	//console.log(playerTurn + " | " + player_element);
+	if (playerTurn == player_element){
+		if (!bought && playerPos%10 !=0){
+		buyBox.position.set(-5, 1, -15);
+		}
+	}
+	
 	for (var i = 0; i < players.length; i++){
 		setPositions(i);
 	}
@@ -590,6 +615,7 @@ function initialiseBoxes(){
 function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 	console.log("All lots owned : " + allLotsOwned);
 	//check if YOU have landed on property
+	//console.log(playerNo + " | " + player_element);
 	if (playerNo == player_element){
 		//console.log("you have landed here");
 		//check if owned
@@ -628,10 +654,7 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 			//display buy / sell boxes
 			//console.log("you have landed here");
 			  //------------------------------
-			if (!bought && playerPos%10 != 0){
-				console.log(playerPos%10);
-				buyBox.position.set(-5, 1, -15);
-			}
+			
 			
 		}//end if
 		
@@ -1166,7 +1189,7 @@ joinBox.addEventListener('cursordown', function(){
 			player_element = 0;
 		} else {
 			players[players.length] = displayname;
-			player_element = players.length;
+			player_element = players.length-1;
 		}
 		
 		sim.scene.add(startBox); //startbox only appears for person who joins game
