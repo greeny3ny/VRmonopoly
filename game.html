@@ -165,7 +165,7 @@ More than 8 people WILL break the app completely!
 </body>
 
 <script>
-var version = "0.3.2.2"
+var version = "0.3.2.3"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -1181,7 +1181,8 @@ function selectProperty(tileNo, hp){
 				
 			//set buy/sell box positions
 			if (housesOwned[tileNo] < 5){
-				//buyHouseBox.position.set(0, 0, 0); 
+				//buyHouseBox.position.set(0, 0, 0);
+				buyHouseBox.position.set(-5, 1, -10);
 			} else {
 				buyHouseBox.position.set(0, -1, 0);
 			}//end if
