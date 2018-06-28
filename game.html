@@ -165,7 +165,7 @@ More than 8 people WILL break the app completely!
 </body>
 
 <script>
-var version = "0.3.2.3"
+var version = "0.3.2.4"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -242,7 +242,7 @@ var endTurnBox = new THREE.Mesh(boxGeo, endTurnMat);
 //--- 
 var buyBox = new THREE.Mesh(boxGeo, greenMat);
 var skipBox = new THREE.Mesh(boxGeo, redMat);
-var buyHouseBox = new THREE.Mesh(boxGeo, greenMat);
+var buyHouseBox = new THREE.Mesh(boxGeo, pinkMat);
 var sellHouseBox = new THREE.Mesh(boxGeo, redMat);
 var playerIcons = [];
 var voteKickBox = [];
@@ -614,7 +614,7 @@ function initialiseBoxes(){
 	
 	buyBox.scale.set(2, 2, 2);
 	//sellHouseBox.scale.set(0.5, 0.5, 0.5);
-	buyHouseBox.scale.set(0.5, 0.5, 0.5);
+	buyHouseBox.scale.set(2, 2, 2);
 	sellHouseBox.scale.set(0.5, 0.5, 0.5);
 	//sim.scene.add(endTurnBox);
 	//sim.scene.add(joinBox);
@@ -1182,7 +1182,7 @@ function selectProperty(tileNo, hp){
 			//set buy/sell box positions
 			if (housesOwned[tileNo] < 5){
 				//buyHouseBox.position.set(0, 0, 0);
-				buyHouseBox.position.set(-5, 1, -10);
+				buyHouseBox.position.set(0, 1, -15);
 			} else {
 				buyHouseBox.position.set(0, -1, 0);
 			}//end if
