@@ -127,12 +127,26 @@ More than 8 people WILL break the app completely!
 	<a-entity id="money6" position='0 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
+	<a-box id="box1" position='3 12 -15' color='green' ></a-box>
+	<a-box id="box2" position='3 11 -15' color='red' ></a-box>
+	<a-box id="box3" position='3 10 -15' color='blue' ></a-box>
+	<a-box id="box4" position='3 9 -15' color='yellow' ></a-box>
+	<!--
+	<a-entity id="money5" position='0 8 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money6" position='0 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	-->
 
 	<!--
 	<a-box id="test22" position="-5 1 -15" scale="2 2 2" opacity="0.5" color="green" n-text='text:BuyBox'></a-box>
 	-->
 	<a-plane id="card" src="#test" n-billboard position='0 7.5 0' rotation='0 0 0' color='white' scale='5 5'>
 	</a-plane>
+	
+	<a-entity id="turnText" position='0 4 0' rotation='0 0 0' n-billboard n-text='text: Test123;' ></a-entity>
+	<a-entity id="ownText" position='0 2 0' rotation='0 0 0' n-billboard n-text='text: Test123;' ></a-entity>
 	
 	<!--
 	<a-entity id="test123" position="-9 0 9" scale="3 3 3" collada-model='#piece1'></a-entity> 
@@ -151,7 +165,7 @@ More than 8 people WILL break the app completely!
 </body>
 
 <script>
-var version = "0.2.2"
+var version = "0.3.0"
 console.log("Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -160,27 +174,21 @@ var username;
 var userID;
 var moderator;
 var displayname;
-
 altspace.getUser().then(function(u){
 		console.log(u);
 		displayname = u.displayName;
 		//console.log(user);
-
 }).then(function(){
 	//console.log("test");
 	setTimeout(main, 2000);
 });
-
-
 //---------------------------------------------------------------
 //---------------------------------------------------------------
 //--------------------- synchronisation? ------------------------
  //waits for user data before starting
-
 /*
 	HEARTBEAT SYSTEM - NEEDS A MAJOR REWRITE!!!
 */
-
 //add user to database
 //add heartbeat to database
 //check other heartbeats
@@ -205,12 +213,9 @@ var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 var greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 var blueMat = new THREE.MeshLambertMaterial( { color: 0x0000ff, transparent:true } );
-
-blueMat.opacity=0;
-
+blueMat.opacity=0.5;
 var boxGeo = new THREE.BoxGeometry(1, 1, 1);
 var tileGeo = new THREE.BoxGeometry(5.4, 0.1, 3.2);
-
 var joinBox = new THREE.Mesh(boxGeo, redMat); 
 var startBox = new THREE.Mesh(boxGeo, pinkMat);
 var resetBox = new THREE.Mesh(boxGeo, greenMat);
@@ -224,6 +229,7 @@ var sellHouseBox = new THREE.Mesh(boxGeo, redMat);
 var playerIcons = [];
 var voteKickBox = [];
 var propertyCards = [];
+var pC_materials = [];
 ///--------------------
 function main(){
 	console.log("main");
@@ -259,7 +265,6 @@ function updateFirebase(){
 	});
 	//console.log("database updated!");
 }
-
 function updatePlayers(){
 	fbGameRef.update({
 		players:players
@@ -295,8 +300,6 @@ function updateHouses(){
 		houses: housesOwned
 	});
 }
-
-
 //reads users in session
 function readFirebaseUsers(){
 	fbGameRef.child("inSession").on("value", function(snapshot) {
@@ -333,6 +336,7 @@ function readFirebaseOwned(){
 	
 	fbGameRef.child("properties").on("value", function(snapshot){
 		propertyOwned = snapshot.val();
+		setPropertyColor();
 	});
 }
 function readFirebaseHouses(){
@@ -340,7 +344,6 @@ function readFirebaseHouses(){
 		housesOwned = snapshot.val();
 	});
 }
-
 /*
 	WILL ALLOW A READ WHEN A CHILD_CHANGE IS DETECTED
 */
@@ -366,6 +369,8 @@ function readOnChildChanged(){
 	});
 	fbGameRef.child("properties").on("child_changed", function(snapshot){
 		propertyOwned = snapshot.val();
+		setPropertyColor();
+		
 	});
 	fbGameRef.child("houses").on("child_changed", function(snapshot){
 		housesOwned = snapshot.val();
@@ -373,7 +378,29 @@ function readOnChildChanged(){
 	
 }
 
+function setPropertyColor(){
+	for (var i=0; i<40; i++){
+		switch(propertyOwned[i]){
+			case 0:
+				propertyCards[i].material.color.setHex(0x00ff00);
+				pC_materials[i].opacity = 0.5;
+				break;
+			case 1:
+				propertyCards[i].material.color.setHex(0xff0000);
+				pC_materials[i].opacity = 0.5;
+				break;
+			case 2:
+				propertyCards[i].material.color.setHex(0x0000ff);
+				pC_materials[i].opacity = 0.5;
+				break;
+			case 3:
+				propertyCards[i].material.color.setHex(0xff00ff);
+				pC_materials[i].opacity = 0.5;
+				break;
+		}
+	}
 
+}
 //checks element if game has started
 function checkPlayerElement(){
 	//assume firebase players already been read
@@ -391,8 +418,6 @@ function checkPlayerElement(){
 var temp = false;
 var temp_start = false;
 var rolled = false; //is dice been rolled?
-
-
 function readFirebase(){
 	console.log("testing");
 	readFirebasePlayers(); //check if players is being updated
@@ -443,7 +468,14 @@ if (gameStart){
 	sim.scene.remove(rollDiceBox);
 	sim.scene.remove(endTurnBox);
 	
+	for (var i=0; i<40; i++){
+		pC_materials[i].color.setHex( 0xffffff );
+		pC_materials[i].opacity = 0;
+	}
+	
 	document.querySelector('#card').setAttribute('src','#test');
+	document.querySelector('#turnText').setAttribute('n-text','text:;');
+	document.querySelector('#ownText').setAttribute('n-text','text:;');
 	
 	if (players == null){
 		//console.log("test");
@@ -482,6 +514,7 @@ function drawText(){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:'+players[i]);
 			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+playerMoney[i]);
 		}	
+		document.querySelector('#turnText').setAttribute('n-text','text: It is ' + players[playerTurn] + "'s turn");
 	}else{
 		for (var i=0; i<8; i++){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
@@ -489,7 +522,6 @@ function drawText(){
 		}	
 	}
 }//end drawText()
-
 var loader = new THREE.ColladaLoader();
 loader.load( 'https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae', function ( collada ) {
  
@@ -501,9 +533,6 @@ loader.load( 'https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.da
 	console.log("test");
 	//sim.scene.add(dae);
   });
-
-
-
 function initialiseBoxes(){
 	//console.log("test");
 	//max 8 players in a game
@@ -524,7 +553,9 @@ function initialiseBoxes(){
 	}//end for8
 	
 	for (var i = 0; i<40; i++){
-		propertyCards[i] = new THREE.Mesh(tileGeo, blueMat);
+		pC_materials[i] = new THREE.MeshLambertMaterial( { color: 0xffffff, transparent:true } );
+		pC_materials[i].opacity = 0;
+		propertyCards[i] = new THREE.Mesh(tileGeo, pC_materials[i]);
 		propertyCards[i].position.set(0, -1, 0);
 		propertyCards[i].scale.set(0.5, 0.5, 0.5);
 		
@@ -557,9 +588,7 @@ function initialiseBoxes(){
 	
 }
 function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
-
-	console.log(allLotsOwned);
-
+	console.log("All lots owned : " + allLotsOwned);
 	//check if YOU have landed on property
 	if (playerNo == player_element){
 		//console.log("you have landed here");
@@ -583,7 +612,6 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 				else {
 					cost = r;
 				}
-
 				playerMoney[propertyOwned[tileNo]] += cost;
 				playerMoney[playerNo] -= cost;
 				
@@ -600,7 +628,8 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 			//display buy / sell boxes
 			//console.log("you have landed here");
 			  //------------------------------
-			if (!bought){
+			if (!bought && playerPos%10 != 0){
+				console.log(playerPos%10);
 				buyBox.position.set(-5, 1, -15);
 			}
 			
@@ -630,7 +659,6 @@ function setPositions(playerNo){
 	var pPos = playerPos[playerNo];
 	
 	var rent;
-
 	
 	switch (playerPos[playerNo]){
 	
@@ -880,7 +908,6 @@ function setPositions(playerNo){
 	landedOn(playerNo, pPos, rent, tPrice, allLotsOwned);
 		
 }//end function
-
 /*
 	POSSIBLY READ THESE FROM JSON OR A DIFFERENT FILE 
 	WILL KEEP CODE NICE AND CLEAN
@@ -954,13 +981,10 @@ function chanceCard(){
 	
 }//end chance
 /*
-
 	THIS IS POSSIBLY UNNEEDED - USE ONE PROPERTY CARD IN MIDDLE OF BOARD ??
 	WILL STILL NEED TO PLACE
-
 */
 function setPropertyCardPos(tileNo){
-
 	/*
 		WILL KEEP THIS AND REMOVE THE OTHER STUFF - KEEPS CODE CLEAN
 	*/
@@ -983,8 +1007,9 @@ function setPropertyCardPos(tileNo){
 		
 		selectProperty(tileNo, hpLocal)
 		document.querySelector('#card').setAttribute('src','#card'+tileNo);
+		document.querySelector('#ownText').setAttribute('n-text','text:Tile Owned by : ' + players[propertyOwned[tileNo]]);
+		
 	});
-
 	switch (tileNo){
 	case 1:
 		propertyCards[tileNo].position.set(-8.7, 0, 6.45);
@@ -1081,7 +1106,6 @@ function setPropertyCardPos(tileNo){
 	}//end switch
 }//end function
 function selectProperty(tileNo, hp){
-
 	housePrice = hp;
 	//resets box positions (avoids bugs)
 	buyHouseBox.position.set(0,-1,0);
@@ -1178,7 +1202,6 @@ endTurnBox.addEventListener('cursordown', function(){
 	buyHouseBox.position.set(0, -1, 0);
 	sellHouseBox.position.set(0, -1, 0);
 	buyBox.position.set(0, -2, 0);
-
 	nextTurn();
 	
 	sim.scene.remove(endTurnBox);
@@ -1190,10 +1213,9 @@ buyBox.addEventListener('cursordown', function(){
 	propertyOwned[playerPos[player_element]] = player_element;
 	playerMoney[player_element] -= tPrice; 
 	buyBox.position.set(0, -2, 0); //positioning error with buybox
-				
+		
 	updateMoney();
 	updateProperties();
-
 	bought = true;
 });
 buyHouseBox.addEventListener('cursordown', function(){
@@ -1217,7 +1239,6 @@ buyHouseBox.addEventListener('cursordown', function(){
 	
 	updateHouses();
 	updateMoney();
-
 	//box can only be clicked 4 times, will disappear after fifth,
 	//so no check needs to be done here
 	}
@@ -1279,7 +1300,6 @@ rollDiceBox.addEventListener('cursordown', function(){
 	//document.querySelector('#dice').setAttribute('n-text','text: You have moved to ' + playerPos);
 	
 	setPositions(playerTurn); //works kinda?
-
 	
 	
 	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
