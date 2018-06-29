@@ -193,7 +193,7 @@ var joined; //local
 var loaded = false;
 var players;
 var playerTurn; //what players turn is it
-var playerPos; //0 = go, array storing all players locations
+var playerPos = []; //0 = go, array storing all players locations
 var player_element; //element local player in array is
 var playerMoney; //array holding all money for players
 var propertyOwned = []; //array of 40, stores what properties are owned by who
@@ -563,8 +563,9 @@ if (gameStart){
 		setPositions(i);
 	}
 	setHousePositions();
-	chanceCard(cardDraw);
-	
+	if (!switched){
+		chanceCard(cardDraw, playerTurn);
+	}
 
 } else {
 //-----------------------------------------------
@@ -1155,38 +1156,72 @@ function drawCard(){
 	POSSIBLY READ THESE FROM JSON OR A DIFFERENT FILE 
 	WILL KEEP CODE NICE AND CLEAN
 */
-function chanceCard(card){
+var switched = false;
+function chanceCard(card, turn){
 	
 	var str = "--";
+	
 	
 	switch (card){
 	
 		case 1:
 			str = "Advance to the Campfire (Collect 200)";
+			if (turn == player_element){
+				playerPos[turn] = 0;
+				switched = true;
+			}
 		break;
 		case 2:
-			str = "Go to the SDK Meetup. - If you pass Campfire, collect 200 " ;
+			str = "Go play Holograms against humanity. - If you pass Campfire, collect 200 " ;
+			if (turn == player_element){
+				playerPos[turn] = 13;
+				switched = true;
+			}
 		break;
 		case 3:
 			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;
+			if (turn == player_element){
+				playerPos[turn] = 23;
+				switched = true;
+			}
 		break;
 		case 4:
 			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;
+			if (turn == player_element){
+				playerMoney[turn] -= 100;
+				switched = true;
+			}
 		break;
 		case 5:
 			str = "Get out of suspension free!";
 		break;
 		case 6:
 			str = "Your Altspace client has bugged! Go back 3 spaces.";
+			if (turn == player_element){
+				playerPos[turn] -= 3;
+				switched = true;
+			}
 		break;
 		case 7:
-			str = "You said you were 5 years old in the campfire. Go to suspension.";
+			str = "You said you were 11 years old in the campfire. Go to suspension.";
+			if (turn == player_element){
+				playerPos[turn] = 30;
+				switched = true;
+			}
 		break;
 		case 8:
 			str = "You won the dance competition. Collect 100.";
+			if (turn == player_element){
+				playerMoney[turn] += 100;
+				switched = true;
+			}
 		break;
 		case 9:
 			str = "Pay marshmallow tax of 15";
+			if (turn == player_element){
+				playerMoney[turn] -= 15;
+				switched = true;
+			}
 		break;
 		case 10:
 			console.log("Advance to the Campfire (Collect $200) ");
@@ -1214,6 +1249,10 @@ function chanceCard(card){
 		break;
 		
 	}
+	
+	updateMoney();
+	updatePosition();
+	
 	console.log(str);
 	document.querySelector('#tempChance').setAttribute('src','#chance1');
 	document.querySelector('#info3').setAttribute('n-text','width:100; text: ' + str);
@@ -1515,6 +1554,8 @@ sellHouseBox.addEventListener('cursordown', function(){
 });
 rollDiceBox.addEventListener('cursordown', function(){
 		
+	switched = false;	
+	
 	console.log("");
 	console.log("Rolling Dice!!!");
 	console.log("");
@@ -1526,7 +1567,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 	diceRoll = dice1 + dice2
 	
 	//testing!
-	//diceRoll = 7;
+	diceRoll = 7;
 	
 	is_double = (dice1==dice2);
 	
