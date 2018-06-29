@@ -27,3 +27,4 @@ TO DO LIST :
  - Update all the stuff to be the cool stuff
  - Change database to node.js?
  - Cake.
+ - Sound effects
