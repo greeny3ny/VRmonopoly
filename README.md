@@ -9,7 +9,8 @@ Build in AFrame and THREE.js
 
 TO DO LIST :
  - Visible hotels
- - Sell box
+ - Mortgages
+ - Trading (rip me if i wanna code this one)
  - End game (if people ever play that far)
  - Model's for pieces
  - Finalised board
@@ -31,3 +32,4 @@ TO DO LIST :
  
  THINGS I HAVE DONE THAT WERE ON THE TO DO LIST:
   - Visible houses
+  - Sell house box
