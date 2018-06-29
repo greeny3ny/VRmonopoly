@@ -8,7 +8,7 @@ Build in AFrame and THREE.js
 - Models by Lia
 
 TO DO LIST :
- - Visible houses/hotels
+ - Visible hotels
  - Sell box
  - End game (if people ever play that far)
  - Model's for pieces
@@ -28,3 +28,6 @@ TO DO LIST :
  - Change database to node.js?
  - Cake.
  - Sound effects
+ 
+ THINGS I HAVE DONE THAT WERE ON THE TO DO LIST:
+  - Visible houses
