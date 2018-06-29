@@ -160,7 +160,7 @@
 </body>
 
 <script>
-var version = "0.4.1.1"
+var version = "0.4.1.2"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -564,7 +564,7 @@ if (gameStart){
 	}
 	setHousePositions();
 	if (!switched){
-		chanceCard(cardDraw, playerTurn);
+		//chanceCard(cardDraw, playerTurn);
 	}
 
 } else {
