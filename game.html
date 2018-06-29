@@ -104,8 +104,9 @@
 	
 	
 	<a-sky color="black" radius="200"></a-sky>
-	
 	<a-plane color="black" scale="100 100" position="0 -0.01 0" rotation="-90 0 0"></a-plane>
+	<a-box color="black" scale="100 30 0.1" position="0 15 -16" n-box-collider="type:environment"></a-box>
+	
 	
 	<a-entity id="board1" position='-9 12 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="board2" position='-9 11 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
@@ -121,6 +122,10 @@
 	<a-box id="box2" position='3 11 -15' color='red' ></a-box>
 	<a-box id="box3" position='3 10 -15' color='blue' ></a-box>
 	<a-box id="box4" position='3 9 -15' color='yellow' ></a-box>
+	
+	<a-entity id="info1" position='-4 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="info2" position='-4 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="info3" position='-4 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<!--
 	<a-entity id="money5" position='0 8 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money6" position='0 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
@@ -136,6 +141,7 @@
 	
 	<a-entity id="turnText" position='0 4 0' rotation='0 0 0' n-billboard n-text='text: Test123;' ></a-entity>
 	<a-entity id="ownText" position='0 2 0' rotation='0 0 0' n-billboard n-text='text: Test123;' ></a-entity>
+	
 	
 	<!--
 	<a-entity id="test123" position="-9 0 9" scale="3 3 3" collada-model='#piece1'></a-entity> 
@@ -154,7 +160,7 @@
 </body>
 
 <script>
-var version = "0.3.4.1"
+var version = "0.4.0.0"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -192,12 +198,15 @@ var player_element; //element local player in array is
 var playerMoney; //array holding all money for players
 var propertyOwned = []; //array of 40, stores what properties are owned by who
 var housesOwned = []; //array of 40, stores how many houses are on tile, 5 houses = hotel
+var diceRoll = 0; //stores diceroll for player whose turn it is
+var cardDraw = 0; //Card drawn when landed on CC or chance.
+var selectedTileNo; //stores number of selected tile
 //positions of buy / sell house buttons
 var SHB_X, SHB_Z = 0; //?? potential use for sell house box
 var BHB_X, BHB_Z = 0; //?? potential use for buy house box
-var selectedTileNo; //stores number of selected tile
 
-const MAX_PLAYERS = 4;
+
+const MAX_PLAYERS = 4; //max amount of players in game
 
 //--- box stuff ---
 
@@ -211,9 +220,8 @@ var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 
 var boxGeo = new THREE.BoxGeometry(1, 1, 1); //geometry used for all clicky boxes / objects
 var tileGeo = new THREE.BoxGeometry(5.4, 0.1, 3.2); //geometry used for tiles user can click on
+var houseGeo = new THREE.SphereGeometry(1,1,1); //temp geometry for houses
 
-
-var houseModel = new THREE.Mesh(boxGeo, pinkMat);
 //-------
 //Creating clicky boxes with their own awesome texture!
 //-------
@@ -244,8 +252,26 @@ var buyPropertyBox = new THREE.Mesh(boxGeo, buyPropMat);
 var buyHouseTex = new THREE.TextureLoader().load("images/buttons/buyHouse.png");
 var buyHouseMat = new THREE.MeshBasicMaterial({ map:buyHouseTex, side:THREE.DoubleSide });
 var buyHouseBox = new THREE.Mesh(boxGeo, buyHouseMat);
+
+var sellHouseTex = new THREE.TextureLoader().load("images/buttons/sellHouse.png");
+var sellHouseMat = new THREE.MeshBasicMaterial({ map:sellHouseTex, side:THREE.DoubleSide });
+var sellHouseBox = new THREE.Mesh(boxGeo, sellHouseMat);
+
+//---
+
+var blueModelTex = new THREE.TextureLoader().load("images/models/blueModel.png");
+var blueModelMat = new THREE.MeshBasicMaterial({ map:blueModelTex, side:THREE.DoubleSide }); 
+
+var greenModelTex = new THREE.TextureLoader().load("images/models/greenModel.png");
+var greenModelMat = new THREE.MeshBasicMaterial({ map:greenModelTex, side:THREE.DoubleSide }); 
+
+var redModelTex = new THREE.TextureLoader().load("images/models/redModel.png");
+var redModelMat = new THREE.MeshBasicMaterial({ map:redModelTex, side:THREE.DoubleSide }); 
+
+var yellowModelTex = new THREE.TextureLoader().load("images/models/yellowModel.png");
+var yellowModelMat = new THREE.MeshBasicMaterial({ map:yellowModelTex, side:THREE.DoubleSide }); 
+
 //--- 
-var sellHouseBox = new THREE.Mesh(boxGeo, redMat);
 var playerIcons = [];
 var voteKickBox = [];
 var propertyCards = [];
@@ -281,7 +307,9 @@ function updateFirebase(){
 		gameStart: gameStart,
 		money: playerMoney,
 		properties: propertyOwned,
-		houses: housesOwned
+		houses: housesOwned,
+		diceRoll: diceRoll,
+		cardDraw: cardDraw
 	});
 	//console.log("database updated!");
 }
@@ -320,6 +348,19 @@ function updateHouses(){
 		houses: housesOwned
 	});
 }
+
+function updateDiceRoll(){
+	fbGameRef.update({
+		diceRoll: diceRoll
+	});
+}
+
+function updateCardDraw(){
+	fbGameRef.update({
+		cardDraw: cardDraw
+	});
+}
+
 //reads users in session
 function readFirebaseUsers(){
 	fbGameRef.child("inSession").on("value", function(snapshot) {
@@ -362,6 +403,19 @@ function readFirebaseOwned(){
 function readFirebaseHouses(){
 	fbGameRef.child("houses").on("value", function(snapshot){
 		housesOwned = snapshot.val();
+		//setHousePositions();
+	});
+}
+
+function readFirebaseDiceRoll(){
+	fbGameRef.child("diceRoll").on("value", function(snapshot) {
+		diceRoll = snapshot.val();
+	});
+}
+
+function readFirebaseCardDraw(){
+	fbGameRef.child("cardDraw").on("value", function(snapshot) {
+		cardDraw = snapshot.val();
 	});
 }
 /*
@@ -394,12 +448,21 @@ function readOnChildChanged(){
 	});
 	fbGameRef.child("houses").on("child_changed", function(snapshot){
 		housesOwned = snapshot.val();
+		
+	});
+	fbGameRef.child("diceRoll").on("child_changed", function(snapshot){
+	    diceRoll = snapshot.val();
+	});
+	fbGameRef.child("cardDraw").on("child_changed", function(snapshot){
+	    cardDraw = snapshot.val();
+		chanceCard(cardDraw);
 	});
 	
 	console.log("Setting positions");
 	for (var i = 0; i < players.length; i++){
 			setPositions(i);
 	}
+	setHousePositions();
 	
 }
 
@@ -444,6 +507,8 @@ function checkPlayerElement(){
 	
 	}
 }//end checkplayerelement
+
+//------
 var temp = false;
 var temp_start = false;
 var rolled = false; //is dice been rolled?
@@ -456,16 +521,17 @@ function readFirebase(){
 	readFirebaseMoney();
 	readFirebaseOwned();
 	readFirebaseHouses();
+	readFirebaseDiceRoll();
 	if (gameStart){
 		console.log("This message should only appear once");
 		checkPlayerElement();
+		//testing
+		setHousePositions();
 	}
 	readOnChildChanged();
 }
 function tick(){
-	//read database
-	//readFirebase();
-		
+	
 if (gameStart){
 	console.log("");
 	console.log("Tick");
@@ -496,6 +562,9 @@ if (gameStart){
 	for (var i = 0; i < players.length; i++){
 		setPositions(i);
 	}
+	setHousePositions();
+	chanceCard(cardDraw);
+	
 
 } else {
 //-----------------------------------------------
@@ -521,6 +590,10 @@ if (gameStart){
 	document.querySelector('#turnText').setAttribute('n-text','text:;');
 	document.querySelector('#ownText').setAttribute('n-text','text:;');
 	
+	for (var j=0; j<houseObjects.length; j++){
+		sim.scene.remove(houseObjects.pop());
+	}
+	
 	if (players == null){
 		//console.log("test");
 		joined = false;
@@ -538,7 +611,7 @@ if (gameStart){
 	}//end for8
 	buyPropertyBox.position.set(0, -2, 0);
 	buyHouseBox.position.set(0, -2, 0);
-	sellHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -2, 0);
 	
 	bought = false;
 //---------------------------
@@ -559,6 +632,8 @@ function drawText(){
 			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+playerMoney[i]);
 		}	
 		document.querySelector('#turnText').setAttribute('n-text','text: It is ' + players[playerTurn] + "'s turn");
+		document.querySelector('#info1').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has rolled " + diceRoll);
+		document.querySelector('#info2').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has landed on tile #" + playerPos[playerTurn]);
 	}else{
 		for (var i=0; i<MAX_PLAYERS; i++){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
@@ -570,7 +645,7 @@ function drawText(){
 /**
 THIS CODE IS MOOT RIGHT NOW
 WILL UPDATE IT WHEN THE REST IS FIXED....
-*/
+
 var loader = new THREE.ColladaLoader();
 loader.load( 'https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae', function ( collada ) {
  
@@ -583,14 +658,15 @@ loader.load( 'https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.da
 	//sim.scene.add(dae);
   });
  //-----
+ */
   
 function initialiseBoxes(){
 	
 	//temporary colors, will replace with models in the future!
-	playerIcons[0] = new THREE.Mesh(boxGeo, greenMat);
-	playerIcons[1] = new THREE.Mesh(boxGeo, redMat);
-	playerIcons[2] = new THREE.Mesh(boxGeo, blueMat);
-	playerIcons[3] = new THREE.Mesh(boxGeo, yellowMat);
+	playerIcons[0] = new THREE.Mesh(boxGeo, greenModelMat);
+	playerIcons[1] = new THREE.Mesh(boxGeo, redModelMat);
+	playerIcons[2] = new THREE.Mesh(boxGeo, blueModelMat);
+	playerIcons[3] = new THREE.Mesh(boxGeo, yellowModelMat);
 	
 	//max 4 players in a game
 	for (var i = 0; i < MAX_PLAYERS; i++){
@@ -622,26 +698,30 @@ function initialiseBoxes(){
 	}//end for40
 	
 	buyPropertyBox.position.set(0, -2, 0);
-	//sellHouseBox.position.set(0, -1, 0);
+	
 	buyHouseBox.position.set(0, -2, 0);
-	sellHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -2, 0);
 	joinBox.position.set(0, 2, 0);
 	startBox.position.set(0,-2,1);
 	resetBox.position.set(11, 0.5, 11);
 	rollDiceBox.position.set(0,-2,-1);
 	endTurnBox.position.set(0,-2,-2);
 	
+
+	
 	buyPropertyBox.scale.set(2, 2, 2);
-	//sellHouseBox.scale.set(0.5, 0.5, 0.5);
+	
 	buyHouseBox.scale.set(2, 2, 2);
-	sellHouseBox.scale.set(0.5, 0.5, 0.5);
+	sellHouseBox.scale.set(2, 2, 2);
+	
+	
 	sim.scene.add(endTurnBox);
 	sim.scene.add(joinBox);
 	sim.scene.add(startBox);
 	sim.scene.add(resetBox);
 	sim.scene.add(rollDiceBox);
 	sim.scene.add(buyPropertyBox);
-	//sim.scene.add(sellHouseBox);
+
 	sim.scene.add(buyHouseBox);
 	sim.scene.add(sellHouseBox);
 	
@@ -744,6 +824,10 @@ function setPositions(playerNo){
 	
 	var rent;
 	
+	if (!chanceBool){
+		cardDraw=0;
+	}
+	
 	switch (pPos){
 	
 	case 0:
@@ -787,7 +871,8 @@ function setPositions(playerNo){
 	
 	//makes chance trigger only once
 	if (!chanceBool){
-		chanceCard(); //testing
+		cardDraw = Math.floor((Math.random()*9)+1);
+		updateCardDraw();
 		chanceBool = true;
 	}
 	
@@ -873,6 +958,11 @@ function setPositions(playerNo){
 	case 22:
 	//CHANCE
 	playerIcons[playerNo].position.set(9, 0, -4.85); 
+	if (!chanceBool){
+		cardDraw = Math.floor((Math.random()*9)+1);
+		updateCardDraw();
+		chanceBool = true;
+	}
 	break;
 	case 23:
 	//PAINT STUDIO (RED-2)
@@ -946,6 +1036,11 @@ function setPositions(playerNo){
 	case 36:
 	//chance
 	playerIcons[playerNo].position.set(-1.55, 0, 9); 
+	if (!chanceBool){
+		cardDraw = Math.floor((Math.random()*9)+1);
+		updateCardDraw();
+		chanceBool = true;
+	}
 	break;
 	case 37:
 	//db1
@@ -989,6 +1084,44 @@ function setAllLots(pPos){
 	return allLots;
 }
 
+/**
+	THIS FUNCTION IS PROBABLY SUPER INEFFICIENT
+	NEEDS A WEE BITTY OF A REWRITE
+*/
+var houseObjects = [];
+function setHousePositions(){
+	//wipe all previous house models
+	wipeHouses();
+	
+	console.log("Placing houses!");
+	
+	for (var i=0; i<40; i++){
+		for (var h=0; h<housesOwned[i]; h++){
+			//console.log("There is a house here ("+h+")");
+			if (propertyOwned[i] == 0){var houseModel = new THREE.Mesh(houseGeo, greenModelMat);}
+			if (propertyOwned[i] == 1){var houseModel = new THREE.Mesh(houseGeo, redModelMat);}
+			if (propertyOwned[i] == 2){var houseModel = new THREE.Mesh(houseGeo, blueModelMat);}
+			if (propertyOwned[i] == 3){var houseModel = new THREE.Mesh(houseGeo, yellowModelMat);}
+			
+			houseModel.scale.set(0.2,0.2,0.2);
+			
+			if (i>0 && i<10){ houseModel.position.set(propertyCards[i].position.x+1, 0.2, propertyCards[i].position.z-0.6 + (h*0.4)); }
+			if (i>10 && i<20){ houseModel.position.set(propertyCards[i].position.x+0.6 - (h*0.4), 0.2, propertyCards[i].position.z+1); }
+			if (i>20 && i<30){ houseModel.position.set(propertyCards[i].position.x-1, 0.2, propertyCards[i].position.z+0.6 - (h*0.4)); }
+			if (i>30 && i<40){ houseModel.position.set(propertyCards[i].position.x-0.6 + (h*0.4), 0.2, propertyCards[i].position.z-1); }
+			sim.scene.add(houseModel);
+			houseObjects.push(houseModel);
+		}
+	}
+
+}
+
+function wipeHouses(){
+	for (var j=0; j<houseObjects.length; j++){
+		sim.scene.remove(houseObjects.pop());
+	}
+}
+
 function checkAllLotsOwned(){
 
 	console.log("Checking if user owns any full lots...");
@@ -1005,47 +1138,55 @@ function checkAllLotsOwned(){
 	//console.log(allLotsOwned);
 }
 
-/*
+/**
+NEEDS A BETTER NAME
+CALLS WHEN A COMMUNITY CHEST OR CHANCE CARD IS DRAWN
+UPDATES LE DATABASÉ
+ we french now oui oui baguettes
+*/
+function drawCard(){
+	
+	cardDraw = Math.floor((Math.random()*9)+1);
+	updateCardDraw();
+
+}
+
+/**
 	POSSIBLY READ THESE FROM JSON OR A DIFFERENT FILE 
 	WILL KEEP CODE NICE AND CLEAN
 */
-function chanceCard(){
-	var rand = Math.floor((Math.random()*4)+1);
+function chanceCard(card){
+	
 	var str = "--";
 	
-	switch (rand){
+	switch (card){
 	
 		case 1:
-			console.log("Advance to the Campfire (Collect $200) ");
 			str = "Advance to the Campfire (Collect 200)";
 		break;
 		case 2:
-			console.log("Go to the SDK Meetup. - If you pass Campfire, collect $200");
 			str = "Go to the SDK Meetup. - If you pass Campfire, collect 200 " ;
 		break;
 		case 3:
-			console.log("Go watch videos in 360 Theater - If you pass Campfire, collect 200 ");
 			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;
 		break;
 		case 4:
-			console.log("You called parentheses brackets on the AltspaceVR slack channel, lose $100");
 			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;
 		break;
-		/*
 		case 5:
-			console.log("Advance to the Campfire (Collect $200) ");
+			str = "Get out of suspension free!";
 		break;
 		case 6:
-			console.log("Advance to the Campfire (Collect $200) ");
+			str = "Your Altspace client has bugged! Go back 3 spaces.";
 		break;
 		case 7:
-			console.log("Advance to the Campfire (Collect $200) ");
+			str = "You said you were 5 years old in the campfire. Go to suspension.";
 		break;
 		case 8:
-			console.log("Advance to the Campfire (Collect $200) ");
+			str = "You won the dance competition. Collect 100.";
 		break;
 		case 9:
-			console.log("Advance to the Campfire (Collect $200) ");
+			str = "Pay marshmallow tax of 15";
 		break;
 		case 10:
 			console.log("Advance to the Campfire (Collect $200) ");
@@ -1071,18 +1212,19 @@ function chanceCard(){
 		default:
 		str = "---";
 		break;
-		*/
+		
 	}
-	
+	console.log(str);
 	document.querySelector('#tempChance').setAttribute('src','#chance1');
+	document.querySelector('#info3').setAttribute('n-text','width:100; text: ' + str);
 	
 }//end chance
-/*
+/**
 	THIS IS POSSIBLY UNNEEDED - USE ONE PROPERTY CARD IN MIDDLE OF BOARD ??
 	WILL STILL NEED TO PLACE
 */
 function setPropertyCardPos(tileNo){
-	/*
+	/**
 		WILL KEEP THIS AND REMOVE THE OTHER STUFF - KEEPS CODE CLEAN
 	*/
 	var hpLocal = 0;
@@ -1207,7 +1349,7 @@ function selectProperty(tileNo, hp){
 	housePrice = hp;
 	//resets box positions (avoids bugs)
 	buyHouseBox.position.set(0,-2,0);
-	sellHouseBox.position.set(0,-1,0);
+	sellHouseBox.position.set(0,-2,0);
 	
 	//check if its the players turn
 	if(playerTurn == player_element){
@@ -1221,6 +1363,7 @@ function selectProperty(tileNo, hp){
 			console.log("Houses owned : " + housesOwned[tileNo]);
 			var allLots = setAllLots(tileNo);
 			//set buy/sell box positions
+			//issue here...
 			if (housesOwned[tileNo] < 5 && allLots){
 				//buyHouseBox.position.set(0, 0, 0);
 				buyHouseBox.position.set(0, 1, -15);
@@ -1229,9 +1372,9 @@ function selectProperty(tileNo, hp){
 			}//end if
 			
 			if (housesOwned[tileNo] > 0){
-				//sellHouseBox.position.set(posX2, 0, posZ2);
+				sellHouseBox.position.set(2, 1, -15);
 			} else {
-				sellHouseBox.position.set(0, -1, 0);
+				sellHouseBox.position.set(0, -2, 0);
 			}
 				
 		}
@@ -1282,6 +1425,8 @@ resetBox.addEventListener('cursordown', function(){
 	if (moderator){
 		players = []; //reset players
 		playerTurn = 0;
+		diceRoll = 0;
+		cardDraw = 0;
 		playerPos = [];
 		gameStart = false;
 		playerMoney = [];
@@ -1301,7 +1446,7 @@ endTurnBox.addEventListener('cursordown', function(){
 	console.log("End Turn");
 	
 	buyHouseBox.position.set(0, -2, 0);
-	sellHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -2, 0);
 	buyPropertyBox.position.set(0, -2, 0);
 	nextTurn();
 	
@@ -1323,25 +1468,28 @@ buyHouseBox.addEventListener('cursordown', function(){
 	
 	//make sure player has enough money
 	if (playerMoney[player_element] >= housePrice){
-	console.log("House Bought!");
-	housesOwned[selectedTileNo] ++;
-	playerMoney[player_element] -= housePrice;
+		console.log("House Bought!");
+		housesOwned[selectedTileNo] ++;
+		playerMoney[player_element] -= housePrice;
 	
-	//sets sell box
-	sellHouseBox.position.set(SHB_X, 0, SHB_Z); //dont need a check as house will already have been bought
+		//sim.scene.add(houseModel);
+		//sim.scene.add(houseModel);
+		//sets sell box
+		//sellHouseBox.position.set(SHB_X, 0, SHB_Z); //dont need a check as house will already have been bought
 	
-	if (housesOwned[selectedTileNo] >= 5){
+		if (housesOwned[selectedTileNo] > 4){
+			buyHouseBox.position.set(0, -2, 0);
+		}
+		
+		sellHouseBox.position.set(2, 1, -15);
+		
 	
-		buyHouseBox.position.set(0, -2, 0);
+		//check bankruptcy
 	
-	}
-	
-	//check bankruptcy
-	
-	updateHouses();
-	updateMoney();
-	//box can only be clicked 4 times, will disappear after fifth,
-	//so no check needs to be done here
+		updateHouses();
+		updateMoney();
+		//box can only be clicked 4 times, will disappear after fifth,
+		//so no check needs to be done here
 	}
 });
 sellHouseBox.addEventListener('cursordown', function(){
@@ -1352,9 +1500,10 @@ sellHouseBox.addEventListener('cursordown', function(){
 	//set buy box position
 	//buyHouseBox.position.set(BHB_X, 0, BHB_Z);
 	
-	if (housesOwned[selectedTileNo] < 1){
+	buyHouseBox.position.set(0, 1, -15);
 	
-		sellHouseBox.position.set(0, -1, 0);
+	if (housesOwned[selectedTileNo] < 1){
+		sellHouseBox.position.set(0, -2, 0);
 	
 	}
 	
@@ -1374,10 +1523,10 @@ rollDiceBox.addEventListener('cursordown', function(){
 	var dice1 = Math.floor((Math.random()*6)+1);
 	var dice2 = Math.floor( (Math.random()*6)+1);
 	console.log("Player rolled : " + dice1 + " | " + dice2);
-	var diceRoll = dice1 + dice2
+	diceRoll = dice1 + dice2
 	
 	//testing!
-	//diceRoll = 3;
+	diceRoll = 7;
 	
 	is_double = (dice1==dice2);
 	
@@ -1396,13 +1545,16 @@ rollDiceBox.addEventListener('cursordown', function(){
 	
 	buyPropertyBox.position.set(0, -2, 0); //hides buy box
 	buyHouseBox.position.set(0, -2, 0); //hides buyhouse box
-	sellHouseBox.position.set(0, -1, 0);
+	sellHouseBox.position.set(0, -2, 0);
 	
 	//used for testing
 	//diceRoll = 7;
 	
+	
+	
 	//readFirebasePos();
 	playerPos[playerTurn] += diceRoll;
+	updateDiceRoll();
 	//console.log(playerPos[playerTurn]);
 	console.log("Player moves to position : " + playerPos);
 	//document.querySelector('#dice').setAttribute('n-text','text: You have moved to ' + playerPos);
