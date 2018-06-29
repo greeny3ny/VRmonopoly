@@ -154,7 +154,7 @@
 </body>
 
 <script>
-var version = "0.3.3.1"
+var version = "0.3.3.T"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
@@ -197,7 +197,7 @@ var SHB_X, SHB_Z = 0; //?? potential use for sell house box
 var BHB_X, BHB_Z = 0; //?? potential use for buy house box
 var selectedTileNo; //stores number of selected tile
 
-const MAX_PLAYERS = 4;
+const MAX_PLAYERS = 1;
 
 //--- box stuff ---
 
@@ -501,7 +501,7 @@ if (gameStart){
 //-----------------------------------------------
  //basically reset stuff
 	
-	if (!joined && players.length<5){
+	if (!joined && players.length<MAX_PLAYERS+1){
 		startBox.position.set(0, -1, 0);
 		joinBox.position.set(0, 2, 0);
 	}
