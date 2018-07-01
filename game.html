@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.2"
+var version = "0.5.1.3"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -630,10 +630,13 @@ if (gameStart){
 		setPositions(i);
 	}
 	setHousePositions();
+	
+	/*
 	if (!switched){
 		console.log("potatoes");
 		chanceCard(cardDraw, playerTurn);
 	}
+	*/
 	
 } else {
 //-----------------------------------------------
