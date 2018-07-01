@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.4"
+var version = "0.5.1.5"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -500,7 +500,6 @@ function readOnChildChanged(){
 	});
 	fbGameRef.child("cardDraw").on("child_changed", function(snapshot){
 	    cardDraw = snapshot.val();
-		setTimeout(chanceBuffer,1000);
 	});
 	
 	console.log("Setting positions");
@@ -509,10 +508,6 @@ function readOnChildChanged(){
 	}
 	setHousePositions();
 	
-}
-
-function chanceBuffer(){
-	chanceCard(cardDraw);
 }
 
 function setPropertyColor(){
@@ -597,12 +592,18 @@ function afterRead(){
 	}
 }
 
-function tick(){
-	
-if (gameStart){
+function consoleLog(){
 	console.log("");
 	console.log("Tick");
 	console.log("");
+
+}
+
+function tick(){
+	
+if (gameStart){
+	
+	//consoleLog();
 	//set up start
 	if (!temp_start) {
 		startBox.position.set(0,-1,0);
@@ -635,12 +636,13 @@ if (gameStart){
 	}
 	setHousePositions();
 	
-	/*
+	
 	if (!switched){
-		console.log("potatoes");
-		chanceCard(cardDraw, playerTurn);
+		switched = true;
+		chanceBuffer();
+		//setTimeout(chanceBuffer,5000);
 	}
-	*/
+	
 	
 } else {
 //-----------------------------------------------
@@ -704,6 +706,12 @@ if (gameStart){
 	drawText();
 	
 }//end tick function
+
+function chanceBuffer(){
+	console.log("potatoes " + cardDraw);
+	chanceCard(cardDraw, playerTurn);
+}
+
 //keep code clean
 function drawText(){
 
@@ -826,8 +834,8 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 	//console.log("All lots owned : " + ALO);
 	//check if YOU have landed on property
 	if (playerNo == player_element){
-		console.log("You have landed here (Tile "+tileNo+")");
-		console.log("Property owned by element " + propertyOwned[tileNo]);
+		//console.log("You have landed here (Tile "+tileNo+")");
+		//console.log("Property owned by element " + propertyOwned[tileNo]);
 		//check if owned
 		if (propertyOwned[tileNo] != 10){
 			
@@ -839,7 +847,7 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 			//other player owns property
 			//sets money of player who owns property 
 			//makes sure money only updated once
-			console.log("This property is owned by someone else!");
+			//console.log("This property is owned by someone else!");
 			if (!temp_money){
 				var h = housesOwned[tileNo];
 				if (h === 0 && ALO){
@@ -862,7 +870,7 @@ function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
 			//do for houses/hotels too
 		
 		} else {
-			console.log("Nobody owns this property!");
+			//console.log("Nobody owns this property!");
 			//console.log("property unowned");
 			//display buy / sell boxes
 			//console.log("you have landed here");
@@ -1193,7 +1201,7 @@ function setHousePositions(){
 	//wipe all previous house models
 	wipeHouses();
 	
-	console.log("Placing houses!");
+	//console.log("Placing houses!");
 	
 	for (var i=0; i<40; i++){
 		for (var h=0; h<housesOwned[i]; h++){
@@ -1224,7 +1232,7 @@ function wipeHouses(){
 
 function checkAllLotsOwned(){
 
-	console.log("Checking if user owns any full lots...");
+	//console.log("Checking if user owns any full lots...");
 	//console.log(propertyOwned[1] + " | " +propertyOwned[3] + " | PE : " + player_element);
 	
 	allLotsOwned[0] = (propertyOwned[1] == propertyOwned[3] && propertyOwned[1] == player_element);
@@ -1374,6 +1382,7 @@ function chanceCard(card, turn){
 		break;
 		default:
 		str = "---";
+		console.log("defaulting");
 		switched = false;
 		break;
 		
@@ -1463,7 +1472,7 @@ function setPropertyCardPos(tileNo){
 		}
 		
 		console.log("Clicked " + tileNo + " with HousePrice of " + hpLocal);
-		console.log(propertyCards[tileNo].position.x);
+		//console.log(propertyCards[tileNo].position.x);
 		selectedTileNo = tileNo;
 		
 		selectProperty(tileNo, hpLocal)
@@ -1587,7 +1596,7 @@ function selectProperty(tileNo, hp){
 		//set buy/sell box positions
 		//buy/sell house option
 		//only places button if more houses can be bought 
-			console.log("Houses owned : " + housesOwned[tileNo]);
+			//console.log("Houses owned : " + housesOwned[tileNo]);
 			var allLots = setAllLots(tileNo);
 			//set buy/sell box positions
 			//issue here...
