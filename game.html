@@ -4,22 +4,10 @@
 <head>
 <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
 <!--<script src="https://cdn.rawgit.com/AltspaceVR/AltspaceSDK/v2.0.2/dist/altspace.min.js"></script>-->
-<script src="../../dist/altspace.js"></script>
+
 <script src="https://sdk.altvr.com/libs/altspace.js/2.4.0/altspace.min.js"></script>
-<script src="js/three.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyAPChB8eI_3xS0Sm8UW1IWcyR-_aE5YJyo",
-    authDomain: "greeny-masterdatabase-altspace.firebaseapp.com",
-    databaseURL: "https://greeny-masterdatabase-altspace.firebaseio.com",
-    projectId: "greeny-masterdatabase-altspace",
-    storageBucket: "greeny-masterdatabase-altspace.appspot.com",
-    messagingSenderId: "667469072790"
-  };
-  firebase.initializeApp(config);
-</script>
 <script>
   // Initialize Firebase
   var config = {
@@ -125,7 +113,9 @@
 	
 	<a-entity id="info1" position='-4 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="info2" position='-4 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
-	<a-entity id="info3" position='-4 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
+	<a-entity id="eventLog" position='-4 4 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
 	<!--
 	<a-entity id="money5" position='0 8 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
 	<a-entity id="money6" position='0 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
@@ -139,8 +129,9 @@
 	<a-plane id="card" src="#test" n-billboard position='0 7.5 0' rotation='0 0 0' color='white' scale='5 5'>
 	</a-plane>
 	
-	<a-entity id="turnText" position='0 4 0' rotation='0 0 0' n-billboard n-text='text: Test123;' ></a-entity>
-	<a-entity id="ownText" position='0 2 0' rotation='0 0 0' n-billboard n-text='text: Test123;' ></a-entity>
+	<a-entity id="turnText" position='0 3 0' rotation='0 0 0' n-billboard n-text='text:;' ></a-entity>
+	<a-entity id="ownText" position='0 4 0' rotation='0 0 0' n-billboard n-text='text:;width:100;' ></a-entity>
+	
 	
 	
 	<!--
@@ -160,10 +151,9 @@
 </body>
 
 <script>
-var version = "0.4.1.2"
+var version = "0.4.2.0"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
-var fbMasterRef = new Firebase("https://greeny-masterdatabase-altspace.firebaseio.com/");
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
 var moderator;
 var displayname;
@@ -204,6 +194,8 @@ var selectedTileNo; //stores number of selected tile
 //positions of buy / sell house buttons
 var SHB_X, SHB_Z = 0; //?? potential use for sell house box
 var BHB_X, BHB_Z = 0; //?? potential use for buy house box
+
+var eventLogString = "This is used for showing events to users!";
 
 
 const MAX_PLAYERS = 4; //max amount of players in game
@@ -366,22 +358,26 @@ function readFirebaseUsers(){
 	fbGameRef.child("inSession").on("value", function(snapshot) {
 		inSession = snapshot.val();
 	});
+	return;
 }
 //reads users who are playing
 function readFirebasePlayers(){
 	fbGameRef.child("players").on("value", function(snapshot){
 		players = snapshot.val();
 	});
+	return;
 }
 function readFirebaseTurn(){
 	fbGameRef.child("turn").on("value", function(snapshot){
 		playerTurn = snapshot.val();
 	});
+	return;
 }
 function readFirebasePos(){
 	fbGameRef.child("position").on("value", function(snapshot){
 		playerPos = snapshot.val();	
 	});
+	return;
 }
 function readFirebaseStart(){
 	fbGameRef.child("gameStart").on("value", function(snapshot){
@@ -392,31 +388,39 @@ function readFirebaseMoney(){
 	fbGameRef.child("money").on("value", function(snapshot){
 		playerMoney = snapshot.val();
 	});
+	return;
 }
 function readFirebaseOwned(){
-	
 	fbGameRef.child("properties").on("value", function(snapshot){
 		propertyOwned = snapshot.val();
-		setPropertyColor();
+		
+		//avoids error thrown at start
+		try {
+			setPropertyColor();
+		} catch (e){}
 	});
+	return;
 }
 function readFirebaseHouses(){
 	fbGameRef.child("houses").on("value", function(snapshot){
 		housesOwned = snapshot.val();
 		//setHousePositions();
 	});
+	return;
 }
 
 function readFirebaseDiceRoll(){
 	fbGameRef.child("diceRoll").on("value", function(snapshot) {
 		diceRoll = snapshot.val();
 	});
+	return;
 }
 
 function readFirebaseCardDraw(){
 	fbGameRef.child("cardDraw").on("value", function(snapshot) {
 		cardDraw = snapshot.val();
 	});
+	return;
 }
 /*
 	WILL ALLOW A READ WHEN A CHILD_CHANGE IS DETECTED
@@ -522,14 +526,32 @@ function readFirebase(){
 	readFirebaseOwned();
 	readFirebaseHouses();
 	readFirebaseDiceRoll();
+	readOnChildChanged();
+
+	setTimeout(afterRead, 1000);
+}
+ /**
+	THIS POPS AFTER THE WHOLE FIREBASE HAS BEEN READ
+	YAY FOR MULTITHREADING / LACK OF PROMISE KNOWLEDGE
+ */
+function afterRead(){
 	if (gameStart){
 		console.log("This message should only appear once");
 		checkPlayerElement();
 		//testing
 		setHousePositions();
+		
+		//hide join box
+		joinBox.position.set(0, -2, 0);
 	}
-	readOnChildChanged();
+	else
+	{
+		if (players == null){
+			reset();
+		}
+	}
 }
+
 function tick(){
 	
 if (gameStart){
@@ -550,11 +572,15 @@ if (gameStart){
 		} 
 	} 
 	
+	var invalidBuyTiles = ["0","2","4","7","10","17","20","22","30","33","36","38"];
+	
 	//this needs a fixing too
 	//console.log(playerTurn + " | " + player_element);
 	if (playerTurn == player_element){
-		if (!bought && playerPos%10 !=0){
-		buyPropertyBox.position.set(-5, 1, -15);
+		if (!bought && !invalidBuyTiles.includes(playerPos.toString())){
+			buyPropertyBox.position.set(-5, 1, -15);
+		} else {
+			buyPropertyBox.position.set(0, -2, 0);
 		}
 	}
 	
@@ -811,6 +837,7 @@ ALL LOTS OWNED CHEAT SHEET
 var allLotsOwned = []; //are all the lots owned by the same person?
 var tPrice = 0;
 var chanceBool = false;
+var taxBool = false;
 function setPositions(playerNo){
 	if (playerPos[playerNo] >= 40){
 		playerPos[playerNo] -= 40; //back at go (0)
@@ -854,7 +881,14 @@ function setPositions(playerNo){
 	case 4:
 	//HOUSE TAX
 	playerIcons[playerNo].position.set(-9, 0, 1.7); 
-	//playerMoney[playerNo] -= 200; //income tax
+	
+	//maybe move this outta this method??
+	if (!taxBool){
+		playerMoney[playerNo] -= 200; //income tax
+		taxBool = true;
+		updateMoney();
+	}
+	
 	break;
 	case 5:
 	//PORTAL1
@@ -1052,6 +1086,11 @@ function setPositions(playerNo){
 	case 38:
 	//tax
 	playerIcons[playerNo].position.set(-4.8, 0, 9); 
+	if (!taxBool){
+		playerMoney[playerNo] -= 75; //income tax
+		taxBool = true;
+		updateMoney();
+	}
 	break;
 	case 39:
 	//db2
@@ -1255,7 +1294,7 @@ function chanceCard(card, turn){
 	
 	console.log(str);
 	document.querySelector('#tempChance').setAttribute('src','#chance1');
-	document.querySelector('#info3').setAttribute('n-text','width:100; text: ' + str);
+	//document.querySelector('#info3').setAttribute('n-text','width:100; text: ' + str);
 	
 }//end chance
 /**
@@ -1286,7 +1325,13 @@ function setPropertyCardPos(tileNo){
 		
 		selectProperty(tileNo, hpLocal)
 		document.querySelector('#card').setAttribute('src','#card'+tileNo);
-		document.querySelector('#ownText').setAttribute('n-text','text:Tile Owned by : ' + players[propertyOwned[tileNo]]);
+		
+		if (players[propertyOwned[tileNo]] == undefined){
+			document.querySelector('#ownText').setAttribute('n-text','text: This tile is unowned');
+		}else{
+			document.querySelector('#ownText').setAttribute('n-text','text: ' + players[propertyOwned[tileNo]] + ' owns this tile.');
+		}
+		
 		
 	});
 	switch (tileNo){
@@ -1428,6 +1473,29 @@ function nextTurn(){
 	temp = false;
 	updateTurn();
 }
+
+/**
+	FUNCTION USED TO RESET GAME
+	ONLY SYNCED STUFF GOES IN HERE
+	OTHER STUFF GOES UP IN THE TICKER!
+*/
+function reset(){
+	players = []; //reset players
+	playerTurn = 0;
+	diceRoll = 0;
+	cardDraw = 0;
+	playerPos = [];
+	gameStart = false;
+	playerMoney = [];
+	propertyOwned = [];
+	housesOwned = [];
+	
+	//only synced data can go here
+	
+	updateFirebase(); //update firebase
+	
+	console.log("Game reset!");
+}
  
 //------- box stuff -----------------
  
@@ -1462,21 +1530,7 @@ joinBox.addEventListener('cursordown', function(){
 resetBox.addEventListener('cursordown', function(){
 	
 	if (moderator){
-		players = []; //reset players
-		playerTurn = 0;
-		diceRoll = 0;
-		cardDraw = 0;
-		playerPos = [];
-		gameStart = false;
-		playerMoney = [];
-		propertyOwned = [];
-		housesOwned = [];
-	
-		//only synced data can go here
-	
-		updateFirebase(); //update firebase
-	
-		console.log("Game reset!");
+		reset();
 	}else{
 		console.log("You do not have privelages to reset space.");
 	}
@@ -1568,7 +1622,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 	diceRoll = dice1 + dice2
 	
 	//testing!
-	//diceRoll = 7;
+	diceRoll = 4;
 	
 	is_double = (dice1==dice2);
 	
@@ -1592,8 +1646,6 @@ rollDiceBox.addEventListener('cursordown', function(){
 	//used for testing
 	//diceRoll = 7;
 	
-	
-	
 	//readFirebasePos();
 	playerPos[playerTurn] += diceRoll;
 	updateDiceRoll();
@@ -1609,6 +1661,7 @@ rollDiceBox.addEventListener('cursordown', function(){
 	
 	temp_money = false; //resets, so money can be dropped if a roll again is needed
 	chanceBool = false;
+	taxBool = false;
 	
 });
 startBox.addEventListener('cursordown', function(){
