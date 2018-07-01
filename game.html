@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.1"
+var version = "0.5.1.2"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -960,9 +960,8 @@ function setPositions(playerNo){
 	playerIcons[playerNo].position.set(-9, PICON_Y, -3.2); 
 	
 	//makes chance trigger only once
-	if (!chanceBool){
-		cardDraw = Math.floor((Math.random()*9)+1);
-		updateCardDraw();
+	if (!chanceBool && playerTurn==playerNo){
+		drawCard();
 		chanceBool = true;
 	}
 	
@@ -1048,9 +1047,8 @@ function setPositions(playerNo){
 	case 22:
 	//CHANCE
 	playerIcons[playerNo].position.set(9, PICON_Y, -4.85); 
-	if (!chanceBool){
-		cardDraw = Math.floor((Math.random()*9)+1);
-		updateCardDraw();
+	if (!chanceBool && playerTurn==playerNo){
+		drawCard();
 		chanceBool = true;
 	}
 	break;
@@ -1126,9 +1124,9 @@ function setPositions(playerNo){
 	case 36:
 	//chance
 	playerIcons[playerNo].position.set(-1.55, PICON_Y, 9); 
-	if (!chanceBool){
-		cardDraw = Math.floor((Math.random()*9)+1);
-		updateCardDraw();
+	
+	if (!chanceBool && playerTurn==playerNo){
+		drawCard();
 		chanceBool = true;
 	}
 	break;
