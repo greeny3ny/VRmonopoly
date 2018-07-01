@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.3"
+var version = "0.5.1.4"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -500,7 +500,7 @@ function readOnChildChanged(){
 	});
 	fbGameRef.child("cardDraw").on("child_changed", function(snapshot){
 	    cardDraw = snapshot.val();
-		chanceCard(cardDraw);
+		setTimeout(chanceBuffer,1000);
 	});
 	
 	console.log("Setting positions");
@@ -509,6 +509,10 @@ function readOnChildChanged(){
 	}
 	setHousePositions();
 	
+}
+
+function chanceBuffer(){
+	chanceCard(cardDraw);
 }
 
 function setPropertyColor(){
