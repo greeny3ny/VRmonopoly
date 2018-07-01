@@ -65,6 +65,15 @@
 		<img id="card35" src="images/propertyCards/disc_golf_teleporter.png" />
 		
 		<img id="chance1" src="images/chanceCards/chance1.png" />
+		<img id="chance2" src="images/chanceCards/chance2.png" />
+		<img id="chance3" src="images/chanceCards/chance3.png" />
+		<img id="chance4" src="images/chanceCards/chance4.png" />
+		
+		<img id="chance9" src="images/chanceCards/chance9.png" />
+		<img id="chanceTempImg" src="images/chanceCards/tempChance.png" />
+		
+		<img id="stackedCards" src="images/chanceCards/stackedCards.png"/>
+		<img id="chanceTop" src="images/chanceCards/chanceTop.png"/>
 		
 		<img id="tut1" src="images/tut1.png" />
 		<img id="tut2" src="images/tut2.png" />
@@ -73,9 +82,11 @@
   	</a-assets>
 
 	<a-entity position='-20 16 -15' rotation='0 0 0' n-text='text: Altopoly! ;'></a-entity>
-	<a-entity id="players" position='8 16 -15' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
 	<a-entity id="version" position='-20 15 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
-	<a-entity id="info" position='-25 6 -15' rotation='0 0 0' n-text="width:200;text:
+	
+	<a-entity id="players" position='8 16 -15' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
+	
+	<a-entity id="info" position='-29.9 6 0' rotation='0 90 0' n-text="width:200;text:
 	Code   : Craig
 	Images : Winrar
 	Models : Lia
@@ -83,17 +94,48 @@
 	Hopefully the app doesn't break under high load.
 	;" ></a-entity>
 
-	<a-box id="tempChance" position='8 10 -15' scale="7 5 0" rotation='0 0 0' ></a-box>
+	<a-box id="tempChance" position='-4.7 0.01 4.7' scale="3.8 2.7 0" rotation='90 0 45' >
+		<a-animation attribute="rotation"
+            dur="2000"
+            easing="linear"
+			from="90 0 45"
+            to="0 0 0"
+            repeat="0"
+			begin="cDraw"
+			></a-animation>
+		
+		<a-animation attribute="position"
+            dur="2000"
+            easing="linear"
+			from="-4.7 0.01 4.7"
+            to="8 10 -15"
+            repeat="0"
+			begin="cDraw"></a-animation>
+			
+		<a-animation attribute="scale"
+            dur="2000"
+            easing="linear"
+			from="3.8 2.7 0"
+            to="7 5 0"
+            repeat="0"
+			begin="cDraw"></a-animation>
+	</a-box>
+	
+	<a-box position='-4.7 0.5 4.7' scale="3.8 2.7 1" rotation='90 0 45' material="src:#stackedCards"></a-box>
+	<a-box position='-4.7 1.001 4.7' scale="3.8 2.7 0" rotation='90 0 45' material="src:#chanceTop"></a-box>
 	
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
 	<!--
 	<a-box id="tile0" n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
 	
-	
+	<!--skybox + stuff to stop people teleporting ages away from board -->
 	<a-sky color="black" radius="200"></a-sky>
 	<a-plane color="black" scale="100 100" position="0 -0.01 0" rotation="-90 0 0"></a-plane>
 	<a-box color="black" scale="100 30 0.1" position="0 15 -16" n-box-collider="type:environment"></a-box>
+	<a-box color="black" scale="100 30 0.1" position="16 15 0" rotation="0 90 0" n-box-collider="type:environment"></a-box>
+	<a-box color="black" scale="100 30 0.1" position="0 15 30" n-box-collider="type:environment"></a-box>
+	<a-box color="black" scale="100 30 0.1" position="-30 15 0" rotation="0 90 0" n-box-collider="type:environment"></a-box>
 	
 	
 	<a-entity id="board1" position='-9 12 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
@@ -151,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.4.2.0"
+var version = "0.5.1.1"
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -195,8 +237,7 @@ var selectedTileNo; //stores number of selected tile
 var SHB_X, SHB_Z = 0; //?? potential use for sell house box
 var BHB_X, BHB_Z = 0; //?? potential use for buy house box
 
-var eventLogString = "This is used for showing events to users!";
-
+var eventLogString = "This is used for showing events to users!"; //not used yet - will possibly be local
 
 const MAX_PLAYERS = 4; //max amount of players in game
 
@@ -590,15 +631,16 @@ if (gameStart){
 	}
 	setHousePositions();
 	if (!switched){
-		//chanceCard(cardDraw, playerTurn);
+		console.log("potatoes");
+		chanceCard(cardDraw, playerTurn);
 	}
-
+	
 } else {
 //-----------------------------------------------
  //basically reset stuff
 	
 	//Caps the amount of people that can join.
-	if (!joined && players.length<MAX_PLAYERS){
+	if (players ==null || (!joined && players.length<MAX_PLAYERS)){
 		startBox.position.set(0, -1, 0);
 		joinBox.position.set(0, 2, 0);
 	}else{
@@ -616,6 +658,11 @@ if (gameStart){
 	document.querySelector('#card').setAttribute('src','#test');
 	document.querySelector('#turnText').setAttribute('n-text','text:;');
 	document.querySelector('#ownText').setAttribute('n-text','text:;');
+	document.querySelector('#info1').setAttribute('n-text','text:;');
+	document.querySelector('#info2').setAttribute('n-text','text:;');
+	document.querySelector('#eventLog').setAttribute('n-text','text:;');
+	
+	document.querySelector('#tempChance').setAttribute('position','0 -10 0');
 	
 	for (var j=0; j<houseObjects.length; j++){
 		sim.scene.remove(houseObjects.pop());
@@ -644,7 +691,7 @@ if (gameStart){
 //---------------------------
 } //end gamestart if
 	//change n-text
-	document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);
+	;
 	
 	//keeps leaderboards updated
 	drawText();
@@ -652,6 +699,11 @@ if (gameStart){
 }//end tick function
 //keep code clean
 function drawText(){
+
+	if (players == null || players.length == 0){document.querySelector('#players').setAttribute('n-text','text: No players have joined the game');} 
+	else {document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);}
+	
+
 	//only draw money if gamestarted else error
 	if (gameStart){
 		for (var i=0; i<players.length; i++){
@@ -661,6 +713,7 @@ function drawText(){
 		document.querySelector('#turnText').setAttribute('n-text','text: It is ' + players[playerTurn] + "'s turn");
 		document.querySelector('#info1').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has rolled " + diceRoll);
 		document.querySelector('#info2').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has landed on tile #" + playerPos[playerTurn]);
+		document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
 	}else{
 		for (var i=0; i<MAX_PLAYERS; i++){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
@@ -701,7 +754,7 @@ function initialiseBoxes(){
 		//playerIcons[i] = dae;		
 		//voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
 		
-		playerIcons[i].position.set(-11, i, 11); //player icon (will be changed to avatars in later update)
+		playerIcons[i].position.set(-11, -2, 11); //player icon (will be changed to avatars in later update)
 		//voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
 		
 		//playerIcons[i].scale.set(3, 3, 3);
@@ -838,6 +891,8 @@ var allLotsOwned = []; //are all the lots owned by the same person?
 var tPrice = 0;
 var chanceBool = false;
 var taxBool = false;
+
+const PICON_Y = 0.5;
 function setPositions(playerNo){
 	if (playerPos[playerNo] >= 40){
 		playerPos[playerNo] -= 40; //back at go (0)
@@ -860,27 +915,27 @@ function setPositions(playerNo){
 	
 	case 0:
 	//GO
-	playerIcons[playerNo].position.set(-9, 0, 8.5); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, 8.5); 
 	break;
 	case 1:
 	//DISC GOLF -B1
-	playerIcons[playerNo].position.set(-9, 0, 6.4); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, 6.4); 
 	rent = [2, 10, 30, 90, 160, 250];
 	tPrice = 60;
 	break;
 	case 2:
 	//CHEST
-	playerIcons[playerNo].position.set(-9, 0, 4.85); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, 4.85); 
 	break;
 	case 3:
 	//THE MAZE -B2
-	playerIcons[playerNo].position.set(-9, 0, 3.275); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, 3.275); 
 	rent = [4, 20, 60, 180, 320, 450];
 	tPrice = 60;
 	break;
 	case 4:
 	//HOUSE TAX
-	playerIcons[playerNo].position.set(-9, 0, 1.7); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, 1.7); 
 	
 	//maybe move this outta this method??
 	if (!taxBool){
@@ -892,17 +947,17 @@ function setPositions(playerNo){
 	break;
 	case 5:
 	//PORTAL1
-	playerIcons[playerNo].position.set(-9, 0, 0.1); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, 0.1); 
 	break;
 	case 6:
 	//BEATLAB -LB1
-	playerIcons[playerNo].position.set(-9, 0, -1.55); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, -1.55); 
 	tPrice = 100;
 	rent = [6, 30, 90, 270, 400, 550];
 	break;
 	case 7:
 	//CHANCE
-	playerIcons[playerNo].position.set(-9, 0, -3.2); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, -3.2); 
 	
 	//makes chance trigger only once
 	if (!chanceBool){
@@ -914,13 +969,13 @@ function setPositions(playerNo){
 	break;
 	case 8:
 	//TAVERN -LB2
-	playerIcons[playerNo].position.set(-9, 0, -4.8); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, -4.8); 
 	rent = [6, 30, 90, 270, 400, 550];
 	tPrice = 100;
 	break;
 	case 9:
 	//wonderland (LBLUE-3)
-	playerIcons[playerNo].position.set(-9, 0, -6.4); 
+	playerIcons[playerNo].position.set(-9, PICON_Y, -6.4); 
 	rent = [8, 40, 100, 300, 450, 600];
 	tPrice = 120;
 	break;
@@ -929,70 +984,70 @@ function setPositions(playerNo){
 	//JAILED
 	//playerIcons[playerNo].position.set(-8.25, 0, -8.25); 
 	//JUST VISITING
-	playerIcons[playerNo].position.set(-9.5, 0, -9.5); 
+	playerIcons[playerNo].position.set(-9.5, PICON_Y, -9.5); 
 	break;
 	case 11:
 	//boss monster (PINK-1)
-	playerIcons[playerNo].position.set(-6.5, 0, -9); 
+	playerIcons[playerNo].position.set(-6.5, PICON_Y, -9); 
 	rent = [10, 50, 150, 450, 625, 750];
 	tPrice = 140;
 	break;
 	case 12:
 	//-UNNAMED- (UTIL-1)
-	playerIcons[playerNo].position.set(-4.85, 0, -9); 
+	playerIcons[playerNo].position.set(-4.85, PICON_Y, -9); 
 	break;
 	case 13:
 	//RAINBOW ROOM (PINK-2)
-	playerIcons[playerNo].position.set(-3.35, 0, -9); 
+	playerIcons[playerNo].position.set(-3.35, PICON_Y, -9); 
 	rent = [10, 50, 150, 450, 625, 750];
 	tPrice = 140;
 	break;
 	case 14:
 	//WINTER WONDERLAND (PINK-3)
-	playerIcons[playerNo].position.set(-1.7, 0, -9); 
+	playerIcons[playerNo].position.set(-1.7, PICON_Y, -9); 
 	rent = [12, 60, 180, 500, 700, 900];
 	tPrice = 160;
 	break;
 	case 15:
 	//JUNGLE MAZE TELEPORT (RAIL-2)
-	playerIcons[playerNo].position.set(-0.1, 0, -9); 
+	playerIcons[playerNo].position.set(-0.1, PICON_Y, -9); 
 	break;
 	case 16:
 	//BOSS MONSTER (ORANGE-1)
-	playerIcons[playerNo].position.set(1.55, 0, -9); 
+	playerIcons[playerNo].position.set(1.55, PICON_Y, -9); 
 	rent = [14, 70, 200, 550, 750, 950];
 	tPrice = 180;
 	break;
 	case 17:
 	//CHEST
-	playerIcons[playerNo].position.set(3.2, 0, -9); 
+	playerIcons[playerNo].position.set(3.2, PICON_Y, -9); 
 	break;
 	case 18:
 	//HOLOGRAMGS(ORANGE-2)
-	playerIcons[playerNo].position.set(4.8, 0, -9);
+	playerIcons[playerNo].position.set(4.8, PICON_Y, -9);
 	rent = [14, 70, 200, 550, 750, 950];
 	tPrice = 180;	
 	break;
 	case 19:
 	//LOVE LETTER (ORANGE-3)
-	playerIcons[playerNo].position.set(6.4, 0, -9); 
+	playerIcons[playerNo].position.set(6.4, PICON_Y, -9); 
 	rent = [16, 80, 220, 600, 800, 1000];
 	tPrice = 200;
 	break;
 	case 20:
 	//COMMUNITY CORNER(FREE PARKING)
-	playerIcons[playerNo].position.set(9.5, 0, -9.5); 
+	playerIcons[playerNo].position.set(9.5, PICON_Y, -9.5); 
 	break;
 	
 	case 21:
 	//SCULPT TOGETHER (RED-1)
-	playerIcons[playerNo].position.set(9, 0, -6.5); 
+	playerIcons[playerNo].position.set(9, PICON_Y, -6.5); 
 	rent = [18, 90, 250, 700, 875, 1050];
 	tPrice = 220;
 	break;
 	case 22:
 	//CHANCE
-	playerIcons[playerNo].position.set(9, 0, -4.85); 
+	playerIcons[playerNo].position.set(9, PICON_Y, -4.85); 
 	if (!chanceBool){
 		cardDraw = Math.floor((Math.random()*9)+1);
 		updateCardDraw();
@@ -1001,76 +1056,76 @@ function setPositions(playerNo){
 	break;
 	case 23:
 	//PAINT STUDIO (RED-2)
-	playerIcons[playerNo].position.set(9, 0, -3.35);
+	playerIcons[playerNo].position.set(9, PICON_Y, -3.35);
 	rent = [18, 90, 250, 700, 875, 1050];
 	tPrice = 220;	
 	break;
 	case 24:
 	//SDK (RED-3)
-	playerIcons[playerNo].position.set(9, 0, -1.7);
+	playerIcons[playerNo].position.set(9, PICON_Y, -1.7);
 	rent = [20, 100, 300, 750, 925, 1100];
 	tPrice = 240;
 	break;
 	case 25:
 	//DISC GOLD TELEPORT (RAIL-3)
-	playerIcons[playerNo].position.set(9, 0, -0.1); 
+	playerIcons[playerNo].position.set(9, PICON_Y, -0.1); 
 	break;
 	case 26:
 	//VIDEO JUKEBOX (YELLOW-1)
-	playerIcons[playerNo].position.set(9, 0, 1.55); 
+	playerIcons[playerNo].position.set(9, PICON_Y, 1.55); 
 	rent = [22, 110, 330, 800, 975, 1150];
 	tPrice = 260;
 	break;
 	case 27:
 	//NIGHT HOUSE PARTY (YELLOW-2)
-	playerIcons[playerNo].position.set(9, 0, 3.2); 
+	playerIcons[playerNo].position.set(9, PICON_Y, 3.2); 
 	rent = [22, 110, 330, 800, 975, 1150];
 	tPrice = 260;
 	break;
 	case 28:
 	//-UNNAMED- (UTIL-2)
-	playerIcons[playerNo].position.set(9, 0, 4.8); 
+	playerIcons[playerNo].position.set(9, PICON_Y, 4.8); 
 	break;
 	case 29:
 	//HOUSE PARTY (YELLOW-3)
-	playerIcons[playerNo].position.set(9, 0, 6.4); 
+	playerIcons[playerNo].position.set(9, PICON_Y, 6.4); 
 	rent = [22, 120, 360, 850, 1025, 1200];
 	tPrice = 280;
 	break;
 	case 30:
 	//GO TO SUSPENSION (GO TO JAIL)
-	playerIcons[playerNo].position.set(-8.25, 0, -8.25); 
+	playerIcons[playerNo].position.set(-8.25, PICON_Y, -8.25); 
 	//change this to jail and add popup?
 	break;
 	case 31:
 	//g1
-	playerIcons[playerNo].position.set(6.5, 0, 9);
+	playerIcons[playerNo].position.set(6.5, PICON_Y, 9);
 	rent = [26, 130, 390, 900, 1100, 1275];
 	tPrice = 300;
 	break;
 	case 32:
 	//g2
-	playerIcons[playerNo].position.set(4.85, 0, 9);
+	playerIcons[playerNo].position.set(4.85, PICON_Y, 9);
 	rent = [26, 130, 390, 900, 1100, 1275];
 	tPrice = 300;	
 	break;
 	case 33:
 	//cc
-	playerIcons[playerNo].position.set(3.35, 0, 9); 
+	playerIcons[playerNo].position.set(3.35, PICON_Y, 9); 
 	break;
 	case 34:
 	//g3
-	playerIcons[playerNo].position.set(1.7, 0, 9); 
+	playerIcons[playerNo].position.set(1.7, PICON_Y, 9); 
 	rent = [28, 150, 450, 1000, 1200, 1400];
 	tPrice = 320;
 	break;
 	case 35:
 	//tele4
-	playerIcons[playerNo].position.set(0.1, 0, 9); 
+	playerIcons[playerNo].position.set(0.1, PICON_Y, 9); 
 	break;
 	case 36:
 	//chance
-	playerIcons[playerNo].position.set(-1.55, 0, 9); 
+	playerIcons[playerNo].position.set(-1.55, PICON_Y, 9); 
 	if (!chanceBool){
 		cardDraw = Math.floor((Math.random()*9)+1);
 		updateCardDraw();
@@ -1079,13 +1134,13 @@ function setPositions(playerNo){
 	break;
 	case 37:
 	//db1
-	playerIcons[playerNo].position.set(-3.2, 0, 9);
+	playerIcons[playerNo].position.set(-3.2, PICON_Y, 9);
 	rent = [35, 175, 500, 1100, 1300, 1500];
 	tPrice = 350;
 	break;
 	case 38:
 	//tax
-	playerIcons[playerNo].position.set(-4.8, 0, 9); 
+	playerIcons[playerNo].position.set(-4.8, PICON_Y, 9); 
 	if (!taxBool){
 		playerMoney[playerNo] -= 75; //income tax
 		taxBool = true;
@@ -1094,7 +1149,7 @@ function setPositions(playerNo){
 	break;
 	case 39:
 	//db2
-	playerIcons[playerNo].position.set(-6.4, 0, 9);
+	playerIcons[playerNo].position.set(-6.4, PICON_Y, 9);
 	rent = [50, 200, 600, 1400, 1700, 2000];
 	tPrice = 400;
 	break;	
@@ -1183,6 +1238,8 @@ NEEDS A BETTER NAME
 CALLS WHEN A COMMUNITY CHEST OR CHANCE CARD IS DRAWN
 UPDATES LE DATABASÉ
  we french now oui oui baguettes
+ 
+ not used?
 */
 function drawCard(){
 	
@@ -1199,67 +1256,94 @@ var switched = false;
 function chanceCard(card, turn){
 	
 	var str = "--";
-	
+	switched = true;
 	
 	switch (card){
 	
 		case 1:
-			str = "Advance to the Campfire (Collect 200)";
+			//go to campfire!			
+			document.querySelector('#tempChance').setAttribute('src','#chance1');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerPos[turn] = 0;
-				switched = true;
+				updatePosition();
 			}
 		break;
 		case 2:
-			str = "Go play Holograms against humanity. - If you pass Campfire, collect 200 " ;
+			//go to hah
+			document.querySelector('#tempChance').setAttribute('src','#chance2');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
+				if (playerPos[turn]>13){
+					playerMoney[turn]+=200;
+					updateMoney();
+				}
 				playerPos[turn] = 13;
-				switched = true;
+				updatePosition();
 			}
 		break;
 		case 3:
-			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;
+			//go to 360 theater
+			document.querySelector('#tempChance').setAttribute('src','#chance3');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
+				if (playerPos[turn]>23){
+					playerMoney[turn]+=200;
+					updateMoney();
+				}
 				playerPos[turn] = 23;
-				switched = true;
+				updatePosition();
 			}
 		break;
 		case 4:
-			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;
+			//-100
+			document.querySelector('#tempChance').setAttribute('src','#chance4');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerMoney[turn] -= 100;
-				switched = true;
+				updateMoney();
 			}
 		break;
 		case 5:
-			str = "Get out of suspension free!";
+			//code this in!
+			//get out of suspension free!
 		break;
 		case 6:
-			str = "Your Altspace client has bugged! Go back 3 spaces.";
+			//back 3
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerPos[turn] -= 3;
-				switched = true;
+				updatePosition();
 			}
 		break;
 		case 7:
-			str = "You said you were 11 years old in the campfire. Go to suspension.";
+			//suspended!
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
-				playerPos[turn] = 30;
-				switched = true;
+				playerPos[turn] = 30; //suspension needs worked on!
+				updatePosition();
 			}
 		break;
 		case 8:
-			str = "You won the dance competition. Collect 100.";
+			//+100
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerMoney[turn] += 100;
-				switched = true;
+				
+				updateMoney();
 			}
 		break;
 		case 9:
-			str = "Pay marshmallow tax of 15";
+			//-15
+			document.querySelector('#tempChance').setAttribute('src','#chance9');
+			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerMoney[turn] -= 15;
-				switched = true;
+				
+				updateMoney();
 			}
 		break;
 		case 10:
@@ -1285,18 +1369,72 @@ function chanceCard(card, turn){
 		break;
 		default:
 		str = "---";
+		switched = false;
 		break;
 		
 	}
 	
-	updateMoney();
-	updatePosition();
-	
 	console.log(str);
-	document.querySelector('#tempChance').setAttribute('src','#chance1');
-	//document.querySelector('#info3').setAttribute('n-text','width:100; text: ' + str);
+	
 	
 }//end chance
+
+function chanceEventMessage(i){
+	switch(i){
+		case 1:
+			str = "Advance to the Campfire";
+			break;
+		case 2:
+			str = "Go play Holograms against humanity. - If you pass Campfire, collect 200 " ;
+			break;
+		case 3:
+			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;	
+			break;
+		case 4:
+			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;	
+			break;
+		case 5:
+			str = "Get out of suspension free!";
+			break;
+		case 6:
+			str = "Your Altspace client has bugged! Go back 3 spaces.";
+			break;
+		case 7:
+			str = "You said you were 11 years old in the campfire. Go to suspension.";	
+			break;
+		case 8:
+			str = "You won the dance competition. Collect 100.";
+			break;
+		case 9:
+			str = "Pay marshmallow tax of 15";
+			break;
+		case 10:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 11:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 12:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 13:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 14:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 15:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 16:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		default:
+			str = "---";
+			break;
+	}
+	return str;
+}
 /**
 	THIS IS POSSIBLY UNNEEDED - USE ONE PROPERTY CARD IN MIDDLE OF BOARD ??
 	WILL STILL NEED TO PLACE
@@ -1622,7 +1760,14 @@ rollDiceBox.addEventListener('cursordown', function(){
 	diceRoll = dice1 + dice2
 	
 	//testing!
-	diceRoll = 4;
+	/**
+		2 - CC
+		4 - TAX
+		7 - CHANCE
+		12 - UTILITY
+		30 - JAIL
+	*/
+	diceRoll = 7;
 	
 	is_double = (dice1==dice2);
 	
