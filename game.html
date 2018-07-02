@@ -94,7 +94,7 @@
 	Hopefully the app doesn't break under high load.
 	;" ></a-entity>
 
-	<a-box id="tempChance" position='-4.7 0.01 4.7' scale="3.8 2.7 0" rotation='90 0 45' >
+	<a-box id="tempChance" sync sync-transform position='-4.7 0.01 4.7' scale="3.8 2.7 0" rotation='90 0 45' >
 		<a-animation attribute="rotation"
             dur="2000"
             easing="linear"
@@ -121,8 +121,8 @@
 			begin="cDraw"></a-animation>
 	</a-box>
 	
-	<a-box position='-4.7 0.5 4.7' scale="3.8 2.7 1" rotation='90 0 45' material="src:#stackedCards"></a-box>
-	<a-box position='-4.7 1.001 4.7' scale="3.8 2.7 0" rotation='90 0 45' material="src:#chanceTop"></a-box>
+	<a-box position='-4.7 0.3 4.7' scale="3.8 2.7 0.6" rotation='90 0 45' material="src:#stackedCards"></a-box>
+	<a-box position='-4.7 0.601 4.7' scale="3.8 2.7 0" rotation='90 0 45' material="src:#chanceTop"></a-box>
 	
     <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
 	
@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.5"
+var version = "0.5.1.8";
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -333,6 +333,7 @@ function initVars(){
 }
 //update database
 function updateFirebase(){
+	console.log("updating full firebase");
 	fbGameRef.update({
 		players: players,
 		turn: playerTurn,
@@ -458,8 +459,10 @@ function readFirebaseDiceRoll(){
 }
 
 function readFirebaseCardDraw(){
+	console.log("is the bug here?");
 	fbGameRef.child("cardDraw").on("value", function(snapshot) {
 		cardDraw = snapshot.val();
+		return;
 	});
 	return;
 }
@@ -639,8 +642,8 @@ if (gameStart){
 	
 	if (!switched){
 		switched = true;
-		chanceBuffer();
-		//setTimeout(chanceBuffer,5000);
+		//chanceBuffer();
+		setTimeout(chanceBuffer,1000);
 	}
 	
 	
@@ -700,8 +703,8 @@ if (gameStart){
 //---------------------------
 } //end gamestart if
 	//change n-text
-	;
 	
+
 	//keeps leaderboards updated
 	drawText();
 	
@@ -793,16 +796,14 @@ function initialiseBoxes(){
 	}//end for40
 	
 	buyPropertyBox.position.set(0, -2, 0);
-	
 	buyHouseBox.position.set(0, -2, 0);
 	sellHouseBox.position.set(0, -2, 0);
-	joinBox.position.set(0, 2, 0);
 	startBox.position.set(0,-2,1);
-	resetBox.position.set(11, 0.5, 11);
 	rollDiceBox.position.set(0,-2,-1);
 	endTurnBox.position.set(0,-2,-2);
 	
-
+	joinBox.position.set(0, 2, 0);
+	resetBox.position.set(11, 0.5, 11);
 	
 	buyPropertyBox.scale.set(2, 2, 2);
 	
@@ -831,11 +832,8 @@ A DISASTER
 all of it can be run only once? doesnt need to be repeatedly ticked??
 */
 function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
-	//console.log("All lots owned : " + ALO);
 	//check if YOU have landed on property
 	if (playerNo == player_element){
-		//console.log("You have landed here (Tile "+tileNo+")");
-		//console.log("Property owned by element " + propertyOwned[tileNo]);
 		//check if owned
 		if (propertyOwned[tileNo] != 10){
 			
@@ -1255,8 +1253,8 @@ UPDATES LE DATABASÉ
  not used?
 */
 function drawCard(){
-	
-	cardDraw = Math.floor((Math.random()*9)+1);
+	cardDraw = Math.floor( (Math.random()*8)+1);
+	console.log("pushing " + cardDraw + " to database");
 	updateCardDraw();
 
 }
