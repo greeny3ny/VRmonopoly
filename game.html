@@ -94,7 +94,7 @@
 	Hopefully the app doesn't break under high load.
 	;" ></a-entity>
 
-	<a-box id="tempChance" sync sync-transform position='-4.7 0.01 4.7' scale="3.8 2.7 0" rotation='90 0 45' >
+	<a-box id="tempChance" position='-4.7 0.01 4.7' scale="3.8 2.7 0" rotation='90 0 45' >
 		<a-animation attribute="rotation"
             dur="2000"
             easing="linear"
@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.8";
+var version = "0.5.1.9";
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -974,6 +974,7 @@ function setPositions(playerNo){
 	
 	//makes chance trigger only once
 	if (!chanceBool && playerTurn==playerNo){
+		console.log(playerTurn + " | " + playerNo);
 		drawCard();
 		chanceBool = true;
 	}
