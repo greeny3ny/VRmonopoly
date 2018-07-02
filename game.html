@@ -119,6 +119,14 @@
             to="7 5 0"
             repeat="0"
 			begin="cDraw"></a-animation>
+			
+		<a-animation attribute="position"
+            dur="2000"
+            easing="linear"
+			from="-4.7 0.01 4.7"
+            to="-4.7 0.01 4.7"
+            repeat="0"
+			begin="resetPosition"></a-animation>
 	</a-box>
 	
 	<a-box position='-4.7 0.3 4.7' scale="3.8 2.7 0.6" rotation='90 0 45' material="src:#stackedCards"></a-box>
@@ -193,7 +201,7 @@
 </body>
 
 <script>
-var version = "0.5.1.11";
+var version = "0.5.2.1";
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -226,7 +234,7 @@ var loaded = false;
 var players;
 var playerTurn; //what players turn is it
 var playerPos = []; //0 = go, array storing all players locations
-var player_element = 10; //element local player in array is
+var player_element; //element local player in array is
 var playerMoney; //array holding all money for players
 var propertyOwned = []; //array of 40, stores what properties are owned by who
 var housesOwned = []; //array of 40, stores how many houses are on tile, 5 houses = hotel
@@ -459,7 +467,6 @@ function readFirebaseDiceRoll(){
 }
 
 function readFirebaseCardDraw(){
-	console.log("is the bug here?");
 	fbGameRef.child("cardDraw").on("value", function(snapshot) {
 		cardDraw = snapshot.val();
 		return;
@@ -603,106 +610,128 @@ function consoleLog(){
 }
 
 function tick(){
-	
-if (gameStart){
-	
-	//consoleLog();
-	//set up start
-	if (!temp_start) {
-		startBox.position.set(0,-1,0);
-		joinBox.position.set(0, -1, 0);
-		temp_start = true;
-	}
-	
-	if (players[playerTurn] == displayname){
-		if (!temp){
-			console.log("It's your turn!");
-			rollDiceBox.position.set(0,2,-1);
-			temp = true;
-		} 
-	} 
-	
-	var invalidBuyTiles = ["0","2","4","7","10","17","20","22","30","33","36","38"];
-	
-	//this needs a fixing too
-	//console.log(playerTurn + " | " + player_element);
-	if (playerTurn == player_element){
-		if (!bought && !invalidBuyTiles.includes(playerPos.toString())){
-			buyPropertyBox.position.set(-5, 1, -15);
-		} else {
-			buyPropertyBox.position.set(0, -2, 0);
+	if (gameStart){
+		//consoleLog();
+		//set up start
+		if (!temp_start) {
+			startBox.position.set(0,-1,0);
+			joinBox.position.set(0, -1, 0);
+			temp_start = true;
 		}
-	}
-	
-	//Bring this out of the ticker somehow??
-	for (var i = 0; i < players.length; i++){
-		setPositions(i);
-	}
-	setHousePositions();
-	
-	
-	if (!switched){
-		switched = true;
-		//chanceBuffer();
-		setTimeout(chanceBuffer,1000);
-	}
-	
-	
-} else {
-//-----------------------------------------------
- //basically reset stuff
-	
-	//Caps the amount of people that can join.
-	if (players ==null || (!joined && players.length<MAX_PLAYERS)){
-		startBox.position.set(0, -1, 0);
-		joinBox.position.set(0, 2, 0);
-	}else{
-		console.log("You are either in game or game is full!");
-		joinBox.position.set(0, -2, 0);
-	}
-	rollDiceBox.position.set(0, -1, 0);
-	endTurnBox.position.set(0, -1, 0);
-	
-	for (var i=0; i<40; i++){
-		pC_materials[i].color.setHex( 0xffffff );
-		pC_materials[i].opacity = 0;
-	}
-	
-	document.querySelector('#card').setAttribute('src','#test');
-	document.querySelector('#turnText').setAttribute('n-text','text:;');
-	document.querySelector('#ownText').setAttribute('n-text','text:;');
-	document.querySelector('#info1').setAttribute('n-text','text:;');
-	document.querySelector('#info2').setAttribute('n-text','text:;');
-	document.querySelector('#eventLog').setAttribute('n-text','text:;');
-	
-	document.querySelector('#tempChance').setAttribute('position','0 -10 0');
-	
-	for (var j=0; j<houseObjects.length; j++){
-		sim.scene.remove(houseObjects.pop());
-	}
-	
-	if (players == null){
-		//console.log("test");
-		joined = false;
-	}
-	
-	//console.log("game reset");
-	temp = false;
-	rolled = false;
-	chanceBool = false;
-	
-	temp_start = false;
-	//reset box positions
-	for (var i = 0; i < MAX_PLAYERS; i++){
-		playerIcons[i].position.set(-11, -1, 11); //player icon (will be changed to avatars in later update)
-	}//end for8
-	buyPropertyBox.position.set(0, -2, 0);
-	buyHouseBox.position.set(0, -2, 0);
-	sellHouseBox.position.set(0, -2, 0);
-	
-	bought = false;
-//---------------------------
-} //end gamestart if
+		
+		var invalidBuyTiles = ["0","2","4","7","10","17","20","22","30","33","36","38"];
+		
+		//this needs a fixing too
+		console.log(playerTurn + " | " + player_element);
+		if (playerTurn == player_element){
+		
+			if (!temp){
+				console.log("It's your turn!");
+				rollDiceBox.position.set(0,2,-1);
+				resetChanceCards();
+				temp = true;
+			} 
+		
+			if (!bought && !invalidBuyTiles.includes(playerPos.toString())){
+				buyPropertyBox.position.set(-5, 1, -15);
+			} else {
+				buyPropertyBox.position.set(0, -2, 0);
+			}
+		}
+		
+		if (!players.includes(displayname)){
+			player_element = 1000;
+		}
+		
+		//if (players.includes(displayname)){
+		//	console.log("you are not in the game!");
+		//	player_element = 1000; //arb number that player_element will NEVER be
+		//}
+		
+		//Bring this out of the ticker somehow??
+		for (var i = 0; i < players.length; i++){
+			setPositions(i); 
+		}
+		setHousePositions();
+		
+		readFirebaseCardDraw();
+		console.log("cardDraw " + cardDraw);
+		console.log("switched " + switched);
+		
+		if (!switched){
+			
+			//chanceBuffer();
+			//possibly dont need timeout as high / at all
+			//using it to allow all users to read from database fast enough!
+			//setTimeout(chanceCard(cardDraw, playerTurn),1000);
+			
+			if (cardDraw != 0){
+				document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
+				console.log("sdihbfsuiufgbsanofgns");
+				console.log("cD : " + cardDraw + " | pT : " + playerTurn);
+				//chanceCard(cardDraw, playerTurn);
+				switched = true;
+			}
+			
+		}
+		
+		
+	} else {
+	//-----------------------------------------------
+	 //basically reset stuff
+		
+		//Caps the amount of people that can join.
+		if (players ==null || (!joined && players.length<MAX_PLAYERS)){
+			startBox.position.set(0, -1, 0);
+			joinBox.position.set(0, 2, 0);
+		}else{
+			console.log("You are either in game or game is full!");
+			joinBox.position.set(0, -2, 0);
+		}
+		rollDiceBox.position.set(0, -1, 0);
+		endTurnBox.position.set(0, -1, 0);
+		
+		for (var i=0; i<40; i++){
+			pC_materials[i].color.setHex( 0xffffff );
+			pC_materials[i].opacity = 0;
+		}
+		
+		document.querySelector('#card').setAttribute('src','#test');
+		document.querySelector('#turnText').setAttribute('n-text','text:;');
+		document.querySelector('#ownText').setAttribute('n-text','text:;');
+		document.querySelector('#info1').setAttribute('n-text','text:;');
+		document.querySelector('#info2').setAttribute('n-text','text:;');
+		document.querySelector('#eventLog').setAttribute('n-text','text:;');
+		
+		document.querySelector('#tempChance').setAttribute('position','0 -10 0');
+		
+		for (var j=0; j<houseObjects.length; j++){
+			sim.scene.remove(houseObjects.pop());
+		}
+		
+		if (players == null){
+			//console.log("test");
+			joined = false;
+		}
+		
+		//console.log("game reset");
+		temp = false;
+		rolled = false;
+		chanceBool = false;
+		switched = false;
+		
+		temp_start = false;
+		//reset box positions
+		for (var i = 0; i < MAX_PLAYERS; i++){
+			playerIcons[i].position.set(-11, -1, 11); //player icon (will be changed to avatars in later update)
+		}//end for8
+		buyPropertyBox.position.set(0, -2, 0);
+		buyHouseBox.position.set(0, -2, 0);
+		sellHouseBox.position.set(0, -2, 0);
+		
+		bought = false;
+	//---------------------------
+	} //end gamestart if
 	//change n-text
 	
 
@@ -710,11 +739,6 @@ if (gameStart){
 	drawText();
 	
 }//end tick function
-
-function chanceBuffer(){
-	console.log("potatoes " + cardDraw);
-	chanceCard(cardDraw, playerTurn);
-}
 
 //keep code clean
 function drawText(){
@@ -732,7 +756,7 @@ function drawText(){
 		document.querySelector('#turnText').setAttribute('n-text','text: It is ' + players[playerTurn] + "'s turn");
 		document.querySelector('#info1').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has rolled " + diceRoll);
 		document.querySelector('#info2').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has landed on tile #" + playerPos[playerTurn]);
-		document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
+		
 	}else{
 		for (var i=0; i<MAX_PLAYERS; i++){
 			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
@@ -952,7 +976,7 @@ function setPositions(playerNo){
 	playerIcons[playerNo].position.set(-9, PICON_Y, 1.7); 
 	
 	//maybe move this outta this method??
-	if (!taxBool){
+	if (!taxBool && playerTurn == player_element){
 		playerMoney[playerNo] -= 200; //income tax
 		taxBool = true;
 		updateMoney();
@@ -1154,7 +1178,7 @@ function setPositions(playerNo){
 	case 38:
 	//tax
 	playerIcons[playerNo].position.set(-4.8, PICON_Y, 9); 
-	if (!taxBool){
+	if (!taxBool&& playerTurn==player_element){
 		playerMoney[playerNo] -= 75; //income tax
 		taxBool = true;
 		updateMoney();
@@ -1256,9 +1280,10 @@ UPDATES LE DATABASÉ
 */
 function drawCard(){
 	cardDraw = Math.floor( (Math.random()*8)+1);
+	document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
 	console.log("pushing " + cardDraw + " to database");
 	updateCardDraw();
-
+	chanceCard(cardDraw, playerTurn);
 }
 
 /**
@@ -1275,8 +1300,6 @@ function chanceCard(card, turn){
 	
 		case 1:
 			//go to campfire!			
-			document.querySelector('#tempChance').setAttribute('src','#chance1');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerPos[turn] = 0;
 				updatePosition();
@@ -1284,8 +1307,6 @@ function chanceCard(card, turn){
 		break;
 		case 2:
 			//go to hah
-			document.querySelector('#tempChance').setAttribute('src','#chance2');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				if (playerPos[turn]>13){
 					playerMoney[turn]+=200;
@@ -1297,8 +1318,6 @@ function chanceCard(card, turn){
 		break;
 		case 3:
 			//go to 360 theater
-			document.querySelector('#tempChance').setAttribute('src','#chance3');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				if (playerPos[turn]>23){
 					playerMoney[turn]+=200;
@@ -1310,8 +1329,6 @@ function chanceCard(card, turn){
 		break;
 		case 4:
 			//-100
-			document.querySelector('#tempChance').setAttribute('src','#chance4');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerMoney[turn] -= 100;
 				updateMoney();
@@ -1323,8 +1340,6 @@ function chanceCard(card, turn){
 		break;
 		case 6:
 			//back 3
-			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerPos[turn] -= 3;
 				updatePosition();
@@ -1332,8 +1347,6 @@ function chanceCard(card, turn){
 		break;
 		case 7:
 			//suspended!
-			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerPos[turn] = 30; //suspension needs worked on!
 				updatePosition();
@@ -1341,8 +1354,6 @@ function chanceCard(card, turn){
 		break;
 		case 8:
 			//+100
-			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerMoney[turn] += 100;
 				
@@ -1351,8 +1362,6 @@ function chanceCard(card, turn){
 		break;
 		case 9:
 			//-15
-			document.querySelector('#tempChance').setAttribute('src','#chance9');
-			document.querySelector('#tempChance').emit('cDraw');
 			if (turn == player_element){
 				playerMoney[turn] -= 15;
 				
@@ -1380,7 +1389,7 @@ function chanceCard(card, turn){
 		case 16:
 			console.log("Advance to the Campfire (Collect $200) ");
 		break;
-		default:
+		case 0:
 		str = "---";
 		console.log("defaulting");
 		switched = false;
@@ -1397,30 +1406,48 @@ function chanceEventMessage(i){
 	switch(i){
 		case 1:
 			str = "Advance to the Campfire";
+			document.querySelector('#tempChance').setAttribute('src','#chance1');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 2:
 			str = "Go play Holograms against humanity. - If you pass Campfire, collect 200 " ;
+			document.querySelector('#tempChance').setAttribute('src','#chance2');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 3:
 			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;	
+			document.querySelector('#tempChance').setAttribute('src','#chance3');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 4:
-			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;	
+			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;
+			document.querySelector('#tempChance').setAttribute('src','#chance4');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 5:
 			str = "Get out of suspension free!";
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 6:
 			str = "Your Altspace client has bugged! Go back 3 spaces.";
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 7:
 			str = "You said you were 11 years old in the campfire. Go to suspension.";	
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 8:
 			str = "You won the dance competition. Collect 100.";
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 9:
 			str = "Pay marshmallow tax of 15";
+			document.querySelector('#tempChance').setAttribute('src','#chance9');
+			document.querySelector('#tempChance').emit('cDraw');
 			break;
 		case 10:
 			console.log("Advance to the Campfire (Collect $200) ");
@@ -1443,8 +1470,9 @@ function chanceEventMessage(i){
 		case 16:
 			console.log("Advance to the Campfire (Collect $200) ");
 			break;
-		default:
+		case 0:
 			str = "---";
+			document.querySelector('#tempChance').emit('resetPosition');
 			break;
 	}
 	return str;
@@ -1618,6 +1646,7 @@ function selectProperty(tileNo, hp){
 	}
 }//END SELECT PROPERTY
 function nextTurn(){
+	resetChanceCards();
 	playerTurn ++; //next players turn once rolled (will be changed)
 	if (playerTurn >= players.length){
 		playerTurn = 0;
@@ -1647,6 +1676,13 @@ function reset(){
 	updateFirebase(); //update firebase
 	
 	console.log("Game reset!");
+}
+
+function resetChanceCards(){
+	switched = false;//refactor plz
+	cardDraw = 0;
+	updateCardDraw();
+	document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
 }
  
 //------- box stuff -----------------
@@ -1693,6 +1729,9 @@ endTurnBox.addEventListener('cursordown', function(){
 	buyHouseBox.position.set(0, -2, 0);
 	sellHouseBox.position.set(0, -2, 0);
 	buyPropertyBox.position.set(0, -2, 0);
+	
+	resetChanceCards();
+	
 	nextTurn();
 	
 	endTurnBox.position.set(0, -1, 0);
@@ -1760,8 +1799,9 @@ sellHouseBox.addEventListener('cursordown', function(){
 });
 rollDiceBox.addEventListener('cursordown', function(){
 		
+	resetChanceCards();
+		
 	diceRoll = 0;
-	switched = false;	
 	
 	console.log("");
 	console.log("Rolling Dice!!!");
@@ -1772,6 +1812,8 @@ rollDiceBox.addEventListener('cursordown', function(){
 	var dice2 = Math.floor( (Math.random()*6)+1);
 	console.log("Player rolled : " + dice1 + " | " + dice2);
 	diceRoll = dice1 + dice2
+	is_double = (dice1==dice2);
+	
 	
 	//testing!
 	/**
@@ -1782,11 +1824,14 @@ rollDiceBox.addEventListener('cursordown', function(){
 		30 - JAIL
 	*/
 	diceRoll = 7;
+	is_double = true;
 	
-	is_double = (dice1==dice2);
+	
 	
 	if (is_double){
 		console.log("Double rolled!");
+		playerTurn = player_element-1;
+		nextTurn();
 	}
 	else
 	{
