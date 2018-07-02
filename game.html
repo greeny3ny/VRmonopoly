@@ -193,7 +193,7 @@
 </body>
 
 <script>
-var version = "0.5.1.10";
+var version = "0.5.1.11";
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -226,7 +226,7 @@ var loaded = false;
 var players;
 var playerTurn; //what players turn is it
 var playerPos = []; //0 = go, array storing all players locations
-var player_element; //element local player in array is
+var player_element = 10; //element local player in array is
 var playerMoney; //array holding all money for players
 var propertyOwned = []; //array of 40, stores what properties are owned by who
 var housesOwned = []; //array of 40, stores how many houses are on tile, 5 houses = hotel
@@ -610,6 +610,7 @@ if (gameStart){
 	//set up start
 	if (!temp_start) {
 		startBox.position.set(0,-1,0);
+		joinBox.position.set(0, -1, 0);
 		temp_start = true;
 	}
 	
@@ -974,7 +975,7 @@ function setPositions(playerNo){
 	
 	//makes chance trigger only once
 	if (!chanceBool && playerTurn==player_element){
-		console.log(playerTurn + " | " + playerNo);
+		console.log(playerTurn + " | " + player_element);
 		drawCard();
 		chanceBool = true;
 	}
