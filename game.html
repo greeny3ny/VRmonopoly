@@ -973,7 +973,7 @@ function setPositions(playerNo){
 	playerIcons[playerNo].position.set(-9, PICON_Y, -3.2); 
 	
 	//makes chance trigger only once
-	if (!chanceBool && playerTurn==playerNo){
+	if (!chanceBool && playerTurn==player_element){
 		console.log(playerTurn + " | " + playerNo);
 		drawCard();
 		chanceBool = true;
@@ -1061,7 +1061,7 @@ function setPositions(playerNo){
 	case 22:
 	//CHANCE
 	playerIcons[playerNo].position.set(9, PICON_Y, -4.85); 
-	if (!chanceBool && playerTurn==playerNo){
+	if (!chanceBool && playerTurn==player_element){
 		drawCard();
 		chanceBool = true;
 	}
@@ -1139,7 +1139,7 @@ function setPositions(playerNo){
 	//chance
 	playerIcons[playerNo].position.set(-1.55, PICON_Y, 9); 
 	
-	if (!chanceBool && playerTurn==playerNo){
+	if (!chanceBool && playerTurn==player_element){
 		drawCard();
 		chanceBool = true;
 	}
