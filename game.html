@@ -120,13 +120,6 @@
             repeat="0"
 			begin="cDraw"></a-animation>
 			
-		<a-animation attribute="position"
-            dur="2000"
-            easing="linear"
-			from="-4.7 0.01 4.7"
-            to="-4.7 0.01 4.7"
-            repeat="0"
-			begin="resetPosition"></a-animation>
 	</a-box>
 	
 	<a-box position='-4.7 0.3 4.7' scale="3.8 2.7 0.6" rotation='90 0 45' material="src:#stackedCards"></a-box>
@@ -201,7 +194,7 @@
 </body>
 
 <script>
-var version = "0.5.2.1";
+var version = "0.5.2.2";
 console.log("Altopoly Version : " + version);
 document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
 var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
@@ -1472,7 +1465,8 @@ function chanceEventMessage(i){
 			break;
 		case 0:
 			str = "---";
-			document.querySelector('#tempChance').emit('resetPosition');
+			document.querySelector('#tempChance').setAttribute('position', '-4.7 0.01 4.7');
+			document.querySelector('#tempChance').setAttribute('position', '90 0 45');
 			break;
 	}
 	return str;
@@ -1823,8 +1817,8 @@ rollDiceBox.addEventListener('cursordown', function(){
 		12 - UTILITY
 		30 - JAIL
 	*/
-	diceRoll = 7;
-	is_double = true;
+	//diceRoll = 7;
+	/is_double = true;
 	
 	
 	
