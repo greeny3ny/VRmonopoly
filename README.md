@@ -1,6 +1,9 @@
 # Altopoly
 Monopoly for AltspaceVR.
 
+TO DO BIG TIME : 
+OBJECT ORIENT THE SH*T OUT OF THIS YOU MESSY MESSY CODER
+
 Build in AFrame and THREE.js
 
 - Code by Craig
