@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+<!--<script src="https://cdn.rawgit.com/AltspaceVR/AltspaceSDK/v2.0.2/dist/altspace.min.js"></script>-->
+
+<!--<script src="https://sdk.altvr.com/libs/altspace.js/2.4.0/altspace.min.js"></script> -->
+
+<!--<script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>-->
+
+
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+</head>
+
+<body>
+
+<!-- set up the scene -->
+<a-scene sync-system="author: greeny3ny; app: monopoly1">
+ 
+    <!-- add a view camera (2d only) -->
+    <!--<a-text value="Hello, World!"></a-text>-->
+
+    <a-assets>
+		<img id="board" src="https://greeny3ny.github.io/VRmonopoly/images/ALTOPOLY.png"/>
+		<img id="cardTemplate" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCard.jpg"/>
+		
+		<img id="test" src="https://greeny3ny.github.io/VRmonopoly/images/test123.png"/>
+		
+		<img id="card1" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/disc_golf.png" />
+		<img id="card3" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/the_maze.png" />
+		<img id="card6" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/beat_lab.png" />
+		<img id="card8" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/medieval_tavern.png" />
+		<img id="card9" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/winter_wonderland.png" />
+		<img id="card11" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/boss_monster.png" />
+		<img id="card13" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/hah.png" />
+		<img id="card14" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/love_letter.png" />
+		<img id="card16" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/video_jukebox.png" />
+		<img id="card18" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/dress_up.png" />
+		<img id="card19" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/secret_caesar.png" />
+		<img id="card21" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/comedy_club.png" />
+		<img id="card23" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/360_theater.png" />
+		<img id="card24" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/sculpt_together.png" />
+		<img id="card26" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/highrise.png" />
+		<img id="card27" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/old_welcome_space.png" />
+		<img id="card29" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/new_user_info.png" />
+		<img id="card31" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/game_room.png" />
+		<img id="card32" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/rainbow_room.png" />
+		<img id="card34" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/dojo.png" />
+		<img id="card37" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/campfire_with_pets.png" />
+		<img id="card39" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/the_campfire.png" />
+		
+		<img id="card5" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/observation_deck_teleporter.png" />
+		<img id="card15" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/the_maze_teleporter.png" />
+		<img id="card25" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/help_center_teleporter.png" />
+		<img id="card35" src="https://greeny3ny.github.io/VRmonopoly/images/propertyCards/disc_golf_teleporter.png" />
+		
+		<img id="chance1" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/chance1.png" />
+		<img id="chance2" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/chance2.png" />
+		<img id="chance3" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/chance3.png" />
+		<img id="chance4" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/chance4.png" />
+		
+		<img id="chance9" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/chance9.png" />
+		<img id="chanceTempImg" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/tempChance.png" />
+		
+		<img id="stackedCards" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/stackedCards.png"/>
+		<img id="chanceTop" src="https://greeny3ny.github.io/VRmonopoly/images/chanceCards/chanceTop.png"/>
+		
+		<img id="tut1" src="https://greeny3ny.github.io/VRmonopoly/images/tut1.png" />
+		<img id="tut2" src="https://greeny3ny.github.io/VRmonopoly/images/tut2.png" />
+		
+		<a-asset-item id="piece1" src="https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae"></a-asset-item>
+  	</a-assets>
+
+	<a-entity position='-20 16 -15' rotation='0 0 0' n-text='text: Altopoly! ;'></a-entity>
+	<a-entity id="version" position='-20 15 -15' rotation='0 0 0' n-text='text: Version :  ;' ></a-entity>
+	
+	<a-entity id="players" position='8 16 -15' rotation='0 0 0' n-text='text: Players :  ;' ></a-entity>
+	
+	<a-entity id="info" position='-29.9 6 0' rotation='0 90 0' n-text="width:200;text:
+	Code   : Craig
+	Images : Winrar
+	Models : Lia
+	No more than 4 people in a game!
+	Hopefully the app doesn't break under high load.
+	;" ></a-entity>
+
+	<a-box id="tempChance" position='-4.7 0.01 4.7' scale="3.8 2.7 0" rotation='90 0 45' >
+		<a-animation attribute="rotation"
+            dur="2000"
+            easing="linear"
+			from="90 0 45"
+            to="0 0 0"
+            repeat="0"
+			begin="cDraw"
+			></a-animation>
+		
+		<a-animation attribute="position"
+            dur="2000"
+            easing="linear"
+			from="-4.7 0.01 4.7"
+            to="8 10 -15"
+            repeat="0"
+			begin="cDraw"></a-animation>
+			
+		<a-animation attribute="scale"
+            dur="2000"
+            easing="linear"
+			from="3.8 2.7 0"
+            to="7 5 0"
+            repeat="0"
+			begin="cDraw"></a-animation>
+			
+	</a-box>
+	
+	<a-box position='-4.7 0.3 4.7' scale="3.8 2.7 0.6" rotation='90 0 45' material="src:#stackedCards"></a-box>
+	<a-box position='-4.7 0.601 4.7' scale="3.8 2.7 0" rotation='90 0 45' material="src:#chanceTop"></a-box>
+	
+    <a-entity geometry="primitive: box" material="shader: flat; src: #board" position = '0 0 0' scale="20 0 20"></a-entity>
+	
+	<!--
+	<a-box id="tile0" n-mesh-collider="type:hologram" color="white" position="-8.75, 1, 8.75" rotation="0 0 0" scale="3 3 3" opacity="0.5"  altspace-cursor-collider="enabled: false"></a-box> <!-- home collider-->
+	
+	<!--skybox + stuff to stop people teleporting ages away from board -->
+	<a-sky color="black" radius="200"></a-sky>
+	<a-plane color="black" scale="100 100" position="0 -0.01 0" rotation="-90 0 0"></a-plane>
+	<a-box color="black" scale="100 30 0.1" position="0 15 -16" n-box-collider="type:environment"></a-box>
+	<a-box color="black" scale="100 30 0.1" position="16 15 0" rotation="0 90 0" n-box-collider="type:environment"></a-box>
+	<a-box color="black" scale="100 30 0.1" position="0 15 30" n-box-collider="type:environment"></a-box>
+	<a-box color="black" scale="100 30 0.1" position="-30 15 0" rotation="0 90 0" n-box-collider="type:environment"></a-box>
+	
+	
+	<a-entity id="board1" position='-9 12 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="board2" position='-9 11 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="board3" position='-9 10 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="board4" position='-9 9 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
+	<a-entity id="money1" position='0 12 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money2" position='0 11 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money3" position='0 10 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money4" position='0 9 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
+	<a-box id="box1" position='3 12 -15' color='green' ></a-box>
+	<a-box id="box2" position='3 11 -15' color='red' ></a-box>
+	<a-box id="box3" position='3 10 -15' color='blue' ></a-box>
+	<a-box id="box4" position='3 9 -15' color='yellow' ></a-box>
+	
+	<a-entity id="info1" position='-4 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="info2" position='-4 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
+	<a-entity id="eventLog" position='-4 4 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	
+	<!--
+	<a-entity id="money5" position='0 8 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money6" position='0 7 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money7" position='0 6 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	<a-entity id="money8" position='0 5 -15' rotation='0 0 0' n-text='text: ---;' ></a-entity>
+	-->
+
+	<!--
+	<a-box id="test22" position="-5 1 -15" scale="2 2 2" opacity="0.5" color="green" n-text='text:buyPropertyBox'></a-box>
+	-->
+	<a-plane id="card" src="#test" n-billboard position='0 7.5 0' rotation='0 0 0' color='white' scale='5 5'>
+	</a-plane>
+	
+	<a-entity id="turnText" position='0 3 0' rotation='0 0 0' n-billboard n-text='text:;' ></a-entity>
+	<a-entity id="ownText" position='0 4 0' rotation='0 0 0' n-billboard n-text='text:;width:100;' ></a-entity>
+	
+	
+	
+	<!--
+	<a-entity id="test123" position="-9 0 9" scale="3 3 3" collada-model='#piece1'></a-entity> 
+	
+	<a-entity id="dice" position='0 3 0' n-text='text: blah has rolled blah'></a-entity>
+	<!--
+	<a-box color="black" position="-10, 0, -4.8" scale="0.5, 0.5, 0.5"></a-box>
+	<a-box color="red" position="-10, 0, -4.3" scale="0.5, 0.5, 0.5"></a-box>
+	<a-box color="green" position="-10, 0, -5.3" scale="0.5, 0.5, 0.5"></a-box>
+	<!--<a-box depth="100" height="0.1" width="100" position='0 360 0'><a-box>A
+	
+	
+--> 
+</a-scene>
+ 
+</body>
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCvKQCyURJiH13dXDl_f6kB_deZ67QmbgQ",
+    authDomain: "vrmonopoly.firebaseapp.com",
+    databaseURL: "https://vrmonopoly.firebaseio.com",
+    projectId: "vrmonopoly",
+    storageBucket: "vrmonopoly.appspot.com",
+    messagingSenderId: "831868478183",
+    appId: "1:831868478183:web:fbc105497210748b003842"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+<script>
+
+var fbGameRef = firebase.database().ref();
+//This needs a complete complete code rewrite...
+//I no longer write messy trash like this
+var version = "0.trash";
+console.log("Altopoly Version : " + version);
+document.querySelector('#version').setAttribute('n-text','text: Version : ' + version);
+//var fbGameRef = new Firebase("https://vrmonopoly.firebaseio.com/");
+
+
+var moderator;
+var displayname;
+
+displayname = "1";
+/*
+altspace.getUser().then(function(u){
+		console.log(u);
+		displayname = u.displayName;
+		moderator = u.isModerator;
+		//console.log(user);
+}).then(function(){
+	//console.log("test");
+	setTimeout(main, 2000);
+});
+*/
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//--------------------- synchronisation? ------------------------
+ //waits for user data before starting
+/*
+	HEARTBEAT SYSTEM - NEEDS A MAJOR REWRITE!!!
+*/
+//add user to database
+//add heartbeat to database
+//check other heartbeats
+//do database stuff re heatbeats
+//var sim = new altspace.utilities.Simulation(); //simulation
+var gameStart; //boolean declaring if game is started or not
+var joined; //local 
+var loaded = false;
+var players;
+var playerTurn; //what players turn is it
+var playerPos = []; //0 = go, array storing all players locations
+var player_element; //element local player in array is
+var playerMoney; //array holding all money for players
+var propertyOwned = []; //array of 40, stores what properties are owned by who
+var housesOwned = []; //array of 40, stores how many houses are on tile, 5 houses = hotel
+var diceRoll = 0; //stores diceroll for player whose turn it is
+var cardDraw = 0; //Card drawn when landed on CC or chance.
+var selectedTileNo; //stores number of selected tile
+//positions of buy / sell house buttons
+var SHB_X, SHB_Z = 0; //?? potential use for sell house box
+var BHB_X, BHB_Z = 0; //?? potential use for buy house box
+
+var eventLogString = "This is used for showing events to users!"; //not used yet - will possibly be local
+
+const MAX_PLAYERS = 4; //max amount of players in game
+
+//--- box stuff ---
+
+//temporary colors
+var redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+var greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var blueMat = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+var yellowMat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+var pinkMat = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+
+
+var boxGeo = new THREE.BoxGeometry(1, 1, 1); //geometry used for all clicky boxes / objects
+var tileGeo = new THREE.BoxGeometry(5.4, 0.1, 3.2); //geometry used for tiles user can click on
+var houseGeo = new THREE.SphereGeometry(1,1,1); //temp geometry for houses
+
+//-------
+//Creating clicky boxes with their own awesome texture!
+//-------
+var startGameTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/startGame.png");
+var startGameMat = new THREE.MeshBasicMaterial({ map:startGameTex, side:THREE.DoubleSide }); 
+var startBox = new THREE.Mesh(boxGeo, startGameMat);
+
+var joinGameTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/joinGame.png");
+var joinGameMat = new THREE.MeshBasicMaterial({ map:joinGameTex, side:THREE.DoubleSide });
+var joinBox = new THREE.Mesh(boxGeo, joinGameMat);
+
+var resetGameTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/resetGame.png");
+var resetGameMat = new THREE.MeshBasicMaterial({ map:resetGameTex, side:THREE.DoubleSide });
+var resetBox = new THREE.Mesh(boxGeo, resetGameMat);
+
+var rollDiceTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/rollDice.png");
+var rollDiceMat = new THREE.MeshBasicMaterial({ map:rollDiceTex, side:THREE.DoubleSide });
+var rollDiceBox = new THREE.Mesh(boxGeo, rollDiceMat);
+
+var endTurnTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/endTurn.png");
+var endTurnMat = new THREE.MeshBasicMaterial({ map:endTurnTex, side:THREE.DoubleSide });
+var endTurnBox = new THREE.Mesh(boxGeo, endTurnMat);
+
+var buyPropTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/buyProperty.png");
+var buyPropMat = new THREE.MeshBasicMaterial({ map:buyPropTex, side:THREE.DoubleSide });
+var buyPropertyBox = new THREE.Mesh(boxGeo, buyPropMat);
+
+var buyHouseTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/buyHouse.png");
+var buyHouseMat = new THREE.MeshBasicMaterial({ map:buyHouseTex, side:THREE.DoubleSide });
+var buyHouseBox = new THREE.Mesh(boxGeo, buyHouseMat);
+
+var sellHouseTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/buttons/sellHouse.png");
+var sellHouseMat = new THREE.MeshBasicMaterial({ map:sellHouseTex, side:THREE.DoubleSide });
+var sellHouseBox = new THREE.Mesh(boxGeo, sellHouseMat);
+
+//---
+
+var blueModelTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/models/blueModel.png");
+var blueModelMat = new THREE.MeshBasicMaterial({ map:blueModelTex, side:THREE.DoubleSide }); 
+
+var greenModelTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/models/greenModel.png");
+var greenModelMat = new THREE.MeshBasicMaterial({ map:greenModelTex, side:THREE.DoubleSide }); 
+
+var redModelTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/models/redModel.png");
+var redModelMat = new THREE.MeshBasicMaterial({ map:redModelTex, side:THREE.DoubleSide }); 
+
+var yellowModelTex = new THREE.TextureLoader().load("https://greeny3ny.github.io/VRmonopoly/images/models/yellowModel.png");
+var yellowModelMat = new THREE.MeshBasicMaterial({ map:yellowModelTex, side:THREE.DoubleSide }); 
+
+//--- 
+var playerIcons = [];
+var voteKickBox = [];
+var propertyCards = [];
+var pC_materials = [];
+///--------------------
+function main(){
+	console.log("Main function has loaded!");
+	
+	initVars();
+	initialiseBoxes();
+	readFirebase();
+	
+	setInterval(tick, 1000); //start ticker
+}
+//initialise variables
+function initVars(){
+	gameStart = false;
+	
+	joined = false;
+	
+	players = [];
+	
+	playerTurn = 0;
+	playerPos = [];	
+	playerMoney = [];
+}
+//update database
+function updateFirebase(){
+	console.log("updating full firebase");
+	fbGameRef.update({
+		players: players,
+		turn: playerTurn,
+		position: playerPos,
+		gameStart: gameStart,
+		money: playerMoney,
+		properties: propertyOwned,
+		houses: housesOwned,
+		diceRoll: diceRoll,
+		cardDraw: cardDraw
+	});
+	//console.log("database updated!");
+}
+function updatePlayers(){
+	fbGameRef.update({
+		players:players
+	});
+}
+function updateTurn(){
+	fbGameRef.update({
+		turn:playerTurn
+	});
+}
+function updatePosition(){
+	fbGameRef.update({
+		position:playerPos
+	});
+}
+function updateGameStart(){
+	fbGameRef.update({
+		gameStart: gameStart
+	});
+}
+function updateMoney(){
+	fbGameRef.update({
+		money: playerMoney
+	});
+}
+function updateProperties(){
+	fbGameRef.update({
+		properties: propertyOwned
+	});
+}
+function updateHouses(){
+	fbGameRef.update({
+		houses: housesOwned
+	});
+}
+
+function updateDiceRoll(){
+	fbGameRef.update({
+		diceRoll: diceRoll
+	});
+}
+
+function updateCardDraw(){
+	fbGameRef.update({
+		cardDraw: cardDraw
+	});
+}
+
+//reads users in session
+function readFirebaseUsers(){
+	fbGameRef.child("inSession").on("value", function(snapshot) {
+		inSession = snapshot.val();
+	});
+	return;
+}
+//reads users who are playing
+function readFirebasePlayers(){
+	fbGameRef.child("players").on("value", function(snapshot){
+		players = snapshot.val();
+	});
+	return;
+}
+function readFirebaseTurn(){
+	fbGameRef.child("turn").on("value", function(snapshot){
+		playerTurn = snapshot.val();
+	});
+	return;
+}
+function readFirebasePos(){
+	fbGameRef.child("position").on("value", function(snapshot){
+		playerPos = snapshot.val();	
+	});
+	return;
+}
+function readFirebaseStart(){
+	fbGameRef.child("gameStart").on("value", function(snapshot){
+		gameStart = snapshot.val();
+	});
+}
+function readFirebaseMoney(){
+	fbGameRef.child("money").on("value", function(snapshot){
+		playerMoney = snapshot.val();
+	});
+	return;
+}
+function readFirebaseOwned(){
+	fbGameRef.child("properties").on("value", function(snapshot){
+		propertyOwned = snapshot.val();
+		
+		//avoids error thrown at start
+		try {
+			setPropertyColor();
+		} catch (e){}
+	});
+	return;
+}
+function readFirebaseHouses(){
+	fbGameRef.child("houses").on("value", function(snapshot){
+		housesOwned = snapshot.val();
+		//setHousePositions();
+	});
+	return;
+}
+
+function readFirebaseDiceRoll(){
+	fbGameRef.child("diceRoll").on("value", function(snapshot) {
+		diceRoll = snapshot.val();
+	});
+	return;
+}
+
+function readFirebaseCardDraw(){
+	fbGameRef.child("cardDraw").on("value", function(snapshot) {
+		cardDraw = snapshot.val();
+		return;
+	});
+	return;
+}
+/*
+	WILL ALLOW A READ WHEN A CHILD_CHANGE IS DETECTED
+*/
+function readOnChildChanged(){
+	console.log("Child changed in firebase!");
+	fbGameRef.child("inSession").on("child_changed", function(snapshot) {
+		inSession = snapshot.val();
+	});
+	fbGameRef.child("players").on("child_changed", function(snapshot){
+		players = snapshot.val();
+	});
+	fbGameRef.child("turn").on("child_changed", function(snapshot){
+		playerTurn = snapshot.val();
+	});
+	fbGameRef.child("position").on("child_changed", function(snapshot){
+		playerPos = snapshot.val();	
+	});
+	fbGameRef.child("gameStart").on("child_changed", function(snapshot){
+		gameStart = snapshot.val();
+	});
+	fbGameRef.child("money").on("child_changed", function(snapshot){
+		playerMoney = snapshot.val();
+		console.log("Players money has changed!");
+	});
+	fbGameRef.child("properties").on("child_changed", function(snapshot){
+		propertyOwned = snapshot.val();
+		setPropertyColor();	
+	});
+	fbGameRef.child("houses").on("child_changed", function(snapshot){
+		housesOwned = snapshot.val();
+		
+	});
+	fbGameRef.child("diceRoll").on("child_changed", function(snapshot){
+	    diceRoll = snapshot.val();
+	});
+	fbGameRef.child("cardDraw").on("child_changed", function(snapshot){
+	    cardDraw = snapshot.val();
+	});
+	
+	console.log("Setting positions");
+	for (var i = 0; i < players.length; i++){
+			setPositions(i);
+	}
+	setHousePositions();
+	
+}
+
+function setPropertyColor(){
+	for (var i=0; i<40; i++){
+		switch(propertyOwned[i]){
+			case 0:
+				propertyCards[i].material.color.setHex(0x00ff00);
+				pC_materials[i].opacity = 0.5;
+				break;
+			case 1:
+				propertyCards[i].material.color.setHex(0xff0000);
+				pC_materials[i].opacity = 0.5;
+				break;
+			case 2:
+				propertyCards[i].material.color.setHex(0x0000ff);
+				pC_materials[i].opacity = 0.5;
+				break;
+			case 3:
+				propertyCards[i].material.color.setHex(0xffff00);
+				pC_materials[i].opacity = 0.5;
+				break;
+		}
+	}
+
+}
+/**
+THIS DOESNT WORK AS OF YET
+SAD FACE
+*/
+function checkPlayerElement(){
+	//assume firebase players already been read
+	for (var i = 0; i < players.length; i++){
+	
+		//will only work if no 2 players share the same name
+		if (players[i] == displayname){
+			player_element = i;
+			console.log(displayname + " has element of " + player_element);
+		} else {
+			//console.log("player not in current game");
+		}
+	
+	}
+}//end checkplayerelement
+
+//------
+var temp = false;
+var temp_start = false;
+var rolled = false; //is dice been rolled?
+function readFirebase(){
+	console.log("Initial firebase read");
+	readFirebasePlayers(); //check if players is being updated
+	readFirebaseStart();
+	readFirebaseTurn();
+	readFirebasePos();
+	readFirebaseMoney();
+	readFirebaseOwned();
+	readFirebaseHouses();
+	readFirebaseDiceRoll();
+	readOnChildChanged();
+
+	setTimeout(afterRead, 1000);
+}
+ /**
+	THIS POPS AFTER THE WHOLE FIREBASE HAS BEEN READ
+	YAY FOR MULTITHREADING / LACK OF PROMISE KNOWLEDGE
+ */
+function afterRead(){
+	if (gameStart){
+		console.log("This message should only appear once");
+		checkPlayerElement();
+		//testing
+		setHousePositions();
+		
+		//hide join box
+		joinBox.position.set(0, -2, 0);
+	}
+	else
+	{
+		if (players == null){
+			reset();
+		}
+	}
+}
+
+function consoleLog(){
+	console.log("");
+	console.log("Tick");
+	console.log("");
+
+}
+
+function tick(){
+	if (gameStart){
+		//consoleLog();
+		//set up start
+		if (!temp_start) {
+			startBox.position.set(0,-1,0);
+			joinBox.position.set(0, -1, 0);
+			temp_start = true;
+		}
+		
+		var invalidBuyTiles = ["0","2","4","7","10","17","20","22","30","33","36","38"];
+		
+		//this needs a fixing too
+		console.log(playerTurn + " | " + player_element);
+		if (playerTurn == player_element){
+		
+			if (!temp){
+				console.log("It's your turn!");
+				rollDiceBox.position.set(0,2,-1);
+				resetChanceCards();
+				temp = true;
+			} 
+		
+			if (!bought && !invalidBuyTiles.includes(playerPos.toString())){
+				buyPropertyBox.position.set(-5, 1, -15);
+			} else {
+				buyPropertyBox.position.set(0, -2, 0);
+			}
+		}
+		
+		if (!players.includes(displayname)){
+			player_element = 1000;
+		}
+		
+		//if (players.includes(displayname)){
+		//	console.log("you are not in the game!");
+		//	player_element = 1000; //arb number that player_element will NEVER be
+		//}
+		
+		//Bring this out of the ticker somehow??
+		for (var i = 0; i < players.length; i++){
+			setPositions(i); 
+		}
+		setHousePositions();
+		
+		readFirebaseCardDraw();
+		console.log("cardDraw " + cardDraw);
+		console.log("switched " + switched);
+		
+		if (!switched){
+			
+			//chanceBuffer();
+			//possibly dont need timeout as high / at all
+			//using it to allow all users to read from database fast enough!
+			//setTimeout(chanceCard(cardDraw, playerTurn),1000);
+			
+			if (cardDraw != 0){
+				document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
+				console.log("sdihbfsuiufgbsanofgns");
+				console.log("cD : " + cardDraw + " | pT : " + playerTurn);
+				//chanceCard(cardDraw, playerTurn);
+				switched = true;
+			}
+			
+		}
+		
+		
+	} else {
+	//-----------------------------------------------
+	 //basically reset stuff
+		
+		//Caps the amount of people that can join.
+		if (players ==null || (!joined && players.length<MAX_PLAYERS)){
+			startBox.position.set(0, -1, 0);
+			joinBox.position.set(0, 2, 0);
+		}else{
+			console.log("You are either in game or game is full!");
+			joinBox.position.set(0, -2, 0);
+		}
+		rollDiceBox.position.set(0, -1, 0);
+		endTurnBox.position.set(0, -1, 0);
+		
+		for (var i=0; i<40; i++){
+			pC_materials[i].color.setHex( 0xffffff );
+			pC_materials[i].opacity = 0;
+		}
+		
+		document.querySelector('#card').setAttribute('src','#test');
+		document.querySelector('#turnText').setAttribute('n-text','text:;');
+		document.querySelector('#ownText').setAttribute('n-text','text:;');
+		document.querySelector('#info1').setAttribute('n-text','text:;');
+		document.querySelector('#info2').setAttribute('n-text','text:;');
+		document.querySelector('#eventLog').setAttribute('n-text','text:;');
+		
+		document.querySelector('#tempChance').setAttribute('position','0 -10 0');
+		
+		for (var j=0; j<houseObjects.length; j++){
+			scene.remove(houseObjects.pop());
+		}
+		
+		if (players == null){
+			//console.log("test");
+			joined = false;
+		}
+		
+		//console.log("game reset");
+		temp = false;
+		rolled = false;
+		chanceBool = false;
+		switched = false;
+		
+		temp_start = false;
+		//reset box positions
+		for (var i = 0; i < MAX_PLAYERS; i++){
+			playerIcons[i].position.set(-11, -1, 11); //player icon (will be changed to avatars in later update)
+		}//end for8
+		buyPropertyBox.position.set(0, -2, 0);
+		buyHouseBox.position.set(0, -2, 0);
+		sellHouseBox.position.set(0, -2, 0);
+		
+		bought = false;
+	//---------------------------
+	} //end gamestart if
+	//change n-text
+	
+
+	//keeps leaderboards updated
+	drawText();
+	
+}//end tick function
+
+//keep code clean
+function drawText(){
+
+	if (players == null || players.length == 0){document.querySelector('#players').setAttribute('n-text','text: No players have joined the game');} 
+	else {document.querySelector('#players').setAttribute('n-text','text: Players : ' + players);}
+	
+
+	//only draw money if gamestarted else error
+	if (gameStart){
+		for (var i=0; i<players.length; i++){
+			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:'+players[i]);
+			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:'+playerMoney[i]);
+		}	
+		document.querySelector('#turnText').setAttribute('n-text','text: It is ' + players[playerTurn] + "'s turn");
+		document.querySelector('#info1').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has rolled " + diceRoll);
+		document.querySelector('#info2').setAttribute('n-text','width:100; text: ' + players[playerTurn] + " has landed on tile #" + playerPos[playerTurn]);
+		
+	}else{
+		for (var i=0; i<MAX_PLAYERS; i++){
+			document.querySelector('#board'+(i+1)).setAttribute('n-text','text:---');
+			document.querySelector('#money'+(i+1)).setAttribute('n-text','text:---');
+		}	
+	}
+}//end drawText()
+
+/**
+THIS CODE IS MOOT RIGHT NOW
+WILL UPDATE IT WHEN THE REST IS FIXED....
+
+var loader = new THREE.ColladaLoader();
+loader.load( 'https://greeny3ny.github.io/VRmonopoly/models/altpice/alt-peice.dae', function ( collada ) {
+ 
+    // Grab the collada scene data:
+    dae = collada.scene;
+    // Scale-up the model so that we can see it:
+    dae.scale.x = dae.scale.y = dae.scale.z = 5;
+	dae.rotation.set(Math.PI/2, Math.PI, 0);
+	//console.log("test");
+	//sim.scene.add(dae);
+  });
+ //-----
+ */
+
+  
+function initialiseBoxes(){
+	
+	//temporary colors, will replace with models in the future!
+	playerIcons[0] = new THREE.Mesh(boxGeo, greenModelMat);
+	playerIcons[1] = new THREE.Mesh(boxGeo, redModelMat);
+	playerIcons[2] = new THREE.Mesh(boxGeo, blueModelMat);
+	playerIcons[3] = new THREE.Mesh(boxGeo, yellowModelMat);
+	
+	//max 4 players in a game
+	for (var i = 0; i < MAX_PLAYERS; i++){
+		//playerIcons[i] = new THREE.Mesh(boxGeo);
+		//playerIcons[i] = dae;		
+		//voteKickBox[i] = new THREE.Mesh(boxGeo, greenMat);
+		
+		playerIcons[i].position.set(-11, -2, 11); //player icon (will be changed to avatars in later update)
+		//voteKickBox[i].position.set(12, 2*i, -6); //not using these yet
+		
+		//playerIcons[i].scale.set(3, 3, 3);
+		playerIcons[i].scale.set(0.5, 1, 0.5);
+		
+		scene.add(playerIcons[i]);
+		//sim.scene.add(voteKickBox[i]);
+		
+	}//end for8
+	
+	for (var i = 0; i<40; i++){
+		pC_materials[i] = new THREE.MeshLambertMaterial( { color: 0xffffff, transparent:true } );
+		pC_materials[i].opacity = 0;
+		propertyCards[i] = new THREE.Mesh(tileGeo, pC_materials[i]);
+		propertyCards[i].position.set(0, -1, 0);
+		propertyCards[i].scale.set(0.5, 0.5, 0.5);
+		
+		setPropertyCardPos(i);
+		
+		scene.add(propertyCards[i]);
+	}//end for40
+	
+	buyPropertyBox.position.set(0, -2, 0);
+	buyHouseBox.position.set(0, -2, 0);
+	sellHouseBox.position.set(0, -2, 0);
+	startBox.position.set(0,-2,1);
+	rollDiceBox.position.set(0,-2,-1);
+	endTurnBox.position.set(0,-2,-2);
+	
+	joinBox.position.set(0, 2, 0);
+	resetBox.position.set(11, 0.5, 11);
+	
+	buyPropertyBox.scale.set(2, 2, 2);
+	
+	buyHouseBox.scale.set(2, 2, 2);
+	sellHouseBox.scale.set(2, 2, 2);
+	
+	
+	scene.add(endTurnBox);
+	scene.add(joinBox);
+	scene.add(startBox);
+	scene.add(resetBox);
+	scene.add(rollDiceBox);
+	scene.add(buyPropertyBox);
+
+	scene.add(buyHouseBox);
+	scene.add(sellHouseBox);
+	
+}
+
+
+/**
+THIS WHOLE FUNCTION IS BROKEN
+A HUGE MESS
+A DISASTER
+
+all of it can be run only once? doesnt need to be repeatedly ticked??
+*/
+function landedOn(playerNo, tileNo, rent, tilePrice, ALO){
+	//check if YOU have landed on property
+	if (playerNo == player_element){
+		//check if owned
+		if (propertyOwned[tileNo] != 10){
+			
+			//check if client owns property already
+			//console.log(propertyOwned[tileNo]);
+			if (propertyOwned[tileNo] == player_element){
+				//dont do anything				
+			} else {
+			//other player owns property
+			//sets money of player who owns property 
+			//makes sure money only updated once
+			//console.log("This property is owned by someone else!");
+			if (!temp_money){
+				var h = housesOwned[tileNo];
+				if (h === 0 && ALO){
+					cost = rent[0]*2;
+				}
+				else {
+					cost = rent[h];
+				}
+				playerMoney[propertyOwned[tileNo]] += cost;
+				playerMoney[playerNo] -= cost;
+				
+				console.log("Player "+playerMoney[playerNo]+" loses " +cost);
+				
+				updateMoney();
+				//bankruptcy check
+				
+				temp_money = true;
+			}
+			}
+			//do for houses/hotels too
+		
+		} else {
+			//console.log("Nobody owns this property!");
+			//console.log("property unowned");
+			//display buy / sell boxes
+			//console.log("you have landed here");
+			  //------------------------------
+			
+			
+		}//end if
+		
+		
+	}//end if playerNo ==  player_element
+	else {return;}
+	
+}
+//move boxes to position and carries out specific task based on place
+var temp_money;
+var bought = false; //variable saying if player bought tile or not
+var cost = 0; //stores how much player recieves/pays
+var housePrice = 0; //local, stores house price of tile
+
+/**
+ALL LOTS OWNED CHEAT SHEET
+0 - BROWN
+1 - LIGHT BLUE
+2 - PINK
+3 - ORANGE
+4 - RED
+5 - YELLOW
+6 - GREEN
+7 - DARK BLUE
+*/
+
+var allLotsOwned = []; //are all the lots owned by the same person?
+var tPrice = 0;
+var chanceBool = false;
+var taxBool = false;
+
+const PICON_Y = 0.5;
+function setPositions(playerNo){
+	if (playerPos[playerNo] >= 40){
+		playerPos[playerNo] -= 40; //back at go (0)
+		playerMoney[playerNo] += 200; //collect 200
+	}
+	
+	
+	
+	var pPos = playerPos[playerNo];
+	//console.log("pPos : " + pPos);
+	//console.log("playerPos : " + playerPos[playerNo]);
+	
+	var rent;
+	
+	if (!chanceBool){
+		cardDraw=0;
+	}
+	
+	switch (pPos){
+	
+	case 0:
+	//GO
+	playerIcons[playerNo].position.set(-9, PICON_Y, 8.5); 
+	break;
+	case 1:
+	//DISC GOLF -B1
+	playerIcons[playerNo].position.set(-9, PICON_Y, 6.4); 
+	rent = [2, 10, 30, 90, 160, 250];
+	tPrice = 60;
+	break;
+	case 2:
+	//CHEST
+	playerIcons[playerNo].position.set(-9, PICON_Y, 4.85); 
+	break;
+	case 3:
+	//THE MAZE -B2
+	playerIcons[playerNo].position.set(-9, PICON_Y, 3.275); 
+	rent = [4, 20, 60, 180, 320, 450];
+	tPrice = 60;
+	break;
+	case 4:
+	//HOUSE TAX
+	playerIcons[playerNo].position.set(-9, PICON_Y, 1.7); 
+	
+	//maybe move this outta this method??
+	if (!taxBool && playerTurn == player_element){
+		playerMoney[playerNo] -= 200; //income tax
+		taxBool = true;
+		updateMoney();
+	}
+	
+	break;
+	case 5:
+	//PORTAL1
+	playerIcons[playerNo].position.set(-9, PICON_Y, 0.1); 
+	break;
+	case 6:
+	//BEATLAB -LB1
+	playerIcons[playerNo].position.set(-9, PICON_Y, -1.55); 
+	tPrice = 100;
+	rent = [6, 30, 90, 270, 400, 550];
+	break;
+	case 7:
+	//CHANCE
+	playerIcons[playerNo].position.set(-9, PICON_Y, -3.2); 
+	
+	//makes chance trigger only once
+	if (!chanceBool && playerTurn==player_element){
+		console.log(playerTurn + " | " + player_element);
+		drawCard();
+		chanceBool = true;
+	}
+	
+	break;
+	case 8:
+	//TAVERN -LB2
+	playerIcons[playerNo].position.set(-9, PICON_Y, -4.8); 
+	rent = [6, 30, 90, 270, 400, 550];
+	tPrice = 100;
+	break;
+	case 9:
+	//wonderland (LBLUE-3)
+	playerIcons[playerNo].position.set(-9, PICON_Y, -6.4); 
+	rent = [8, 40, 100, 300, 450, 600];
+	tPrice = 120;
+	break;
+	case 10:
+	//SUSPENSION (JAIL)
+	//JAILED
+	//playerIcons[playerNo].position.set(-8.25, 0, -8.25); 
+	//JUST VISITING
+	playerIcons[playerNo].position.set(-9.5, PICON_Y, -9.5); 
+	break;
+	case 11:
+	//boss monster (PINK-1)
+	playerIcons[playerNo].position.set(-6.5, PICON_Y, -9); 
+	rent = [10, 50, 150, 450, 625, 750];
+	tPrice = 140;
+	break;
+	case 12:
+	//-UNNAMED- (UTIL-1)
+	playerIcons[playerNo].position.set(-4.85, PICON_Y, -9); 
+	break;
+	case 13:
+	//RAINBOW ROOM (PINK-2)
+	playerIcons[playerNo].position.set(-3.35, PICON_Y, -9); 
+	rent = [10, 50, 150, 450, 625, 750];
+	tPrice = 140;
+	break;
+	case 14:
+	//WINTER WONDERLAND (PINK-3)
+	playerIcons[playerNo].position.set(-1.7, PICON_Y, -9); 
+	rent = [12, 60, 180, 500, 700, 900];
+	tPrice = 160;
+	break;
+	case 15:
+	//JUNGLE MAZE TELEPORT (RAIL-2)
+	playerIcons[playerNo].position.set(-0.1, PICON_Y, -9); 
+	break;
+	case 16:
+	//BOSS MONSTER (ORANGE-1)
+	playerIcons[playerNo].position.set(1.55, PICON_Y, -9); 
+	rent = [14, 70, 200, 550, 750, 950];
+	tPrice = 180;
+	break;
+	case 17:
+	//CHEST
+	playerIcons[playerNo].position.set(3.2, PICON_Y, -9); 
+	break;
+	case 18:
+	//HOLOGRAMGS(ORANGE-2)
+	playerIcons[playerNo].position.set(4.8, PICON_Y, -9);
+	rent = [14, 70, 200, 550, 750, 950];
+	tPrice = 180;	
+	break;
+	case 19:
+	//LOVE LETTER (ORANGE-3)
+	playerIcons[playerNo].position.set(6.4, PICON_Y, -9); 
+	rent = [16, 80, 220, 600, 800, 1000];
+	tPrice = 200;
+	break;
+	case 20:
+	//COMMUNITY CORNER(FREE PARKING)
+	playerIcons[playerNo].position.set(9.5, PICON_Y, -9.5); 
+	break;
+	
+	case 21:
+	//SCULPT TOGETHER (RED-1)
+	playerIcons[playerNo].position.set(9, PICON_Y, -6.5); 
+	rent = [18, 90, 250, 700, 875, 1050];
+	tPrice = 220;
+	break;
+	case 22:
+	//CHANCE
+	playerIcons[playerNo].position.set(9, PICON_Y, -4.85); 
+	if (!chanceBool && playerTurn==player_element){
+		drawCard();
+		chanceBool = true;
+	}
+	break;
+	case 23:
+	//PAINT STUDIO (RED-2)
+	playerIcons[playerNo].position.set(9, PICON_Y, -3.35);
+	rent = [18, 90, 250, 700, 875, 1050];
+	tPrice = 220;	
+	break;
+	case 24:
+	//SDK (RED-3)
+	playerIcons[playerNo].position.set(9, PICON_Y, -1.7);
+	rent = [20, 100, 300, 750, 925, 1100];
+	tPrice = 240;
+	break;
+	case 25:
+	//DISC GOLD TELEPORT (RAIL-3)
+	playerIcons[playerNo].position.set(9, PICON_Y, -0.1); 
+	break;
+	case 26:
+	//VIDEO JUKEBOX (YELLOW-1)
+	playerIcons[playerNo].position.set(9, PICON_Y, 1.55); 
+	rent = [22, 110, 330, 800, 975, 1150];
+	tPrice = 260;
+	break;
+	case 27:
+	//NIGHT HOUSE PARTY (YELLOW-2)
+	playerIcons[playerNo].position.set(9, PICON_Y, 3.2); 
+	rent = [22, 110, 330, 800, 975, 1150];
+	tPrice = 260;
+	break;
+	case 28:
+	//-UNNAMED- (UTIL-2)
+	playerIcons[playerNo].position.set(9, PICON_Y, 4.8); 
+	break;
+	case 29:
+	//HOUSE PARTY (YELLOW-3)
+	playerIcons[playerNo].position.set(9, PICON_Y, 6.4); 
+	rent = [22, 120, 360, 850, 1025, 1200];
+	tPrice = 280;
+	break;
+	case 30:
+	//GO TO SUSPENSION (GO TO JAIL)
+	playerIcons[playerNo].position.set(-8.25, PICON_Y, -8.25); 
+	//change this to jail and add popup?
+	break;
+	case 31:
+	//g1
+	playerIcons[playerNo].position.set(6.5, PICON_Y, 9);
+	rent = [26, 130, 390, 900, 1100, 1275];
+	tPrice = 300;
+	break;
+	case 32:
+	//g2
+	playerIcons[playerNo].position.set(4.85, PICON_Y, 9);
+	rent = [26, 130, 390, 900, 1100, 1275];
+	tPrice = 300;	
+	break;
+	case 33:
+	//cc
+	playerIcons[playerNo].position.set(3.35, PICON_Y, 9); 
+	break;
+	case 34:
+	//g3
+	playerIcons[playerNo].position.set(1.7, PICON_Y, 9); 
+	rent = [28, 150, 450, 1000, 1200, 1400];
+	tPrice = 320;
+	break;
+	case 35:
+	//tele4
+	playerIcons[playerNo].position.set(0.1, PICON_Y, 9); 
+	break;
+	case 36:
+	//chance
+	playerIcons[playerNo].position.set(-1.55, PICON_Y, 9); 
+	
+	if (!chanceBool && playerTurn==player_element){
+		drawCard();
+		chanceBool = true;
+	}
+	break;
+	case 37:
+	//db1
+	playerIcons[playerNo].position.set(-3.2, PICON_Y, 9);
+	rent = [35, 175, 500, 1100, 1300, 1500];
+	tPrice = 350;
+	break;
+	case 38:
+	//tax
+	playerIcons[playerNo].position.set(-4.8, PICON_Y, 9); 
+	if (!taxBool&& playerTurn==player_element){
+		playerMoney[playerNo] -= 75; //income tax
+		taxBool = true;
+		updateMoney();
+	}
+	break;
+	case 39:
+	//db2
+	playerIcons[playerNo].position.set(-6.4, PICON_Y, 9);
+	rent = [50, 200, 600, 1400, 1700, 2000];
+	tPrice = 400;
+	break;	
+	
+	}//end switch
+	
+	checkAllLotsOwned();
+	
+	var allLots = setAllLots(pPos);
+	//console.log(allLots);
+	
+	landedOn(playerNo, pPos, rent, tPrice, allLots);
+		
+}//end function
+
+function setAllLots(pPos){
+    var allLots = false;
+	if (pPos == 1 || pPos == 3){ allLots = allLotsOwned[0]}
+	if (pPos == 6 || pPos == 8 || pPos == 9){ allLots = allLotsOwned[1]}
+	if (pPos == 11 || pPos == 13 || pPos == 14){ allLots = allLotsOwned[2]}
+	if (pPos == 16 || pPos == 18 || pPos == 19){ allLots = allLotsOwned[3]}
+	if (pPos == 21 || pPos == 23 || pPos == 24){ allLots = allLotsOwned[4]}
+	if (pPos == 26 || pPos == 27 || pPos == 29){ allLots = allLotsOwned[5]}
+	if (pPos == 31 || pPos == 32 || pPos == 34){ allLots = allLotsOwned[6]}
+	if (pPos == 37 || pPos == 39){ allLots = allLotsOwned[7]}
+	
+	return allLots;
+}
+
+/**
+	THIS FUNCTION IS PROBABLY SUPER INEFFICIENT
+	NEEDS A WEE BITTY OF A REWRITE
+*/
+var houseObjects = [];
+function setHousePositions(){
+	//wipe all previous house models
+	wipeHouses();
+	
+	//console.log("Placing houses!");
+	
+	for (var i=0; i<40; i++){
+		for (var h=0; h<housesOwned[i]; h++){
+			//console.log("There is a house here ("+h+")");
+			if (propertyOwned[i] == 0){var houseModel = new THREE.Mesh(houseGeo, greenModelMat);}
+			if (propertyOwned[i] == 1){var houseModel = new THREE.Mesh(houseGeo, redModelMat);}
+			if (propertyOwned[i] == 2){var houseModel = new THREE.Mesh(houseGeo, blueModelMat);}
+			if (propertyOwned[i] == 3){var houseModel = new THREE.Mesh(houseGeo, yellowModelMat);}
+			
+			houseModel.scale.set(0.2,0.2,0.2);
+			
+			if (i>0 && i<10){ houseModel.position.set(propertyCards[i].position.x+1, 0.2, propertyCards[i].position.z-0.6 + (h*0.4)); }
+			if (i>10 && i<20){ houseModel.position.set(propertyCards[i].position.x+0.6 - (h*0.4), 0.2, propertyCards[i].position.z+1); }
+			if (i>20 && i<30){ houseModel.position.set(propertyCards[i].position.x-1, 0.2, propertyCards[i].position.z+0.6 - (h*0.4)); }
+			if (i>30 && i<40){ houseModel.position.set(propertyCards[i].position.x-0.6 + (h*0.4), 0.2, propertyCards[i].position.z-1); }
+			scene.add(houseModel);
+			houseObjects.push(houseModel);
+		}
+	}
+
+}
+
+function wipeHouses(){
+	for (var j=0; j<houseObjects.length; j++){
+		scene.remove(houseObjects.pop());
+	}
+}
+
+function checkAllLotsOwned(){
+
+	//console.log("Checking if user owns any full lots...");
+	//console.log(propertyOwned[1] + " | " +propertyOwned[3] + " | PE : " + player_element);
+	
+	allLotsOwned[0] = (propertyOwned[1] == propertyOwned[3] && propertyOwned[1] == player_element);
+	allLotsOwned[1] = (propertyOwned[6] == propertyOwned[8] && propertyOwned[8]==propertyOwned[9] && propertyOwned[9] == player_element);
+	allLotsOwned[2] = (propertyOwned[11] == propertyOwned[13] && propertyOwned[13]==propertyOwned[14] && propertyOwned[14] == player_element);
+	allLotsOwned[3] = (propertyOwned[16] == propertyOwned[18] && propertyOwned[18]==propertyOwned[19] && propertyOwned[19] == player_element);
+	allLotsOwned[4] = (propertyOwned[21] == propertyOwned[23] && propertyOwned[23]==propertyOwned[24] && propertyOwned[24] == player_element);
+	allLotsOwned[5] = (propertyOwned[26] == propertyOwned[27] && propertyOwned[27]==propertyOwned[29] && propertyOwned[29] == player_element);
+	allLotsOwned[6] = (propertyOwned[31] == propertyOwned[32] && propertyOwned[32]==propertyOwned[34] && propertyOwned[34] == player_element);
+	allLotsOwned[7] = (propertyOwned[37] == propertyOwned[39] && propertyOwned[37] == player_element);
+	//console.log(allLotsOwned);
+}
+
+/**
+NEEDS A BETTER NAME
+CALLS WHEN A COMMUNITY CHEST OR CHANCE CARD IS DRAWN
+UPDATES LE DATABASÉ
+ we french now oui oui baguettes
+ 
+ not used?
+*/
+function drawCard(){
+	cardDraw = Math.floor( (Math.random()*8)+1);
+	document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
+	console.log("pushing " + cardDraw + " to database");
+	updateCardDraw();
+	chanceCard(cardDraw, playerTurn);
+}
+
+/**
+	POSSIBLY READ THESE FROM JSON OR A DIFFERENT FILE 
+	WILL KEEP CODE NICE AND CLEAN
+*/
+var switched = false;
+function chanceCard(card, turn){
+	
+	var str = "--";
+	switched = true;
+	
+	switch (card){
+	
+		case 1:
+			//go to campfire!			
+			if (turn == player_element){
+				playerPos[turn] = 0;
+				updatePosition();
+			}
+		break;
+		case 2:
+			//go to hah
+			if (turn == player_element){
+				if (playerPos[turn]>13){
+					playerMoney[turn]+=200;
+					updateMoney();
+				}
+				playerPos[turn] = 13;
+				updatePosition();
+			}
+		break;
+		case 3:
+			//go to 360 theater
+			if (turn == player_element){
+				if (playerPos[turn]>23){
+					playerMoney[turn]+=200;
+					updateMoney();
+				}
+				playerPos[turn] = 23;
+				updatePosition();
+			}
+		break;
+		case 4:
+			//-100
+			if (turn == player_element){
+				playerMoney[turn] -= 100;
+				updateMoney();
+			}
+		break;
+		case 5:
+			//code this in!
+			//get out of suspension free!
+		break;
+		case 6:
+			//back 3
+			if (turn == player_element){
+				playerPos[turn] -= 3;
+				updatePosition();
+			}
+		break;
+		case 7:
+			//suspended!
+			if (turn == player_element){
+				playerPos[turn] = 30; //suspension needs worked on!
+				updatePosition();
+			}
+		break;
+		case 8:
+			//+100
+			if (turn == player_element){
+				playerMoney[turn] += 100;
+				
+				updateMoney();
+			}
+		break;
+		case 9:
+			//-15
+			if (turn == player_element){
+				playerMoney[turn] -= 15;
+				
+				updateMoney();
+			}
+		break;
+		case 10:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 11:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 12:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 13:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 14:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 15:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 16:
+			console.log("Advance to the Campfire (Collect $200) ");
+		break;
+		case 0:
+		str = "---";
+		console.log("defaulting");
+		switched = false;
+		break;
+		
+	}
+	
+	console.log(str);
+	
+	
+}//end chance
+
+function chanceEventMessage(i){
+	switch(i){
+		case 1:
+			str = "Advance to the Campfire";
+			document.querySelector('#tempChance').setAttribute('src','#chance1');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 2:
+			str = "Go play Holograms against humanity. - If you pass Campfire, collect 200 " ;
+			document.querySelector('#tempChance').setAttribute('src','#chance2');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 3:
+			str = "Go watch videos in 360 Theater - If you pass Campfire, collect 200 " ;	
+			document.querySelector('#tempChance').setAttribute('src','#chance3');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 4:
+			str = "You called parentheses brackets on the AltspaceVR slack channel, lose 100 " ;
+			document.querySelector('#tempChance').setAttribute('src','#chance4');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 5:
+			str = "Get out of suspension free!";
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 6:
+			str = "Your Altspace client has bugged! Go back 3 spaces.";
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 7:
+			str = "You said you were 11 years old in the campfire. Go to suspension.";	
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 8:
+			str = "You won the dance competition. Collect 100.";
+			document.querySelector('#tempChance').setAttribute('src','#chanceTempImg');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 9:
+			str = "Pay marshmallow tax of 15";
+			document.querySelector('#tempChance').setAttribute('src','#chance9');
+			document.querySelector('#tempChance').emit('cDraw');
+			break;
+		case 10:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 11:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 12:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 13:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 14:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 15:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 16:
+			console.log("Advance to the Campfire (Collect $200) ");
+			break;
+		case 0:
+			str = "---";
+			document.querySelector('#tempChance').setAttribute('position', '-4.7 0.01 4.7');
+			document.querySelector('#tempChance').setAttribute('position', '90 0 45');
+			break;
+	}
+	return str;
+}
+/**
+	THIS IS POSSIBLY UNNEEDED - USE ONE PROPERTY CARD IN MIDDLE OF BOARD ??
+	WILL STILL NEED TO PLACE
+*/
+function setPropertyCardPos(tileNo){
+	/**
+		WILL KEEP THIS AND REMOVE THE OTHER STUFF - KEEPS CODE CLEAN
+	*/
+	var hpLocal = 0;
+	
+	propertyCards[tileNo].addEventListener('cursordown', function(){
+		//set house price based on position
+		if (tileNo < 10){
+			hpLocal = 50;
+		}else if (tileNo > 10 && tileNo <20){
+			hpLocal = 100;
+		}else if (tileNo > 20 && tileNo < 30){
+			hpLocal = 150;
+		}else if (tileNo > 30){
+			hpLocal = 200;
+		}
+		
+		console.log("Clicked " + tileNo + " with HousePrice of " + hpLocal);
+		//console.log(propertyCards[tileNo].position.x);
+		selectedTileNo = tileNo;
+		
+		selectProperty(tileNo, hpLocal)
+		document.querySelector('#card').setAttribute('src','#card'+tileNo);
+		
+		if (players[propertyOwned[tileNo]] == undefined){
+			document.querySelector('#ownText').setAttribute('n-text','text: This tile is unowned');
+		}else{
+			document.querySelector('#ownText').setAttribute('n-text','text: ' + players[propertyOwned[tileNo]] + ' owns this tile.');
+		}
+		
+		
+	});
+	switch (tileNo){
+	case 1:
+		propertyCards[tileNo].position.set(-8.7, 0, 6.45);
+	break;
+	case 3:
+		propertyCards[tileNo].position.set(-8.7, 0, 3.275); 
+	break;
+	case 5:
+		propertyCards[tileNo].position.set(-8.7, 0, 0);	
+	break;
+	case 6:
+		propertyCards[tileNo].position.set(-8.7, 0, -1.575); 
+	break;
+	case 8:
+		propertyCards[tileNo].position.set(-8.7, 0, -4.85); 
+	break;
+	case 9:
+		propertyCards[tileNo].position.set(-8.7, 0, -6.475); 
+	break;
+	case 11:
+		propertyCards[tileNo].position.set(-6.5, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 13:
+		propertyCards[tileNo].position.set(-3.31, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 14:
+		propertyCards[tileNo].position.set(-1.65, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 15:
+		propertyCards[tileNo].position.set(-0.025, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 16:
+		propertyCards[tileNo].position.set(1.6, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 18:
+		propertyCards[tileNo].position.set(4.85, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 19:
+		propertyCards[tileNo].position.set(6.5, 0, -8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 21:
+		propertyCards[tileNo].position.set(8.7, 0, -6.475); 
+	break;
+	case 23:
+		propertyCards[tileNo].position.set(8.7, 0, -3.25); 
+	break;
+	case 24:
+		propertyCards[tileNo].position.set(8.7, 0, -1.625); 
+	break;
+	case 25:
+		propertyCards[tileNo].position.set(8.7, 0, 0); 
+	break;
+	case 26:
+		propertyCards[tileNo].position.set(8.7, 0, 1.635); 
+	break;
+	case 27:
+		propertyCards[tileNo].position.set(8.7, 0, 3.275); 
+	break;
+	case 29:
+		propertyCards[tileNo].position.set(8.7, 0, 6.5); 
+	break;
+	case 31:
+		propertyCards[tileNo].position.set(6.475, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 32:
+		propertyCards[tileNo].position.set(4.85, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 34:
+		propertyCards[tileNo].position.set(1.6, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 35:
+		propertyCards[tileNo].position.set(-0.05, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 37:
+		propertyCards[tileNo].position.set(-3.3, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	case 39:
+		propertyCards[tileNo].position.set(-6.5, 0, 8.65);
+		propertyCards[tileNo].rotation.set(0, Math.PI/2, 0);
+	break;
+	
+	}//end switch
+}//end function
+function selectProperty(tileNo, hp){
+	housePrice = hp;
+	//resets box positions (avoids bugs)
+	buyHouseBox.position.set(0,-2,0);
+	sellHouseBox.position.set(0,-2,0);
+	
+	//check if its the players turn
+	if(playerTurn == player_element){
+		
+		//check if player owns property
+		
+		if (propertyOwned[tileNo] == player_element){
+		//set buy/sell box positions
+		//buy/sell house option
+		//only places button if more houses can be bought 
+			//console.log("Houses owned : " + housesOwned[tileNo]);
+			var allLots = setAllLots(tileNo);
+			//set buy/sell box positions
+			//issue here...
+			if (housesOwned[tileNo] < 5 && allLots){
+				//buyHouseBox.position.set(0, 0, 0);
+				buyHouseBox.position.set(0, 1, -15);
+			} else {
+				buyHouseBox.position.set(0, -2, 0);
+			}//end if
+			
+			if (housesOwned[tileNo] > 0){
+				sellHouseBox.position.set(2, 1, -15);
+			} else {
+				sellHouseBox.position.set(0, -2, 0);
+			}
+				
+		}
+	
+	}
+}//END SELECT PROPERTY
+function nextTurn(){
+	resetChanceCards();
+	playerTurn ++; //next players turn once rolled (will be changed)
+	if (playerTurn >= players.length){
+		playerTurn = 0;
+	}
+	temp = false;
+	updateTurn();
+}
+
+/**
+	FUNCTION USED TO RESET GAME
+	ONLY SYNCED STUFF GOES IN HERE
+	OTHER STUFF GOES UP IN THE TICKER!
+*/
+function reset(){
+	players = []; //reset players
+	playerTurn = 0;
+	diceRoll = 0;
+	cardDraw = 0;
+	playerPos = [];
+	gameStart = false;
+	playerMoney = [];
+	propertyOwned = [];
+	housesOwned = [];
+	
+	//only synced data can go here
+	
+	updateFirebase(); //update firebase
+	
+	console.log("Game reset!");
+}
+
+function resetChanceCards(){
+	switched = false;//refactor plz
+	cardDraw = 0;
+	updateCardDraw();
+	document.querySelector('#eventLog').setAttribute('n-text','width:100; text: ' + chanceEventMessage(cardDraw));
+}
+ 
+//------- box stuff -----------------
+ 
+//sim.scene.add(rollDiceBox);
+joinBox.addEventListener('cursordown', function(){
+	//console.log("join click | " + joined);
+	if (!joined && !gameStart){
+		
+		//players already being read every second
+		//add to database
+		console.log("Players currently in game :" + players);
+		
+		//issue here ??? idk what issue???
+		if (players == null){
+			players = []; //sets up array again
+			players[0] = displayname;
+			player_element = 0;
+		} else {
+			players[players.length] = displayname;
+			player_element = players.length-1;
+		}
+		
+		startBox.position.set(0,2,1);
+		joinBox.position.set(0, -1, 0);
+		
+		joined = true;
+		console.log(displayname + " joined at element " + player_element);
+		updatePlayers();
+	}
+	
+});
+resetBox.addEventListener('cursordown', function(){
+	
+	if (moderator){
+		reset();
+	}else{
+		console.log("You do not have privelages to reset space.");
+	}
+});
+endTurnBox.addEventListener('cursordown', function(){
+	console.log("End Turn");
+	
+	buyHouseBox.position.set(0, -2, 0);
+	sellHouseBox.position.set(0, -2, 0);
+	buyPropertyBox.position.set(0, -2, 0);
+	
+	resetChanceCards();
+	
+	nextTurn();
+	
+	endTurnBox.position.set(0, -1, 0);
+});
+buyPropertyBox.addEventListener('cursordown', function(){
+	console.log("Tile Bought!");
+	//console.log("a: " + playerPos[player_element]);
+	console.log("Price:" + tPrice);
+	propertyOwned[playerPos[player_element]] = player_element;
+	playerMoney[player_element] -= tPrice; 
+	buyPropertyBox.position.set(0, -2, 0); //positioning error with buyPropertyBox
+		
+	updateMoney();
+	updateProperties();
+	bought = true;
+});
+buyHouseBox.addEventListener('cursordown', function(){
+	
+	//make sure player has enough money
+	if (playerMoney[player_element] >= housePrice){
+		console.log("House Bought!");
+		housesOwned[selectedTileNo] ++;
+		playerMoney[player_element] -= housePrice;
+	
+		//sim.scene.add(houseModel);
+		//sim.scene.add(houseModel);
+		//sets sell box
+		//sellHouseBox.position.set(SHB_X, 0, SHB_Z); //dont need a check as house will already have been bought
+	
+		if (housesOwned[selectedTileNo] > 4){
+			buyHouseBox.position.set(0, -2, 0);
+		}
+		
+		sellHouseBox.position.set(2, 1, -15);
+		
+	
+		//check bankruptcy
+	
+		updateHouses();
+		updateMoney();
+		//box can only be clicked 4 times, will disappear after fifth,
+		//so no check needs to be done here
+	}
+});
+sellHouseBox.addEventListener('cursordown', function(){
+	console.log("House Sold!");
+	housesOwned[selectedTileNo] --;
+	playerMoney[player_element] += housePrice;
+	
+	//set buy box position
+	//buyHouseBox.position.set(BHB_X, 0, BHB_Z);
+	
+	buyHouseBox.position.set(0, 1, -15);
+	
+	if (housesOwned[selectedTileNo] < 1){
+		sellHouseBox.position.set(0, -2, 0);
+	
+	}
+	
+	//check bankruptcy
+	
+	updateHouses();
+	updateMoney();
+	
+});
+rollDiceBox.addEventListener('cursordown', function(){
+		
+	resetChanceCards();
+		
+	diceRoll = 0;
+	
+	console.log("");
+	console.log("Rolling Dice!!!");
+	console.log("");
+		
+	var is_double = false;
+	var dice1 = Math.floor((Math.random()*6)+1);
+	var dice2 = Math.floor( (Math.random()*6)+1);
+	console.log("Player rolled : " + dice1 + " | " + dice2);
+	diceRoll = dice1 + dice2
+	is_double = (dice1==dice2);
+	
+	
+	//testing!
+	/**
+		2 - CC
+		4 - TAX
+		7 - CHANCE
+		12 - UTILITY
+		30 - JAIL
+	*/
+	//diceRoll = 7;
+	//is_double = true;
+	
+	
+	
+	if (is_double){
+		console.log("Double rolled!");
+		playerTurn = player_element-1;
+		nextTurn();
+	}
+	else
+	{
+		rollDiceBox.position.set(0, -1, 0);
+		endTurnBox.position.set(0,2,-2);
+		rolled = true;
+	}
+	
+	//QUERY HERE??
+	bought = false; //makes sure player can buy again
+	
+	buyPropertyBox.position.set(0, -2, 0); //hides buy box
+	buyHouseBox.position.set(0, -2, 0); //hides buyhouse box
+	sellHouseBox.position.set(0, -2, 0);
+	
+	//used for testing
+	//diceRoll = 7;
+	
+	//readFirebasePos();
+	playerPos[playerTurn] += diceRoll;
+	updateDiceRoll();
+	//console.log(playerPos[playerTurn]);
+	console.log("Player moves to position : " + playerPos);
+	//document.querySelector('#dice').setAttribute('n-text','text: You have moved to ' + playerPos);
+	
+	//setPositions(playerTurn); //works kinda?
+	
+	
+	//when first player takes his turn box doesnt move, but when the next player (and the next and so on) click the button, they see the synced positions
+	updatePosition();
+	
+	temp_money = false; //resets, so money can be dropped if a roll again is needed
+	chanceBool = false;
+	taxBool = false;
+	
+});
+startBox.addEventListener('cursordown', function(){
+	console.log("Game start!");
+	
+	//loop through all players in game
+	playerPos=[];
+	playerMoney=[];
+	propertyOwned = [];
+	housesOwned = [];
+	for (var i = 0; i < players.length; i++){
+		console.log("Setting up players ("+i+")");
+		playerPos[i] = 0;
+		playerMoney[i] = 1500;
+		
+	}
+	
+	for (var i=0; i<40; i++){
+		propertyOwned[i] = 10; //10 being who owns property (there is no player 10, variable used as a placeholder for noone)
+		housesOwned[i] = 0; //every tile starts with 0 houses
+		//console.log(housesOwned);
+	}
+	
+	
+	playerTurn = 0;
+	gameStart = true;
+	updateFirebase();
+	
+	//spawn player icons
+	//tell player one to roll
+	
+	
+	
+});
+</script>
+</html>
